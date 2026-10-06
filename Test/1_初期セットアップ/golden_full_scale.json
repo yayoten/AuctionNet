@@ -1,0 +1,36 @@
+{
+  "_provenance": "修正後の github/ で `cd github && python main_test.py`（本家設定: PVNUM=500000, 48 agents, 2 episodes, player 0/1。学習済みモデルが無いので PID にフォールバック）を 2026-10-06 に実行した出力。macOS arm64 / Python 3.9.6 / numpy 1.24.2 / torch 1.12.0 / scipy 1.11.1 / pandas 2.0.3。他の環境・バージョンでは、乱数や浮動小数の違いでずれうる。修正前（クローン直後・gin だけ迂回）の値は rank_score=0.000863, reward=[31, 50]。CV の乱数シード分離と PID の reset 修正で変わった。",
+  "platform": "Darwin-arm64",
+  "python": "3.9",
+  "rank_score": 0.0018949148924765759,
+  "analysis_info": {
+    "category": [
+      0,
+      0
+    ],
+    "reward": [
+      46,
+      50
+    ],
+    "win_pv_ratio": [
+      0.056,
+      0.087
+    ],
+    "budget_consumer_ratio": [
+      0.992,
+      0.988
+    ],
+    "second_price_ratio": [
+      0.857,
+      0.869
+    ],
+    "last_compete_tick_index": [
+      41,
+      47
+    ],
+    "cpa_exceedance_Rate": [
+      0.252,
+      1.46
+    ]
+  }
+}
