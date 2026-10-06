@@ -14,3 +14,9 @@ __pycache__/
 # 検証用の Python 仮想環境（Test/1_初期セットアップ/setup_env.sh で作る）
 .venv/
 .pytest_cache/
+
+# DB: 索引（runs/ から作り直せる）と、重い生データ
+DB/auctionnet.duckdb
+DB/auctionnet.duckdb.wal
+DB/runs/*/raw/
+DB/runs/*.tmp/

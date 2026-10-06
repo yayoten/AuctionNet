@@ -2,13 +2,14 @@
 
 フォルダ名の規則（research/README.md「4. IDの付け方」「5. ディレクトリ構成」）：
   問い    {Q001|Q001-A|Q001-A1|Q001-A1a}_{題}/   （同名の md を置く：{ID}.md）
+  作業    W001_{題}/                              （問いが立つ前のまとまり。Q と同じ粒度で、問いと同じ扱い）
   REP     REP001_{題}/                            （REP001.md, REP001.tex, REP001.pdf）
 mdの冒頭に `---` で囲んだ `key: value` があれば読む（任意）。使うキーは type / status / summary。
 """
 import re
 from pathlib import Path
 
-QUESTION_RE = re.compile(r"^(Q\d{3}(?:-[A-Z](?:\d+(?:[a-z]\d*)*)?)?)_(.+)$")
+QUESTION_RE = re.compile(r"^(Q\d{3}(?:-[A-Z](?:\d+(?:[a-z]\d*)*)?)?|W\d{3})_(.+)$")  # W001: 問いが立つ前の「作業」。Q と同じ粒度
 REP_RE = re.compile(r"^(REP\d{3})_(.+)$")
 
 RESEARCH_ROOT = Path(__file__).resolve().parent.parent

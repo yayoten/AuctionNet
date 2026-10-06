@@ -1,0 +1,152 @@
+"""DB/columns.json（列の辞書）を作る。列の意味・単位・「なぜ取るか」を、ここに書く。
+
+列を足したら、ここに書いてから `python DB/make_columns.py` で columns.json を作り直し、`python DB/build_db.py` で DB に反映する。
+build_db.py は、columns.json に無い列、または実データに無い列があると警告する。
+"""
+import json
+from pathlib import Path
+
+H = Path(__file__).resolve().parent
+
+
+def c(meaning, why, unit=""):
+    return {"meaning": meaning, "why": why, "unit": unit}
+
+
+COLUMNS = {
+    "runs": {
+        "description": "1実行 = 1つの設定 × プレイヤーを置く広告主1人。主キー run_id。params と結果はすべて run_id で結ぶ。",
+        "columns": {
+            "run_id": c("実行の ID。`R{設定とコードの版のハッシュ}-p{プレイヤー位置}`。同じ設定を同じコードで流すと同じ値になる",
+                        "どのパラメータでどの結果が出たかを、run_id 1本で結ぶため"),
+            "spec_name": c("spec.json の name（人が付けた名前）", "人が読むときの目印"),
+            "work": c("作業ID（例 W001）", "どの作業の実験かを逆引きするため"),
+            "rep": c("REP の ID（例 REP001）", "どの検証・探索の実験かを逆引きするため"),
+            "note": c("spec.json の note", "実験意図の自由記述"),
+            "sweep_point": c("sweep で振ったパラメータ名と値（JSON）", "パラメータ掃引の結果を、振った値で集計するため"),
+            "player_index": c("プレイヤー戦略を置いた広告主の番号（0..47）。広告主ごとに予算・CPA・カテゴリが違う",
+                              "位置による有利不利（予算規模、CPA制約の厳しさ）を切り分けるため"),
+            "strategy": c("プレイヤー戦略（PID / ABid / OnlineLP）", "手法ごとの比較の軸"),
+            "created_at": c("実行日時（ローカル時刻）", "時系列の把握"),
+            "head_commit": c("実行時の git HEAD のコミットID", "あとから同じコードを取り出して再現するため"),
+            "github_tree": c("実行時の github/ ディレクトリの tree ハッシュ", "シミュレータ本体のコードの版。変わったときだけ変わる"),
+            "github_dirty": c("github/ に未コミットの変更があったか", "true の run は、コミットから再現できない。結果の扱いに注意するため"),
+            "github_version": c("github_tree（＋未コミット差分のハッシュ）。run_id の元になる", "コードの版が違う結果を取り違えないため"),
+            "repo_dirty_paths": c("実行時に未コミットだったパス（JSON、最大30件）", "再現できない変更の把握"),
+            "host": c("実行した端末名", "端末差（浮動小数・乱数の実装差）の切り分け"),
+            "os": c("OS", "同上"),
+            "cpu_count": c("論理CPU数", "所要時間の解釈（並列実行数との関係）"),
+            "status": c("ok / error", "失敗した run も記録して、欠測の理由を残すため"),
+            "error": c("status=error のときの例外", "失敗の原因"),
+            "traceback": c("status=error のときのトレースバック", "失敗の原因"),
+            "python": c("Python のバージョン", "再現条件"),
+            "numpy": c("numpy のバージョン", "再現条件（乱数列の実装差）"),
+            "torch": c("torch のバージョン", "再現条件"),
+            "pandas": c("pandas のバージョン", "再現条件"),
+            "score": c("論文・コンペ式のスコア。エピソード報酬×CPAペナルティを全エピソードで足し、20000 で割った値",
+                       "論文・コンペの評価指標そのもの。他の論文結果との比較に使う"),
+            "reward_total": c("全エピソードの獲得価値（コンバージョン数）の合計", "ペナルティ前の生の成果。ペナルティの効きを見るため"),
+            "sim_seconds": c("シミュレーション全体の所要時間", "実験規模の見積り（1回の評価にかかる時間）", "秒"),
+            "wall_seconds": c("run 全体の所要時間（環境構築・集計・書き出しを含む）", "同上", "秒"),
+            "peak_rss_mb": c("プロセスの最大メモリ（RSS）", "並列数を決める・規模を上げられるかの見積り", "MB"),
+            "bidding_seconds_total": c("プレイヤーの bidding() の所要時間の合計", "「1回の思考にかかる時間」。手法の計算コストの比較", "秒"),
+            "bidding_seconds_per_call_mean": c("bidding() 1回あたりの平均所要時間", "同上。コンペの制限時間（2秒）との比較", "秒"),
+            "n_episodes": c("評価したエピソード数", "score の解釈（エピソード数で和をとる）"),
+            "n_ticks": c("1エピソードのティック数", "同上"),
+            "params_spec": c("spec.json（展開後。人が書いた『変えた値』）をそのまま JSON で", "人が意図した条件の原本"),
+            "params_effective": c("実際に使われた値（コード側の既定値を補ったもの）を JSON で", "既定値に頼った値も含めて、どの設定の結果かを完全に特定するため"),
+            "spec_file": c("展開前の spec.json のパス", "原本のファイルへの逆引き"),
+        },
+    },
+    "episodes": {
+        "description": "1実行 × エピソード。プレイヤーのエピソード全体の成績。主キー (run_id, episode)。",
+        "columns": {
+            "run_id": c("runs.run_id", "結合キー"),
+            "episode": c("エピソード番号。広告機会の生成と環境ノイズの乱数シードになる", "同じ番号なら同じ広告機会列。手法間の比較は同じ episode で行う"),
+            "category": c("プレイヤーの広告主のカテゴリ（0..5）", "カテゴリごとに価値の水準・競合が違うため"),
+            "cpa_constraint": c("CPA 制約（1コンバージョンに使ってよい費用の上限）", "ペナルティの判定。位置ごとに 60..130 と違う"),
+            "budget": c("予算", "予算消化率の分母。位置ごとに 2000..4850 と違う"),
+            "reward": c("獲得価値（コンバージョン数の合計）", "最大化したい成果"),
+            "all_cost": c("支払い合計", "予算消化・CPAの計算"),
+            "real_cpa": c("実績 CPA = all_cost / reward", "CPA 制約との比較（超過するとペナルティ）"),
+            "penalty": c("CPA 超過ペナルティ係数（超過なしは 1。超過すると (制約CPA/実績CPA)^beta）", "reward の何割がペナルティで失われたかを見るため"),
+            "score_component": c("penalty × reward（20000 で割る前のスコア）", "エピソード単位のスコア"),
+            "score_rank": c("48人の広告主の score_component の中でのプレイヤーの順位（1が最良）", "背景の広告主に対して強いか弱いかの絶対的な目安"),
+            "n_agents": c("エピソードの広告主数", "順位の分母"),
+            "all_compete_pv": c("競争に参加した広告機会の総数", "規模の把握"),
+            "all_win_pv": c("露出まで到達した広告機会の数", "勝てた量"),
+            "win_pv_ratio": c("露出数 / 競争数", "入札の積極性の目安"),
+            "budget_consumer_ratio": c("予算消化率 = all_cost / budget", "予算を使い切れているか（使い切れていないなら入札が弱すぎる）"),
+            "second_price_ratio": c("支払い / 勝った入札額の合計", "第2価格オークションなので、入札を上げても支払いがどれだけ増えるかの目安"),
+            "cpa_exceedance_rate": c("(実績CPA − CPA制約) / CPA制約。正なら超過", "どれだけ制約を破ったか"),
+            "last_compete_tick_index": c("最後に露出に至ったティック番号", "予算が尽きた時刻の目安（47 なら最後まで残った）"),
+            "bid_mean": c("入札額の平均", "入札の水準"),
+            "others_score_mean": c("プレイヤー以外の47人の score_component の平均", "背景の広告主の成績。プレイヤーの変更が他者に与える影響や、環境の難しさの目安"),
+        },
+    },
+    "ticks": {
+        "description": "1実行 × エピソード × ティック（48区間）。プレイヤー視点の時系列。主キー (run_id, episode, tick)。",
+        "columns": {
+            "run_id": c("runs.run_id", "結合キー"),
+            "episode": c("エピソード番号", "結合キー"),
+            "tick": c("ティック番号（0..47）。1エピソードを48区間に分けた時刻", "時間方向の挙動（予算ペース配分、競合の変化）を見るため"),
+            "num_pv": c("そのティックの広告機会の数（トラフィック量）", "ティックの重み。トラフィックが多い時間帯に予算をどう配分したかの解釈に必要"),
+            "pvalue_mean": c("プレイヤーにとっての pValue（コンバージョン確率の予測）の平均", "広告機会の価値の水準。入札額 = alpha × pValue"),
+            "pvalue_std": c("同・標準偏差", "価値のばらつき。ばらつきが大きいほど、選別入札の余地が大きい"),
+            "pvalue_sigma_mean": c("pValue の不確実性（sigma）の平均", "予測の不確実性が成績に効くかを後で検討するため"),
+            "bid_mean": c("プレイヤーの入札額の平均", "入札の水準"),
+            "bid_nonzero_ratio": c("入札額が正の広告機会の割合", "予算切れ・入札停止の検出"),
+            "alpha_eff": c("実効入札係数 = 入札額の和 / pValue の和", "エージェントが決めるのは alpha だけ（論文の整理）なので、手法の違いは alpha の時系列に現れる。手法の挙動を見る主指標"),
+            "alpha_rank": c("48人の alpha_eff の中でのプレイヤーの順位（1が最大）", "他者に対して強気か弱気か。勝てない原因が alpha の低さかを切り分ける"),
+            "alpha_others_mean": c("他の47人の alpha_eff の平均", "競合の入札水準。プレイヤーの alpha との差が勝敗を決める"),
+            "alpha_others_median": c("他の47人の alpha_eff の中央値", "外れ値（極端な alpha の競合）に引きずられない競合水準"),
+            "n_won": c("落札した広告機会の数（スロット1〜3）", "勝てた量（露出の抽選前）"),
+            "n_slot1": c("スロット1で落札した数", "露出率が高い（1.0）スロットをどれだけ取れたか"),
+            "n_slot2": c("スロット2で落札した数", "露出率 0.8"),
+            "n_slot3": c("スロット3で落札した数", "露出率 0.6"),
+            "n_exposed": c("実際に露出した数（抽選後）", "コスト・価値が発生する単位"),
+            "reward": c("そのティックの獲得価値", "成果の時間推移"),
+            "cost": c("そのティックの支払い", "予算ペース配分の時間推移"),
+            "remaining_budget_before": c("そのティックの入札前の残り予算", "予算の残り方（早く尽きるか、余るか）"),
+            "lwc_mean": c("最下位スロット（3位）の最低落札価格の平均（least winning cost）", "市場価格の水準。競争の激しさの目安"),
+            "total_cost_all": c("全広告主の支払い合計", "市場全体の消化量。他者がどの時刻に予算を使うか"),
+            "n_active_agents": c("そのティックで予算が残っている広告主の数（最大48）", "時間とともに競合が脱落していく様子。競合の減少は alpha を下げるべき根拠になりうる"),
+            "bidding_seconds": c("プレイヤーの bidding() の所要時間", "1回の思考にかかる時間", "秒"),
+            "tick_wall_seconds": c("そのティックのシミュレーション全体の所要時間", "規模の見積り", "秒"),
+            "rss_mb": c("そのティックでのメモリ使用量", "規模を上げられるかの見積り", "MB"),
+        },
+    },
+    "agents": {
+        "description": "1実行 × エピソード × 広告主（48人）。背景の広告主を含む全員の成績。主キー (run_id, episode, agent_index)。",
+        "columns": {
+            "run_id": c("runs.run_id", "結合キー"),
+            "episode": c("エピソード番号", "結合キー"),
+            "agent_index": c("広告主の番号（0..47）", "結合キー"),
+            "agent_name": c("戦略名＋番号（背景の学習済み戦略 IQL/TD3_BC/CQL/BC/BCQ/MOPO/COMBO、OnlineLP、PID）", "背景の広告主の種類ごとの成績を比べるため"),
+            "category": c("カテゴリ（0..5）", "カテゴリ単位の集計"),
+            "budget": c("予算", "予算規模での比較"),
+            "cpa_constraint": c("CPA 制約", "制約の厳しさでの比較"),
+            "reward": c("獲得価値", "成果"),
+            "cost": c("支払い合計", "予算消化"),
+            "final_remaining_budget": c("エピソード終了時の残り予算", "使い切れたか"),
+            "real_cpa": c("実績 CPA", "制約との比較"),
+            "penalty": c("CPA 超過ペナルティ係数", "同上"),
+            "score_component": c("penalty × reward", "スコア"),
+            "score_rank": c("48人の中での順位（1が最良）", "プレイヤーの相対位置"),
+            "is_player": c("プレイヤー戦略を置いた広告主か", "プレイヤーと背景の区別"),
+        },
+    },
+    "params_long": {
+        "description": "runs.params_effective を縦に展開したもの（build_db.py が作る）。パラメータ値で run を絞る・結合するときに使う。",
+        "columns": {
+            "run_id": c("runs.run_id", "結合キー"),
+            "key": c("パラメータ名（例 player.kwargs.base_action, env.Controller.pv_num）", "どのパラメータか"),
+            "value_json": c("値（JSON 文字列）", "任意の型の値を保持"),
+            "value_num": c("値が数値ならその値。そうでなければ NULL", "数値パラメータでの集計・並べ替え"),
+        },
+    },
+}
+
+if __name__ == "__main__":
+    (H / "columns.json").write_text(json.dumps(COLUMNS, ensure_ascii=False, indent=1), encoding="utf-8")
+    print("wrote", H / "columns.json")

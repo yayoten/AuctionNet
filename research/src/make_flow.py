@@ -22,7 +22,7 @@ def safe(node_id):
 
 
 def label(node):
-    kind = "問い" if node.kind == "question" else node.meta.get("type", "REP")
+    kind = ("作業" if node.id.startswith("W") else "問い") if node.kind == "question" else node.meta.get("type", "REP")
     status = node.meta.get("status", "")
     text = f"{node.id} {node.title}"
     return text, kind, status

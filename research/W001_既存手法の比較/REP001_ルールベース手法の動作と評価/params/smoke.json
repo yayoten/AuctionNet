@@ -1,0 +1,9 @@
+{
+  "name": "smoke_pid_small",
+  "work": "W001", "rep": "REP001",
+  "note": "動作確認。小さい規模(PVNUM=20000)",
+  "player": {"strategy": "PID", "kwargs": {}},
+  "player_indices": [0],
+  "episodes": [0],
+  "gin": {"PVNUM": 20000}
+}

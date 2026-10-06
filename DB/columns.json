@@ -1,0 +1,542 @@
+{
+ "runs": {
+  "description": "1実行 = 1つの設定 × プレイヤーを置く広告主1人。主キー run_id。params と結果はすべて run_id で結ぶ。",
+  "columns": {
+   "run_id": {
+    "meaning": "実行の ID。`R{設定とコードの版のハッシュ}-p{プレイヤー位置}`。同じ設定を同じコードで流すと同じ値になる",
+    "why": "どのパラメータでどの結果が出たかを、run_id 1本で結ぶため",
+    "unit": ""
+   },
+   "spec_name": {
+    "meaning": "spec.json の name（人が付けた名前）",
+    "why": "人が読むときの目印",
+    "unit": ""
+   },
+   "work": {
+    "meaning": "作業ID（例 W001）",
+    "why": "どの作業の実験かを逆引きするため",
+    "unit": ""
+   },
+   "rep": {
+    "meaning": "REP の ID（例 REP001）",
+    "why": "どの検証・探索の実験かを逆引きするため",
+    "unit": ""
+   },
+   "note": {
+    "meaning": "spec.json の note",
+    "why": "実験意図の自由記述",
+    "unit": ""
+   },
+   "sweep_point": {
+    "meaning": "sweep で振ったパラメータ名と値（JSON）",
+    "why": "パラメータ掃引の結果を、振った値で集計するため",
+    "unit": ""
+   },
+   "player_index": {
+    "meaning": "プレイヤー戦略を置いた広告主の番号（0..47）。広告主ごとに予算・CPA・カテゴリが違う",
+    "why": "位置による有利不利（予算規模、CPA制約の厳しさ）を切り分けるため",
+    "unit": ""
+   },
+   "strategy": {
+    "meaning": "プレイヤー戦略（PID / ABid / OnlineLP）",
+    "why": "手法ごとの比較の軸",
+    "unit": ""
+   },
+   "created_at": {
+    "meaning": "実行日時（ローカル時刻）",
+    "why": "時系列の把握",
+    "unit": ""
+   },
+   "head_commit": {
+    "meaning": "実行時の git HEAD のコミットID",
+    "why": "あとから同じコードを取り出して再現するため",
+    "unit": ""
+   },
+   "github_tree": {
+    "meaning": "実行時の github/ ディレクトリの tree ハッシュ",
+    "why": "シミュレータ本体のコードの版。変わったときだけ変わる",
+    "unit": ""
+   },
+   "github_dirty": {
+    "meaning": "github/ に未コミットの変更があったか",
+    "why": "true の run は、コミットから再現できない。結果の扱いに注意するため",
+    "unit": ""
+   },
+   "github_version": {
+    "meaning": "github_tree（＋未コミット差分のハッシュ）。run_id の元になる",
+    "why": "コードの版が違う結果を取り違えないため",
+    "unit": ""
+   },
+   "repo_dirty_paths": {
+    "meaning": "実行時に未コミットだったパス（JSON、最大30件）",
+    "why": "再現できない変更の把握",
+    "unit": ""
+   },
+   "host": {
+    "meaning": "実行した端末名",
+    "why": "端末差（浮動小数・乱数の実装差）の切り分け",
+    "unit": ""
+   },
+   "os": {
+    "meaning": "OS",
+    "why": "同上",
+    "unit": ""
+   },
+   "cpu_count": {
+    "meaning": "論理CPU数",
+    "why": "所要時間の解釈（並列実行数との関係）",
+    "unit": ""
+   },
+   "status": {
+    "meaning": "ok / error",
+    "why": "失敗した run も記録して、欠測の理由を残すため",
+    "unit": ""
+   },
+   "error": {
+    "meaning": "status=error のときの例外",
+    "why": "失敗の原因",
+    "unit": ""
+   },
+   "traceback": {
+    "meaning": "status=error のときのトレースバック",
+    "why": "失敗の原因",
+    "unit": ""
+   },
+   "python": {
+    "meaning": "Python のバージョン",
+    "why": "再現条件",
+    "unit": ""
+   },
+   "numpy": {
+    "meaning": "numpy のバージョン",
+    "why": "再現条件（乱数列の実装差）",
+    "unit": ""
+   },
+   "torch": {
+    "meaning": "torch のバージョン",
+    "why": "再現条件",
+    "unit": ""
+   },
+   "pandas": {
+    "meaning": "pandas のバージョン",
+    "why": "再現条件",
+    "unit": ""
+   },
+   "score": {
+    "meaning": "論文・コンペ式のスコア。エピソード報酬×CPAペナルティを全エピソードで足し、20000 で割った値",
+    "why": "論文・コンペの評価指標そのもの。他の論文結果との比較に使う",
+    "unit": ""
+   },
+   "reward_total": {
+    "meaning": "全エピソードの獲得価値（コンバージョン数）の合計",
+    "why": "ペナルティ前の生の成果。ペナルティの効きを見るため",
+    "unit": ""
+   },
+   "sim_seconds": {
+    "meaning": "シミュレーション全体の所要時間",
+    "why": "実験規模の見積り（1回の評価にかかる時間）",
+    "unit": "秒"
+   },
+   "wall_seconds": {
+    "meaning": "run 全体の所要時間（環境構築・集計・書き出しを含む）",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "peak_rss_mb": {
+    "meaning": "プロセスの最大メモリ（RSS）",
+    "why": "並列数を決める・規模を上げられるかの見積り",
+    "unit": "MB"
+   },
+   "bidding_seconds_total": {
+    "meaning": "プレイヤーの bidding() の所要時間の合計",
+    "why": "「1回の思考にかかる時間」。手法の計算コストの比較",
+    "unit": "秒"
+   },
+   "bidding_seconds_per_call_mean": {
+    "meaning": "bidding() 1回あたりの平均所要時間",
+    "why": "同上。コンペの制限時間（2秒）との比較",
+    "unit": "秒"
+   },
+   "n_episodes": {
+    "meaning": "評価したエピソード数",
+    "why": "score の解釈（エピソード数で和をとる）",
+    "unit": ""
+   },
+   "n_ticks": {
+    "meaning": "1エピソードのティック数",
+    "why": "同上",
+    "unit": ""
+   },
+   "params_spec": {
+    "meaning": "spec.json（展開後。人が書いた『変えた値』）をそのまま JSON で",
+    "why": "人が意図した条件の原本",
+    "unit": ""
+   },
+   "params_effective": {
+    "meaning": "実際に使われた値（コード側の既定値を補ったもの）を JSON で",
+    "why": "既定値に頼った値も含めて、どの設定の結果かを完全に特定するため",
+    "unit": ""
+   },
+   "spec_file": {
+    "meaning": "展開前の spec.json のパス",
+    "why": "原本のファイルへの逆引き",
+    "unit": ""
+   }
+  }
+ },
+ "episodes": {
+  "description": "1実行 × エピソード。プレイヤーのエピソード全体の成績。主キー (run_id, episode)。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "episode": {
+    "meaning": "エピソード番号。広告機会の生成と環境ノイズの乱数シードになる",
+    "why": "同じ番号なら同じ広告機会列。手法間の比較は同じ episode で行う",
+    "unit": ""
+   },
+   "category": {
+    "meaning": "プレイヤーの広告主のカテゴリ（0..5）",
+    "why": "カテゴリごとに価値の水準・競合が違うため",
+    "unit": ""
+   },
+   "cpa_constraint": {
+    "meaning": "CPA 制約（1コンバージョンに使ってよい費用の上限）",
+    "why": "ペナルティの判定。位置ごとに 60..130 と違う",
+    "unit": ""
+   },
+   "budget": {
+    "meaning": "予算",
+    "why": "予算消化率の分母。位置ごとに 2000..4850 と違う",
+    "unit": ""
+   },
+   "reward": {
+    "meaning": "獲得価値（コンバージョン数の合計）",
+    "why": "最大化したい成果",
+    "unit": ""
+   },
+   "all_cost": {
+    "meaning": "支払い合計",
+    "why": "予算消化・CPAの計算",
+    "unit": ""
+   },
+   "real_cpa": {
+    "meaning": "実績 CPA = all_cost / reward",
+    "why": "CPA 制約との比較（超過するとペナルティ）",
+    "unit": ""
+   },
+   "penalty": {
+    "meaning": "CPA 超過ペナルティ係数（超過なしは 1。超過すると (制約CPA/実績CPA)^beta）",
+    "why": "reward の何割がペナルティで失われたかを見るため",
+    "unit": ""
+   },
+   "score_component": {
+    "meaning": "penalty × reward（20000 で割る前のスコア）",
+    "why": "エピソード単位のスコア",
+    "unit": ""
+   },
+   "score_rank": {
+    "meaning": "48人の広告主の score_component の中でのプレイヤーの順位（1が最良）",
+    "why": "背景の広告主に対して強いか弱いかの絶対的な目安",
+    "unit": ""
+   },
+   "n_agents": {
+    "meaning": "エピソードの広告主数",
+    "why": "順位の分母",
+    "unit": ""
+   },
+   "all_compete_pv": {
+    "meaning": "競争に参加した広告機会の総数",
+    "why": "規模の把握",
+    "unit": ""
+   },
+   "all_win_pv": {
+    "meaning": "露出まで到達した広告機会の数",
+    "why": "勝てた量",
+    "unit": ""
+   },
+   "win_pv_ratio": {
+    "meaning": "露出数 / 競争数",
+    "why": "入札の積極性の目安",
+    "unit": ""
+   },
+   "budget_consumer_ratio": {
+    "meaning": "予算消化率 = all_cost / budget",
+    "why": "予算を使い切れているか（使い切れていないなら入札が弱すぎる）",
+    "unit": ""
+   },
+   "second_price_ratio": {
+    "meaning": "支払い / 勝った入札額の合計",
+    "why": "第2価格オークションなので、入札を上げても支払いがどれだけ増えるかの目安",
+    "unit": ""
+   },
+   "cpa_exceedance_rate": {
+    "meaning": "(実績CPA − CPA制約) / CPA制約。正なら超過",
+    "why": "どれだけ制約を破ったか",
+    "unit": ""
+   },
+   "last_compete_tick_index": {
+    "meaning": "最後に露出に至ったティック番号",
+    "why": "予算が尽きた時刻の目安（47 なら最後まで残った）",
+    "unit": ""
+   },
+   "bid_mean": {
+    "meaning": "入札額の平均",
+    "why": "入札の水準",
+    "unit": ""
+   },
+   "others_score_mean": {
+    "meaning": "プレイヤー以外の47人の score_component の平均",
+    "why": "背景の広告主の成績。プレイヤーの変更が他者に与える影響や、環境の難しさの目安",
+    "unit": ""
+   }
+  }
+ },
+ "ticks": {
+  "description": "1実行 × エピソード × ティック（48区間）。プレイヤー視点の時系列。主キー (run_id, episode, tick)。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "episode": {
+    "meaning": "エピソード番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "tick": {
+    "meaning": "ティック番号（0..47）。1エピソードを48区間に分けた時刻",
+    "why": "時間方向の挙動（予算ペース配分、競合の変化）を見るため",
+    "unit": ""
+   },
+   "num_pv": {
+    "meaning": "そのティックの広告機会の数（トラフィック量）",
+    "why": "ティックの重み。トラフィックが多い時間帯に予算をどう配分したかの解釈に必要",
+    "unit": ""
+   },
+   "pvalue_mean": {
+    "meaning": "プレイヤーにとっての pValue（コンバージョン確率の予測）の平均",
+    "why": "広告機会の価値の水準。入札額 = alpha × pValue",
+    "unit": ""
+   },
+   "pvalue_std": {
+    "meaning": "同・標準偏差",
+    "why": "価値のばらつき。ばらつきが大きいほど、選別入札の余地が大きい",
+    "unit": ""
+   },
+   "pvalue_sigma_mean": {
+    "meaning": "pValue の不確実性（sigma）の平均",
+    "why": "予測の不確実性が成績に効くかを後で検討するため",
+    "unit": ""
+   },
+   "bid_mean": {
+    "meaning": "プレイヤーの入札額の平均",
+    "why": "入札の水準",
+    "unit": ""
+   },
+   "bid_nonzero_ratio": {
+    "meaning": "入札額が正の広告機会の割合",
+    "why": "予算切れ・入札停止の検出",
+    "unit": ""
+   },
+   "alpha_eff": {
+    "meaning": "実効入札係数 = 入札額の和 / pValue の和",
+    "why": "エージェントが決めるのは alpha だけ（論文の整理）なので、手法の違いは alpha の時系列に現れる。手法の挙動を見る主指標",
+    "unit": ""
+   },
+   "alpha_rank": {
+    "meaning": "48人の alpha_eff の中でのプレイヤーの順位（1が最大）",
+    "why": "他者に対して強気か弱気か。勝てない原因が alpha の低さかを切り分ける",
+    "unit": ""
+   },
+   "alpha_others_mean": {
+    "meaning": "他の47人の alpha_eff の平均",
+    "why": "競合の入札水準。プレイヤーの alpha との差が勝敗を決める",
+    "unit": ""
+   },
+   "alpha_others_median": {
+    "meaning": "他の47人の alpha_eff の中央値",
+    "why": "外れ値（極端な alpha の競合）に引きずられない競合水準",
+    "unit": ""
+   },
+   "n_won": {
+    "meaning": "落札した広告機会の数（スロット1〜3）",
+    "why": "勝てた量（露出の抽選前）",
+    "unit": ""
+   },
+   "n_slot1": {
+    "meaning": "スロット1で落札した数",
+    "why": "露出率が高い（1.0）スロットをどれだけ取れたか",
+    "unit": ""
+   },
+   "n_slot2": {
+    "meaning": "スロット2で落札した数",
+    "why": "露出率 0.8",
+    "unit": ""
+   },
+   "n_slot3": {
+    "meaning": "スロット3で落札した数",
+    "why": "露出率 0.6",
+    "unit": ""
+   },
+   "n_exposed": {
+    "meaning": "実際に露出した数（抽選後）",
+    "why": "コスト・価値が発生する単位",
+    "unit": ""
+   },
+   "reward": {
+    "meaning": "そのティックの獲得価値",
+    "why": "成果の時間推移",
+    "unit": ""
+   },
+   "cost": {
+    "meaning": "そのティックの支払い",
+    "why": "予算ペース配分の時間推移",
+    "unit": ""
+   },
+   "remaining_budget_before": {
+    "meaning": "そのティックの入札前の残り予算",
+    "why": "予算の残り方（早く尽きるか、余るか）",
+    "unit": ""
+   },
+   "lwc_mean": {
+    "meaning": "最下位スロット（3位）の最低落札価格の平均（least winning cost）",
+    "why": "市場価格の水準。競争の激しさの目安",
+    "unit": ""
+   },
+   "total_cost_all": {
+    "meaning": "全広告主の支払い合計",
+    "why": "市場全体の消化量。他者がどの時刻に予算を使うか",
+    "unit": ""
+   },
+   "n_active_agents": {
+    "meaning": "そのティックで予算が残っている広告主の数（最大48）",
+    "why": "時間とともに競合が脱落していく様子。競合の減少は alpha を下げるべき根拠になりうる",
+    "unit": ""
+   },
+   "bidding_seconds": {
+    "meaning": "プレイヤーの bidding() の所要時間",
+    "why": "1回の思考にかかる時間",
+    "unit": "秒"
+   },
+   "tick_wall_seconds": {
+    "meaning": "そのティックのシミュレーション全体の所要時間",
+    "why": "規模の見積り",
+    "unit": "秒"
+   },
+   "rss_mb": {
+    "meaning": "そのティックでのメモリ使用量",
+    "why": "規模を上げられるかの見積り",
+    "unit": "MB"
+   }
+  }
+ },
+ "agents": {
+  "description": "1実行 × エピソード × 広告主（48人）。背景の広告主を含む全員の成績。主キー (run_id, episode, agent_index)。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "episode": {
+    "meaning": "エピソード番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "agent_index": {
+    "meaning": "広告主の番号（0..47）",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "agent_name": {
+    "meaning": "戦略名＋番号（背景の学習済み戦略 IQL/TD3_BC/CQL/BC/BCQ/MOPO/COMBO、OnlineLP、PID）",
+    "why": "背景の広告主の種類ごとの成績を比べるため",
+    "unit": ""
+   },
+   "category": {
+    "meaning": "カテゴリ（0..5）",
+    "why": "カテゴリ単位の集計",
+    "unit": ""
+   },
+   "budget": {
+    "meaning": "予算",
+    "why": "予算規模での比較",
+    "unit": ""
+   },
+   "cpa_constraint": {
+    "meaning": "CPA 制約",
+    "why": "制約の厳しさでの比較",
+    "unit": ""
+   },
+   "reward": {
+    "meaning": "獲得価値",
+    "why": "成果",
+    "unit": ""
+   },
+   "cost": {
+    "meaning": "支払い合計",
+    "why": "予算消化",
+    "unit": ""
+   },
+   "final_remaining_budget": {
+    "meaning": "エピソード終了時の残り予算",
+    "why": "使い切れたか",
+    "unit": ""
+   },
+   "real_cpa": {
+    "meaning": "実績 CPA",
+    "why": "制約との比較",
+    "unit": ""
+   },
+   "penalty": {
+    "meaning": "CPA 超過ペナルティ係数",
+    "why": "同上",
+    "unit": ""
+   },
+   "score_component": {
+    "meaning": "penalty × reward",
+    "why": "スコア",
+    "unit": ""
+   },
+   "score_rank": {
+    "meaning": "48人の中での順位（1が最良）",
+    "why": "プレイヤーの相対位置",
+    "unit": ""
+   },
+   "is_player": {
+    "meaning": "プレイヤー戦略を置いた広告主か",
+    "why": "プレイヤーと背景の区別",
+    "unit": ""
+   }
+  }
+ },
+ "params_long": {
+  "description": "runs.params_effective を縦に展開したもの（build_db.py が作る）。パラメータ値で run を絞る・結合するときに使う。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "key": {
+    "meaning": "パラメータ名（例 player.kwargs.base_action, env.Controller.pv_num）",
+    "why": "どのパラメータか",
+    "unit": ""
+   },
+   "value_json": {
+    "meaning": "値（JSON 文字列）",
+    "why": "任意の型の値を保持",
+    "unit": ""
+   },
+   "value_num": {
+    "meaning": "値が数値ならその値。そうでなければ NULL",
+    "why": "数値パラメータでの集計・並べ替え",
+    "unit": ""
+   }
+  }
+ }
+}
