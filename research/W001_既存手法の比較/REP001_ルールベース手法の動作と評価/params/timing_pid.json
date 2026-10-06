@@ -1,0 +1,9 @@
+{
+  "name": "timing_pid_default",
+  "work": "W001", "rep": "REP001",
+  "note": "規模感の測定。PID 既定設定を実規模(PVNUM=500000)で4位置・4エピソード、4並列で流す",
+  "player": {"strategy": "PID", "kwargs": {}},
+  "player_indices": [0, 8, 16, 24],
+  "episodes": [0, 1, 2, 3],
+  "seed": 1
+}

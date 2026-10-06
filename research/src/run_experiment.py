@@ -334,6 +334,21 @@ def execute_run(task):
 
 
 # ----------------------------------------------------------------------------- 入口
+def strategy_defaults(strategy):
+    """戦略のコンストラクタの既定値（github を import して調べる。重い依存は読まない）。"""
+    _setup_imports_light()
+    import importlib
+    mod = {"PID": "pid_bidding_strategy", "ABid": "abid_bidding_strategy", "OnlineLP": "onlinelp_bidding_strategy"}[strategy]
+    cls = getattr(importlib.import_module(f"github.simul_bidding_env.strategy.{mod}"), STRATEGIES[strategy])
+    return _defaults_of(cls.__init__)
+
+
+def _setup_imports_light():
+    for p in (str(REPO), str(GITHUB / "strategy_train_env")):
+        if p not in sys.path:
+            sys.path.append(p)
+
+
 def build_tasks(spec_path, force):
     spec = json.loads(Path(spec_path).read_text(encoding="utf-8"))
     version = code_version()
@@ -343,6 +358,10 @@ def build_tasks(spec_path, force):
         resolved.setdefault("seed", 1)
         resolved.setdefault("player_indices", [0, 1])
         assert resolved["player"]["strategy"] in STRATEGIES, f"strategy は {list(STRATEGIES)} のどれか"
+        # 既定値と同じ指定は取り除く（同じ実効条件なら同じ run_id にして、既にある結果を使い回すため）
+        defaults = strategy_defaults(resolved["player"]["strategy"])
+        kw = resolved["player"].get("kwargs", {})
+        resolved["player"]["kwargs"] = {k: v for k, v in kw.items() if not (k in defaults and defaults[k] == v)}
         resolved["spec_file"] = str(Path(spec_path).as_posix())
         for idx in resolved["player_indices"]:
             rid = make_run_id(resolved, idx, version["github_version"])

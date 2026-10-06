@@ -1,0 +1,32 @@
+{
+  "work": "W001",
+  "rep": "REP001",
+  "name": "sweep_olp_table_episode",
+  "note": "E5: OnlineLP がどの日の早見表を使うか",
+  "player": {
+    "strategy": "OnlineLP",
+    "kwargs": {}
+  },
+  "sweep": {
+    "player.kwargs.episode": [
+      0,
+      3,
+      6
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed": 1
+}

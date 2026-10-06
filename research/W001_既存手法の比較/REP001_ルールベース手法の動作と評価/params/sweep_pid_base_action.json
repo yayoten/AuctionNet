@@ -1,0 +1,34 @@
+{
+  "work": "W001",
+  "rep": "REP001",
+  "name": "sweep_pid_base_action",
+  "note": "E5: PID の初期α",
+  "player": {
+    "strategy": "PID",
+    "kwargs": {}
+  },
+  "sweep": {
+    "player.kwargs.base_action": [
+      5,
+      15,
+      30,
+      60,
+      100
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed": 1
+}

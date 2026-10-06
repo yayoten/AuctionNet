@@ -1,9 +1,9 @@
 {
   "spec": {
-    "name": "smoke_pid_small",
+    "name": "repro_pid_default_p0",
     "work": "W001",
     "rep": "REP001",
-    "note": "動作確認。小さい規模(PVNUM=20000)",
+    "note": "再現性の確認。timing_pid.json の p0 と同じ設定を --force で再実行し、結果が一致するかを見る",
     "player": {
       "strategy": "PID",
       "kwargs": {}
@@ -12,14 +12,14 @@
       0
     ],
     "episodes": [
-      0
+      0,
+      1,
+      2,
+      3
     ],
-    "gin": {
-      "PVNUM": 20000
-    },
-    "sweep_point": {},
     "seed": 1,
-    "spec_file": "research/W001_既存手法の比較/REP001_ルールベース手法の動作と評価/params/smoke.json"
+    "sweep_point": {},
+    "spec_file": "research/W001_既存手法の比較/REP001_ルールベース手法の動作と評価/params/repro_pid_p0.json"
   },
   "effective": {
     "player": {
@@ -93,9 +93,9 @@
         "num_tick": 48,
         "num_agent_category": 8,
         "num_category": 6,
-        "pv_num": 20000,
+        "pv_num": 500000,
         "pv_generator_type": "neuripsPvGen",
-        "budget_ratio": 1.0
+        "budget_ratio": 1
       },
       "BiddingEnv": {
         "reserve_pv_price": 0.0001,
@@ -115,11 +115,12 @@
       }
     },
     "episodes": [
-      0
+      0,
+      1,
+      2,
+      3
     ],
     "seed": 1,
-    "gin_bindings": [
-      "PVNUM = 20000"
-    ]
+    "gin_bindings": []
   }
 }

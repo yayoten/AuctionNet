@@ -1,0 +1,34 @@
+{
+  "work": "W001",
+  "rep": "REP001",
+  "name": "sweep_abid_bid_scale",
+  "note": "E5: ABid の入札の倍率",
+  "player": {
+    "strategy": "ABid",
+    "kwargs": {}
+  },
+  "sweep": {
+    "player.kwargs.bid_scale": [
+      0.25,
+      0.5,
+      1,
+      2,
+      4
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed": 1
+}

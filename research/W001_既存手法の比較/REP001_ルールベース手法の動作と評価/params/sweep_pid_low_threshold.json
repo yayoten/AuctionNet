@@ -1,0 +1,32 @@
+{
+  "work": "W001",
+  "rep": "REP001",
+  "name": "sweep_pid_low_threshold",
+  "note": "E5: PID の『使わなすぎ』判定の閾値",
+  "player": {
+    "strategy": "PID",
+    "kwargs": {}
+  },
+  "sweep": {
+    "player.kwargs.low_threshold": [
+      0.5,
+      0.7,
+      0.9
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed": 1
+}

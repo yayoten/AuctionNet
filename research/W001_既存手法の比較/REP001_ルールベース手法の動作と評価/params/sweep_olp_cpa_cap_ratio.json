@@ -1,0 +1,33 @@
+{
+  "work": "W001",
+  "rep": "REP001",
+  "name": "sweep_olp_cpa_cap_ratio",
+  "note": "E5: OnlineLP の α の上限（CPA の何倍か）",
+  "player": {
+    "strategy": "OnlineLP",
+    "kwargs": {}
+  },
+  "sweep": {
+    "player.kwargs.cpa_cap_ratio": [
+      1.0,
+      1.5,
+      2.0,
+      3.0
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed": 1
+}

@@ -1,0 +1,9 @@
+{
+  "name": "repro_pid_default_p0",
+  "work": "W001", "rep": "REP001",
+  "note": "再現性の確認。timing_pid.json の p0 と同じ設定を --force で再実行し、結果が一致するかを見る",
+  "player": {"strategy": "PID", "kwargs": {"base_action": 15}},
+  "player_indices": [0],
+  "episodes": [0, 1, 2, 3],
+  "seed": 1
+}
