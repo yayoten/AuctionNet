@@ -3,7 +3,7 @@
 #   bash programs/run_all.sh [workers]
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$HERE/../../.." && pwd)"
+ROOT="$(cd "$HERE/../../../.." && pwd)"
 export PYTHONUTF8=1
 PY="$ROOT/.venv/Scripts/python.exe"; [ -x "$PY" ] || PY="$ROOT/.venv/bin/python"
 W="${1:-8}"

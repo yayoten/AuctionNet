@@ -365,8 +365,9 @@ def build_tasks(spec_path, force):
         resolved["spec_file"] = str(Path(spec_path).as_posix())
         for idx in resolved["player_indices"]:
             rid = make_run_id(resolved, idx, version["github_version"])
-            if (DB_RUNS / rid / "meta.json").exists() and not force:
-                skipped.append(rid)
+            mp = DB_RUNS / rid / "meta.json"
+            if mp.exists() and not force and json.loads(mp.read_text(encoding="utf-8")).get("status") == "ok":
+                skipped.append(rid)  # status=ok の run だけスキップ。失敗した run は流し直す
                 continue
             tasks.append(dict(resolved=resolved, player_index=idx, run_id=rid, version=version))
     return tasks, skipped

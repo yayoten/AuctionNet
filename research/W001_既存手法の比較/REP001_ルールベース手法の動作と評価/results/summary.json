@@ -1,0 +1,223 @@
+{
+ "E1_runs_by_strategy_status": {
+  "ok": {
+   "ABid": 72,
+   "OnlineLP": 78,
+   "PID": 120
+  }
+ },
+ "E1_n_runs": 270,
+ "E1_n_error": 0,
+ "E1_all_scores_finite": true,
+ "E2": {
+  "ABid": {
+   "n_runs": 72,
+   "n_episodes": 4.0,
+   "sim_seconds_mean": 214.1699,
+   "sim_seconds_max": 226.7388,
+   "peak_rss_mb_mean": 2539.688,
+   "peak_rss_mb_max": 2547.9219,
+   "bidding_ms_per_call_mean": 0.2597,
+   "bidding_ms_per_call_max": 0.5867,
+   "sim_seconds_per_episode_mean": 53.5425
+  },
+  "OnlineLP": {
+   "n_runs": 78,
+   "n_episodes": 4.0,
+   "sim_seconds_mean": 201.4962,
+   "sim_seconds_max": 219.2366,
+   "peak_rss_mb_mean": 2547.016,
+   "peak_rss_mb_max": 2557.1328,
+   "bidding_ms_per_call_mean": 1.6943,
+   "bidding_ms_per_call_max": 2.1718,
+   "sim_seconds_per_episode_mean": 50.3741
+  },
+  "PID": {
+   "n_runs": 120,
+   "n_episodes": 4.0,
+   "sim_seconds_mean": 198.6043,
+   "sim_seconds_max": 228.628,
+   "peak_rss_mb_mean": 2535.0633,
+   "peak_rss_mb_max": 2558.8789,
+   "bidding_ms_per_call_mean": 0.1307,
+   "bidding_ms_per_call_max": 0.3086,
+   "sim_seconds_per_episode_mean": 49.6511
+  }
+ },
+ "E2_bidding_ms_max_single_call": {
+  "ABid": 2.2986,
+  "OnlineLP": 9.4201,
+  "PID": 1.8803
+ },
+ "E4_n_cells": 192,
+ "E4_total_score_component": {
+  "ABid": 3299.4269,
+  "OnlineLP": 4928.0889,
+  "PID": 2560.302
+ },
+ "E4_total_score_normalized_20000": {
+  "ABid": 0.164971,
+  "OnlineLP": 0.246404,
+  "PID": 0.128015
+ },
+ "E4_relative_to_ABid": {
+  "ABid": 1.0,
+  "OnlineLP": 1.4936,
+  "PID": 0.776
+ },
+ "E4_match": true,
+ "E4_cell_win_rate_OnlineLP_vs_PID": 0.765625,
+ "E4_cell_win_rate_OnlineLP_vs_ABid": 0.6927083333333334,
+ "E4_cell_win_rate_PID_vs_ABid": 0.421875,
+ "E4_rank_by_total": [
+  "OnlineLP",
+  "ABid",
+  "PID"
+ ],
+ "E4_by_strategy": {
+  "ABid": {
+   "reward_mean": 25.8281,
+   "penalty_mean": 0.6321,
+   "penalty_lt1_share": 0.8542,
+   "real_cpa_median": 122.4724,
+   "cpa_exceedance_median": 0.2395,
+   "budget_ratio_mean": 0.9292,
+   "win_pv_ratio_mean": 0.0458,
+   "score_rank_mean": 28.3125,
+   "score_component_mean": 17.1845,
+   "score_component_median": 14.6066,
+   "others_score_mean": 21.3557,
+   "last_compete_tick_mean": 28.6615
+  },
+  "OnlineLP": {
+   "reward_mean": 28.7135,
+   "penalty_mean": 0.8457,
+   "penalty_lt1_share": 0.3906,
+   "real_cpa_median": 83.1675,
+   "cpa_exceedance_median": -0.0833,
+   "budget_ratio_mean": 0.7516,
+   "win_pv_ratio_mean": 0.048,
+   "score_rank_mean": 20.8333,
+   "score_component_mean": 25.6671,
+   "score_component_median": 24.0,
+   "others_score_mean": 21.3895,
+   "last_compete_tick_mean": 44.3958
+  },
+  "PID": {
+   "reward_mean": 24.3698,
+   "penalty_mean": 0.5313,
+   "penalty_lt1_share": 0.8177,
+   "real_cpa_median": 129.5854,
+   "cpa_exceedance_median": 0.513,
+   "budget_ratio_mean": 0.9881,
+   "win_pv_ratio_mean": 0.0543,
+   "score_rank_mean": 32.1406,
+   "score_component_mean": 13.3349,
+   "score_component_median": 11.52,
+   "others_score_mean": 21.2863,
+   "last_compete_tick_mean": 38.9948
+  }
+ },
+ "E4_best_strategy_by_category": {
+  "0": "OnlineLP",
+  "1": "OnlineLP",
+  "2": "OnlineLP",
+  "3": "OnlineLP",
+  "4": "OnlineLP",
+  "5": "OnlineLP"
+ },
+ "E4_best_strategy_by_episode": {
+  "0": "OnlineLP",
+  "1": "OnlineLP",
+  "2": "OnlineLP",
+  "3": "OnlineLP"
+ },
+ "E4_cell_cv": {
+  "ABid": 0.697,
+  "OnlineLP": 0.642,
+  "PID": 0.795
+ },
+ "E5_best_per_param": [
+  {
+   "strategy": "ABid",
+   "param": "bid_scale",
+   "value": 0.5,
+   "is_default": false,
+   "score_component_mean": 17.0127,
+   "ratio_to_default": 1.3943
+  },
+  {
+   "strategy": "OnlineLP",
+   "param": "cpa_cap_ratio",
+   "value": 1.5,
+   "is_default": true,
+   "score_component_mean": 23.4233,
+   "ratio_to_default": 1.0
+  },
+  {
+   "strategy": "OnlineLP",
+   "param": "episode",
+   "value": 0.0,
+   "is_default": true,
+   "score_component_mean": 23.4233,
+   "ratio_to_default": 1.0
+  },
+  {
+   "strategy": "PID",
+   "param": "base_action",
+   "value": 5.0,
+   "is_default": false,
+   "score_component_mean": 17.0279,
+   "ratio_to_default": 1.102
+  },
+  {
+   "strategy": "PID",
+   "param": "down_factor",
+   "value": 0.5,
+   "is_default": false,
+   "score_component_mean": 15.7719,
+   "ratio_to_default": 1.0207
+  },
+  {
+   "strategy": "PID",
+   "param": "high_threshold",
+   "value": 0.9,
+   "is_default": false,
+   "score_component_mean": 17.43,
+   "ratio_to_default": 1.1281
+  },
+  {
+   "strategy": "PID",
+   "param": "low_threshold",
+   "value": 0.5,
+   "is_default": false,
+   "score_component_mean": 17.194,
+   "ratio_to_default": 1.1128
+  },
+  {
+   "strategy": "PID",
+   "param": "up_factor",
+   "value": 1.1,
+   "is_default": false,
+   "score_component_mean": 18.2013,
+   "ratio_to_default": 1.178
+  }
+ ],
+ "E5_default_is_best": {
+  "ABid.bid_scale": false,
+  "OnlineLP.cpa_cap_ratio": true,
+  "OnlineLP.episode": true,
+  "PID.base_action": false,
+  "PID.down_factor": false,
+  "PID.high_threshold": false,
+  "PID.low_threshold": false,
+  "PID.up_factor": false
+ },
+ "E5_n_points": 29,
+ "E6_nonfinite_counts": {
+  "episodes": {},
+  "ticks": {},
+  "agents": {}
+ },
+ "E6_ok": true
+}

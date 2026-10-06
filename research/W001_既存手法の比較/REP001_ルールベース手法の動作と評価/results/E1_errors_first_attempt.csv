@@ -1,0 +1,32 @@
+run_id,strategy,player_index,sweep_point,error
+R2e1d74a1c0-p00,PID,0,"{""player.kwargs.low_threshold"": 0.5}","RuntimeError: [enforce fail at C:\actions-runner\_work\pytorch\pytorch\builder\windows\pytorch\c10\core\impl\alloc_cpu.cpp:81] data. DefaultCPUAllocator: not enough memory: you tried to allocate 7280000 bytes.
+  In call to configurable 'Controller' (<class 'github.simul_bidding_env.Controller.Controller.Controller'>)
+  In call to configurable 'run_test' (<function run_test at 0x000001824D9723A0>)"
+R2e1d74a1c0-p08,PID,8,"{""player.kwargs.low_threshold"": 0.5}","ParserError: Error tokenizing data. C error: out of memory
+  In call to configurable 'Controller' (<class 'github.simul_bidding_env.Controller.Controller.Controller'>)
+  In call to configurable 'run_test' (<function run_test at 0x0000022D992723A0>)"
+R2e1d74a1c0-p16,PID,16,"{""player.kwargs.low_threshold"": 0.5}","ParserError: Error tokenizing data. C error: out of memory
+  In call to configurable 'Controller' (<class 'github.simul_bidding_env.Controller.Controller.Controller'>)
+  In call to configurable 'run_test' (<function run_test at 0x000001FEFDB123A0>)"
+R2e1d74a1c0-p24,PID,24,"{""player.kwargs.low_threshold"": 0.5}","RuntimeError: [enforce fail at C:\actions-runner\_work\pytorch\pytorch\builder\windows\pytorch\c10\core\impl\alloc_cpu.cpp:81] data. DefaultCPUAllocator: not enough memory: you tried to allocate 12250000 bytes.
+  In call to configurable 'Controller' (<class 'github.simul_bidding_env.Controller.Controller.Controller'>)
+  In call to configurable 'run_test' (<function run_test at 0x0000028862A123A0>)"
+R6fc66b2a6d-p00,PID,0,"{""player.kwargs.up_factor"": 1.5}","MemoryError: Unable to allocate 2.69 MiB for an array with shape (14664, 48) and data type int32
+  In call to configurable 'run_test' (<function run_test at 0x000002F15FCC2430>)"
+R6fc66b2a6d-p08,PID,8,"{""player.kwargs.up_factor"": 1.5}","MemoryError: Unable to allocate 5.37 MiB for an array with shape (703872,) and data type float64
+  In call to configurable 'run_test' (<function run_test at 0x000001CF51922430>)"
+Rdf3926874a-p00,PID,0,"{""player.kwargs.up_factor"": 1.1}","MemoryError: Unable to allocate 4.55 MiB for an array with shape (596688,) and data type float64
+  In call to configurable 'run_test' (<function run_test at 0x000001B47FD22430>)"
+Rdf3926874a-p08,PID,8,"{""player.kwargs.up_factor"": 1.1}","MemoryError: Unable to allocate 5.37 MiB for an array with shape (48, 14664) and data type float64
+  In call to configurable 'run_test' (<function run_test at 0x00000228FFF92430>)"
+Rdf3926874a-p16,PID,16,"{""player.kwargs.up_factor"": 1.1}","MemoryError: Unable to allocate 6.65 MiB for an array with shape (871488,) and data type float64
+  In call to configurable 'run_test' (<function run_test at 0x000001DB62AE2430>)"
+Rdf3926874a-p24,PID,24,"{""player.kwargs.up_factor"": 1.1}","MemoryError: Unable to allocate 6.65 MiB for an array with shape (18156, 48) and data type float64
+  In call to configurable 'run_test' (<function run_test at 0x000002C45E172430>)"
+Rdf3926874a-p32,PID,32,"{""player.kwargs.up_factor"": 1.1}","MemoryError: Unable to allocate 6.65 MiB for an array with shape (871488,) and data type float64
+  In call to configurable 'run_test' (<function run_test at 0x000001C32FD42430>)"
+Rdf3926874a-p40,PID,40,"{""player.kwargs.up_factor"": 1.1}","MemoryError: Unable to allocate 5.33 MiB for an array with shape (48, 14566) and data type float64
+  In call to configurable 'run_test' (<function run_test at 0x000001F87FE82430>)"
+Ree83f1946e-p08,PID,8,"{""player.kwargs.low_threshold"": 0.9}","ParserError: Error tokenizing data. C error: out of memory
+  In call to configurable 'Controller' (<class 'github.simul_bidding_env.Controller.Controller.Controller'>)
+  In call to configurable 'run_test' (<function run_test at 0x00000182C57723A0>)"
