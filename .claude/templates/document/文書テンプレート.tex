@@ -1,0 +1,41 @@
+% 汎用の文書テンプレート。使わない部分は消して使う。
+% コンパイル：uplatex を2回 → dvipdfmx。doc_format.sty は TEXINPUTS で .claude/templates/document// を参照する（コピーしない）。
+% 1段組みにするときは，documentclass の twocolumn を外す。
+\documentclass[twocolumn, 10pt]{ujarticle}
+\usepackage{doc_format}
+
+\begin{document}
+\doctitle{ここにタイトル}
+\docinfo{20261007}
+\maketitle
+
+\section{見出し}
+本文。
+
+\subsection{小見出し}
+本文。
+
+% 図（1段の幅）
+% \begin{figure}[H]\centering
+% \includegraphics[width=\linewidth]{figs/xxx.png}
+% \caption{図の説明}\label{fig:xxx}
+% \end{figure}
+% 図（2段にまたがる幅）
+% \begin{figure*}[t]\centering
+% \includegraphics[width=0.9\textwidth]{figs/xxx.png}
+% \caption{図の説明}
+% \end{figure*}
+
+% 表
+% \begin{table}[H]\centering
+% \caption{表の説明}\footnotesize
+% \begin{tabularx}{\linewidth}{@{}lX@{}}
+% \toprule
+% 項目 & 内容 \
+% \midrule
+% A & ... \
+% \bottomrule
+% \end{tabularx}
+% \end{table}
+
+\end{document}

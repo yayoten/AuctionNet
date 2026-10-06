@@ -1,0 +1,55 @@
+% 汎用の文書用スタイル。progress_report.sty と同じ体裁で，サマリーの枠と，検証・探索用の命令を持たない。
+% 情報をまとめる資料（解説，調査，説明資料など）に使う。進捗報告（REP）は progress_report.sty を使う。
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{doc_format}[2026/10/07 generic document format]
+
+\RequirePackage[dvipdfmx,top=20truemm,bottom=20truemm,left=20truemm,right=20truemm]{geometry}
+\RequirePackage[dvipdfmx]{graphicx}
+\RequirePackage[dvipdfmx,table]{xcolor}
+\RequirePackage{amsmath, amssymb}
+\RequirePackage{bm}
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{float}
+\RequirePackage{enumitem}
+\RequirePackage{url}
+\RequirePackage{indentfirst}
+\setlength{\columnsep}{2zw}
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{2pt}
+\setlength{\belowcaptionskip}{2pt}
+\pagestyle{plain}
+
+% # 見出し設定 #################################################################
+\makeatletter
+\def\section{\@startsection {section}{1}{\z@}{-1.5ex plus -1ex minus -.2ex}{1.5 ex plus .2ex}{\large\bf}}
+\def\subsection{\@startsection {subsection}{1}{\z@}{-1.5ex plus -1ex minus -.2ex}{1.3 ex plus .2ex}{\normalsize\bf}}
+\def\subsubsection{\@startsection {subsubsection}{1}{\z@}{-1.5ex plus -1ex minus -.2ex}{.3 ex plus .2ex}{\normalsize \bf}}
+\makeatother
+
+% # タイトル設定 ###############################################################
+% \doctitle{タイトル}   -> 中央に大きく出すタイトル
+% \docinfo{...}         -> タイトル直下の右寄せの1行（日付，作成者，版など。省略可）
+% \maketitle            -> \begin{document} の直後に呼ぶ。2段組みでもタイトルは1段で出る
+\makeatletter
+\def\@doctitle{}
+\def\@docinfo{}
+\newcommand{\doctitle}[1]{\def\@doctitle{#1}}
+\newcommand{\docinfo}[1]{\def\@docinfo{#1}}
+\newcommand{\@docmaketitle}{%
+    \vspace{-2.5ex}
+    \begin{center}
+      {\fontsize{14pt}{19pt}\selectfont\gtfamily\sffamily\bfseries\@doctitle}
+    \end{center}
+    \vspace{-2.5ex}
+    \ifx\@docinfo\@empty\else
+    \begin{flushright}
+      {\fontsize{11pt}{14pt}\selectfont\@docinfo}
+    \end{flushright}
+    \fi
+    \vspace{-1ex}
+    \par\bigskip
+}
+\renewcommand{\maketitle}{%
+    \if@twocolumn\twocolumn[\@docmaketitle]\else\@docmaketitle\fi}
+\makeatother

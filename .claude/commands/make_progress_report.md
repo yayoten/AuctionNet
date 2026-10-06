@@ -81,6 +81,21 @@ rm -f *.aux *.dvi *.log
 
 エラーや Overfull/Underfull の警告が出たら直す。
 
+**Windows（MiKTeX）の場合**：`TEXINPUTS` は Windows 形式のパスで、区切りはセミコロンにする
+（`export TEXINPUTS="$(cygpath -m "$(git rev-parse --show-toplevel)")/.claude/templates/progress_report//;"`）。
+日本語フォントは dvipdfmx が自動で埋め込む。
+
+**PDFの見た目の確認**：PDFをページごとに画像にして、実際に目で見る（日本語の表示、2段組みで図が小さすぎないか、
+表のはみ出し、ページ数）。Windows では poppler（`pdftoppm`）が日本語を描画できないので、PyMuPDF で画像にする。
+
+```python
+import fitz
+d = fitz.open("REP{番号}.pdf")
+for i, p in enumerate(d): p.get_pixmap(dpi=75).save(f"page{i+1}.png")
+```
+
+2段組みでは、時系列・多数の小図を含む図は、1段（`figure`）だと文字が読めなくなる。2段抜き（`figure*`、`[t]`）にする。
+
 ### Step 5: 確認と報告
 
 1. PDF のページ数を確認する。1ページが目標、多くても2ページ。超えたら、簡潔でよい章から削る。
