@@ -3,7 +3,8 @@ from github.simul_bidding_env.strategy.base_bidding_strategy import BaseBiddingS
 
 
 class AbidBiddingStrategy(BaseBiddingStrategy):
-    def __init__(self, budget=100, name="AbidBiddingStrategy", cpa=1 / 1.5, category=0, exp_tempral_ratio=np.ones(48)):
+    def __init__(self, budget=100, name="AbidBiddingStrategy", cpa=1 / 1.5, category=0, exp_tempral_ratio=np.ones(48),
+                 bid_scale=1.0):
         super().__init__()
         self.budget = budget
         self.remaining_budget = budget
@@ -11,13 +12,14 @@ class AbidBiddingStrategy(BaseBiddingStrategy):
         self.name = name
         self.cpa = cpa
         self.category = category
+        self.bid_scale = bid_scale  # alpha に掛ける倍率（従来は 1 固定）
 
     def reset(self):
         self.remaining_budget = self.budget
 
     def bidding(self, timeStepIndex, pValues, pValueSigmas, historyPValueInfo, historyBid,
                 historyAuctionResult, historyImpressionResult, historyLeastWinningCost):
-        alpha = self.base_actions[timeStepIndex] * self.cpa / pValues.mean()
+        alpha = self.bid_scale * self.base_actions[timeStepIndex] * self.cpa / pValues.mean()
         bids = alpha * pValues * pValues
         bids[bids < 0] = 0
         return bids

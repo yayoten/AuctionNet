@@ -8,7 +8,9 @@ from typing import List, Dict, Tuple
 class PlayerAnalysis:
     """Class for analyzing player performance over multiple episodes."""
 
-    def __init__(self, name: str = "PlayerAnalysis"):
+    def __init__(self, name: str = "PlayerAnalysis", penalty_beta: float = 2, score_normalizer: float = 20000):
+        self.penalty_beta = penalty_beta
+        self.score_normalizer = score_normalizer
         self.multi_episode_data: List[Tuple] = []
         self.analysis_res: List[Dict] = []
 
@@ -93,7 +95,7 @@ class PlayerAnalysis:
 
     def _get_score_neurips(self, reward: float, cpa: float, cpa_constraint: float) -> float:
         """Calculate the score using a neurips-competition penalty function."""
-        beta = 2
+        beta = self.penalty_beta
         penalty = 1
         if cpa > cpa_constraint:
             coef = cpa_constraint / (cpa + 1e-10)
@@ -116,7 +118,7 @@ class PlayerAnalysis:
             return_res[name] = np.sum(tem_list) if name == 'reward' else np.mean(tem_list)
 
         scores = [self._get_score_neurips(x["reward"], x["cpa"], x["cpaConstraint"]) for x in self.analysis_res]
-        return_res["score"] = np.sum(scores) / 20000
+        return_res["score"] = np.sum(scores) / self.score_normalizer
 
         return return_res
 

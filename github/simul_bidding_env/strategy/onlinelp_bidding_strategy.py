@@ -10,12 +10,13 @@ class OnlineLpBiddingStrategy(BaseBiddingStrategy):
     OnlineLpBidding Strategy
     """
 
-    def __init__(self, budget=100, name="OnlineLpBiddingStrategy", cpa=2, category=1,episode=0):
+    def __init__(self, budget=100, name="OnlineLpBiddingStrategy", cpa=2, category=1,episode=0, cpa_cap_ratio=1.5):
         super().__init__(budget, name, cpa, category)
         file_name = os.path.dirname(os.path.realpath(__file__))
         dir_name = file_name
         model_path = os.path.join(dir_name, "official_agent", "onlineLpTest", f"episode-{episode}.csv")
         self.category = category
+        self.cpa_cap_ratio = cpa_cap_ratio  # alpha の上限は cpa * この値（従来は 1.5 固定）
 
         self.model = pd.read_csv(model_path)
 
@@ -57,6 +58,6 @@ class OnlineLpBiddingStrategy(BaseBiddingStrategy):
             else:
                 alpha = res
 
-        alpha = min(self.cpa*1.5,alpha)
+        alpha = min(self.cpa*self.cpa_cap_ratio,alpha)
         bids = alpha * pValues
         return bids

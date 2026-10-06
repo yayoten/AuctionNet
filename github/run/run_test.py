@@ -99,6 +99,9 @@ def run_test(generate_log: bool = False,
              num_episode: int = 2,
              num_tick: int = 48,
              player_index: int = 0,
+             player_agent=None,
+             episode_ids=None,
+             tick_hook=None,
              ):
     """Runs the bidding simulation test.
 
@@ -107,12 +110,19 @@ def run_test(generate_log: bool = False,
         num_episode (int): Number of episodes to run.
         num_tick (int): Number of ticks per episode.
         player_index (int): Index of the player agent.
+        player_agent: 評価するプレイヤー戦略。None のときは initialize_player_agent() で決める（従来どおり）。
+        episode_ids: 評価するエピソード番号のリスト。None のときは range(num_episode)（従来どおり）。
+            エピソード番号は広告機会の生成と環境ノイズの乱数シードになる。
+        tick_hook: 各ティックの終わりに呼ばれる関数 tick_hook(info: dict)。実験の記録用（結果には影響しない）。
 
     Returns:
         ReturnType: Result of the player analysis.
     """
 
-    player_agent = initialize_player_agent()
+    if player_agent is None:
+        player_agent = initialize_player_agent()
+    if episode_ids is None:
+        episode_ids = list(range(num_episode))
     player_analysis = initialize_player_analysis()
     bidding_controller = Controller(player_index=player_index, player_agent=player_agent)
 
@@ -129,7 +139,7 @@ def run_test(generate_log: bool = False,
 
     begin_time = time.time()
 
-    for episode in range(num_episode):
+    for episode in episode_ids:
         logger.info(f" PlayerIndex:{player_index} episode:{episode} evaluate")
         if generate_log:
             train_data_tracker.reset()
@@ -214,6 +224,14 @@ def run_test(generate_log: bool = False,
                     xi_pit, slot_pit, cost_pit, is_exposed_pit,
                     conversion_action_pit, least_winning_cost_pit, done_list
                 )
+
+            if tick_hook is not None:
+                tick_hook(dict(
+                    episode=episode, tick=tick_index, num_pv=pv_values.shape[0], bids=bids,
+                    pv_values=pv_values, slot=slot_pit, cost=cost, reward=reward,
+                    pvalue_sigmas=pvalue_sigmas, is_exposed=is_exposed_pit, conversion=conversion_action_pit,
+                    remaining_budget_before=remaining_budget_list,
+                    least_winning_cost=least_winning_cost_pit, agents=agents))
 
             total_pv_num += pv_values.shape[0]
 

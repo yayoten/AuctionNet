@@ -18,7 +18,7 @@ from github.simul_bidding_env.strategy.mbrl_mopo_bidding_strategy import MbrlMop
 
 @gin.configurable
 class Controller:
-    def __init__(self, player_index: int = 0, player_agent=None, num_tick=48, num_agent_category=8, num_category=6,pv_num=500000,pv_generator_type="neuripsPvGen"):
+    def __init__(self, player_index: int = 0, player_agent=None, num_tick=48, num_agent_category=8, num_category=6,pv_num=500000,pv_generator_type="neuripsPvGen", budget_ratio=1):
         self.player_index = player_index
         self.num_agent_category = num_agent_category
         self.num_category = num_category
@@ -26,6 +26,7 @@ class Controller:
         self.num_tick = num_tick
         self.pv_num = pv_num
         self.pv_generator_type=pv_generator_type
+        self.budget_ratio = budget_ratio
         self.agent_list = self.initialize_agents()
         self.budget_list = self.calculate_budget()
         self.category = np.arange(self.num_agent) // self.num_agent_category
@@ -114,7 +115,7 @@ class Controller:
 
     def calculate_budget(self) -> list:
         """Calculate the budget for each agent."""
-        BUDGET_RATIO = 1
+        BUDGET_RATIO = getattr(self, "budget_ratio", 1)  # __init__ を通さず呼ばれても動くように
         budget = np.array([
             2900, 4350, 3000, 2400, 4800, 2000, 2050, 3500,
             4600, 2000, 2800, 2350, 2050, 2900, 4750, 3450,

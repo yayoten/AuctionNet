@@ -11,16 +11,17 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 class BiddingEnv:
     """A bidding environment for simulating ad auctions."""
 
-    def __init__(self, reserve_pv_price: float = 0.01, min_remaining_budget: float = 0.1):
+    def __init__(self, reserve_pv_price: float = 0.01, min_remaining_budget: float = 0.1,
+                 slot_coefficients=(1, 0.8, 0.6), default_seed: int = 1, conversion_seed: int = 2):
         self.reserve_pv_price = reserve_pv_price
         self.min_remaining_budget = min_remaining_budget
-        self.slot_coefficients = np.array([1, 0.8, 0.6])
+        self.slot_coefficients = np.array(slot_coefficients)
         self.NUM_ADVERTISERS = 48
         self.advertiser_trunc_values = [(1, 0.01)] * self.NUM_ADVERTISERS
         self.MAGIC_NUMBER = 1019
         self.NUM_SLOTS = 3
-        self.DEFAULT_SEED = 1
-        self.CONVERSION_SEED = 2  # 露出・pValue ノイズの乱数列と共有しない
+        self.DEFAULT_SEED = default_seed
+        self.CONVERSION_SEED = conversion_seed  # 露出・pValue ノイズの乱数列と共有しない
 
     def generate_trunc_values(self, advertiser_index: int, time_step_index: int, episode: int) -> tuple[
         int, float, float]:
