@@ -1,0 +1,88 @@
+% 進捗報告（1報告＝1ページ。仮説検証型と探索型）用スタイル
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{progress_report}[2026/10/06 progress report format]
+
+\RequirePackage[dvipdfmx,top=20truemm,bottom=20truemm,left=20truemm,right=20truemm]{geometry}
+\RequirePackage[dvipdfmx]{graphicx}
+\RequirePackage[dvipdfmx,table]{xcolor}
+\RequirePackage{amsmath, amssymb}
+\RequirePackage{bm}
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{float}
+\RequirePackage{enumitem}
+\RequirePackage{url}
+\RequirePackage{indentfirst}
+\setlength{\columnsep}{2zw}
+% 1報告を1ページに収めやすくするため，図表の前後の余白を詰める
+\setlength{\intextsep}{6pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{2pt}
+\setlength{\belowcaptionskip}{2pt}
+\pagestyle{empty}
+
+% # 見出し設定 #################################################################
+\makeatletter
+\def\section{\@startsection {section}{1}{\z@}{-1.5ex plus -1ex minus -.2ex}{1.5 ex plus .2ex}{\large\bf}}
+\def\subsection{\@startsection {subsection}{1}{\z@}{-1.5ex plus -1ex minus -.2ex}{1.3 ex plus .2ex}{\normalsize\bf}}
+\def\subsubsection{\@startsection {subsubsection}{1}{\z@}{-1.5ex plus -1ex minus -.2ex}{.3 ex plus .2ex}{\normalsize \bf}}
+\makeatother
+
+% # タイトル設定 ###############################################################
+% \verification{タイトル}  -> 「検証N：タイトル」（仮説検証型）
+% \exploration{タイトル}   -> 「探索N：タイトル」（探索型。仮説がない回）
+%   番号Nは検証と探索で共通の連番。\beginverification を呼ぶたびに自動で1つ増える。
+%   途中の番号から始めるときは，\beginverification の前に \setcounter{reportno}{N-1} と書く。
+% \reportdate{yyyymmdd}              -> タイトル直下の日付
+% \summary{...}                      -> 1段組の枠内に出すサマリー（全体で2〜3文の平文）
+\makeatletter
+\def\@verifkind{検証}
+\def\@veriftitle{}
+\def\@reportdate{}
+\def\@summary{}
+\newcounter{reportno}
+\newcommand{\verification}[1]{\def\@verifkind{検証}\def\@veriftitle{#1}}
+\newcommand{\exploration}[1]{\def\@verifkind{探索}\def\@veriftitle{#1}}
+\newcommand{\reportdate}[1]{\def\@reportdate{#1}}
+\newcommand{\summary}[1]{\long\def\@summary{#1}}
+\renewcommand{\maketitle}{%
+    \vspace{-2.5ex}
+    \begin{center}
+      {\fontsize{14pt}{19pt}\selectfont\gtfamily\sffamily\bfseries \@verifkind\arabic{reportno}：\@veriftitle}
+    \end{center}
+    \vspace{-2.5ex}
+    \begin{flushright}
+      {\fontsize{11pt}{14pt}\selectfont\@reportdate}
+    \end{flushright}
+    \vspace{-1ex}
+    \begingroup
+    \setlength{\fboxsep}{6pt}%
+    \setlength{\fboxrule}{0.6pt}%
+    \noindent\fbox{%
+      \begin{minipage}{\dimexpr\textwidth-2\fboxsep-2\fboxrule\relax}
+        {\textgt{サマリー}}\par\vspace{0.5ex}
+        \@summary
+      \end{minipage}}%
+    \endgroup
+    \par\bigskip
+}
+\makeatother
+
+% 仮説を四角で囲んで示す。\hypothesis{仮説の1文}
+\newcommand{\hypothesis}[1]{%
+    \par\vspace{3pt}\noindent
+    \begingroup
+    \setlength{\fboxsep}{4pt}\setlength{\fboxrule}{0.5pt}%
+    \fbox{\begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+      \textbf{仮説}：#1
+    \end{minipage}}%
+    \endgroup
+    \par\vspace{3pt}}
+
+% 検証または探索を1件始める。必ず新しいページから始まり，章・式・図表の番号を1に戻し，
+% 報告番号（reportno）を1つ進める。
+% 複数の検証を1つのPDFにまとめるときは，検証ごとにこの命令を呼ぶ。
+\newcommand{\beginverification}{%
+    \stepcounter{reportno}%
+    \twocolumn[\maketitle]%
+    \setcounter{section}{0}\setcounter{equation}{0}%
+    \setcounter{table}{0}\setcounter{figure}{0}}
