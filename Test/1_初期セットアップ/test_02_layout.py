@@ -21,7 +21,7 @@ def test_top_level_file_exists(rel):
     assert p.stat().st_size > 0 or rel.endswith("__init__.py")
 
 
-@pytest.mark.parametrize("rel", ["assets", "config", "pre_generated_dataset", "results", "run",
+@pytest.mark.parametrize("rel", ["assets", "config", "pre_generated_dataset", "run",
                                  "simul_bidding_env", "strategy_train_env"])
 def test_top_level_dir_exists(rel):
     assert (GITHUB_DIR / rel).is_dir()
@@ -184,7 +184,7 @@ def test_assets_images_exist():
 
 
 def test_results_dir_is_empty_placeholder():
-    assert list((GITHUB_DIR / "results").iterdir()) == []
+    assert not (GITHUB_DIR / "results").exists() or list((GITHUB_DIR / "results").iterdir()) == []
 
 
 def test_license_is_apache_2():

@@ -16,7 +16,7 @@ from conftest import GITHUB_DIR
 
 def _parse_requirements():
     reqs = {}
-    for line in (GITHUB_DIR / "requirements.txt").read_text().splitlines():
+    for line in (GITHUB_DIR / "requirements.txt").read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line or line.startswith("#"):
             continue
@@ -202,7 +202,7 @@ def test_einops_is_importable_in_this_venv():
 # ---------- 他端末での再現用ロックファイル ----------
 def _lock():
     out = {}
-    for line in (Path(__file__).parent / "requirements.lock.txt").read_text().splitlines():
+    for line in (Path(__file__).parent / "requirements.lock.txt").read_text(encoding="utf-8").splitlines():
         if "==" in line:
             n, v = line.strip().split("==")
             out[_norm(n)] = v

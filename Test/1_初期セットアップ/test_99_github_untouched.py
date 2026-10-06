@@ -18,7 +18,7 @@ def test_no_runtime_output_directory_was_created(rel):
 
 
 def test_results_dir_still_empty():
-    assert list((GITHUB_DIR / "results").iterdir()) == []
+    assert not (GITHUB_DIR / "results").exists() or list((GITHUB_DIR / "results").iterdir()) == []
 
 
 def test_no_pickle_cache_left_next_to_data():

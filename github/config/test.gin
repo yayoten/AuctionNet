@@ -24,7 +24,7 @@ NUM_EPISODE = 2
 # Num of control units in a single bidding period
 NUM_TICK = 48
 
-# Whether to generate a log files（Log files can be used as raw data for training strategies.）
+# Whether to generate a log files(Log files can be used as raw data for training strategies.)
 GENERATE_LOG = False
 
 run_test.generate_log = %GENERATE_LOG

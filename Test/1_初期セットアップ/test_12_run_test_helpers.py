@@ -146,7 +146,7 @@ def test_initialize_player_agent_falls_back_when_training_package_importable_but
                        text=True, timeout=300)
     assert r.returncode == 0, r.stderr[-800:]
     assert "AGENT PidBiddingStrategy PidBiddingStrategy0" in r.stdout
-    assert "saved_model/IQLtest/iql_model.pth" in r.stderr  # 理由はログに出る
+    assert "iql_model.pth" in r.stderr  # 理由はログに出る
 
 
 def test_initialize_player_agent_never_calls_sys_exit():

@@ -44,15 +44,15 @@ def test_gin_agent_count_is_consistent():
 
 
 def test_gin_generate_log_off_by_default():
-    assert re.search(r"^GENERATE_LOG\s*=\s*False", GIN_FILE.read_text(), re.M)
+    assert re.search(r"^GENERATE_LOG\s*=\s*False", GIN_FILE.read_text(encoding="utf-8"), re.M)
 
 
 def test_gin_pv_generator_type_is_neurips():
-    assert 'Controller.pv_generator_type = "neuripsPvGen"' in GIN_FILE.read_text()
+    assert 'Controller.pv_generator_type = "neuripsPvGen"' in GIN_FILE.read_text(encoding="utf-8")
 
 
 def test_gin_binds_every_declared_parameter_once():
-    text = GIN_FILE.read_text()
+    text = GIN_FILE.read_text(encoding="utf-8")
     for target in ("run_test.generate_log", "run_test.num_episode", "run_test.num_tick",
                    "BiddingEnv.reserve_pv_price", "BiddingEnv.min_remaining_budget",
                    "Controller.num_agent_category", "Controller.num_category", "Controller.num_tick",
@@ -61,19 +61,19 @@ def test_gin_binds_every_declared_parameter_once():
 
 
 def test_gin_pvnum_macro_is_bound_to_controller():
-    text = GIN_FILE.read_text()
+    text = GIN_FILE.read_text(encoding="utf-8")
     assert "PVNUM = 500000" in text
     assert "Controller.pv_num = %PVNUM" in text
 
 
 def test_gin_imports_use_github_prefix():
-    text = GIN_FILE.read_text()
+    text = GIN_FILE.read_text(encoding="utf-8")
     assert "import github.run.run_test" in text
     assert not re.search(r"^import (run|simul_bidding_env)\.", text, re.M)
 
 
 def test_gin_num_agent_macro_is_defined_but_never_used():
-    assert "%NUM_AGENT\n" not in GIN_FILE.read_text() + "\n"
+    assert "%NUM_AGENT\n" not in GIN_FILE.read_text(encoding="utf-8") + "\n"
 
 
 # ---------- config/test.gin そのもの ----------

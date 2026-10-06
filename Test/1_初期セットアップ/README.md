@@ -94,3 +94,10 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 - BCQ の同梱モデルは、テストの入力範囲では出力が 95 で一定（状態に反応していないように見える。未調査）。
 - `main_*.py` を import すると sys.path に `strategy_train_env` が足される（conftest で毎テスト取り除いている）。
 - `main_onlineLp.py` はデータが無いと何もせず正常終了する。
+
+## Windows（2026-10-07、Windows 11 AMD64 / Python 3.9.25 / CPU 版 torch 1.12.0）
+
+`setup_env.sh`（uv 経路）で環境を作り、全テストが通ることを確認した（1040 passed, 9 skipped。skip は macOS 基準値との比較など）。直した点：
+
+- `github/config/test.gin` 27行目のコメントの全角括弧を ASCII に。Windows の既定 cp932 で gin が読めず `main_test.py` が起動しなかった。
+- テスト側：`read_text()` に `encoding="utf-8"` を指定。`saved_model/IQLtest/...` のパス区切りに依存した比較をやめた。`github/results/`（git に載らない空ディレクトリ）が無くても通るようにした。
