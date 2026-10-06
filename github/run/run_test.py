@@ -11,7 +11,7 @@ import psutil
 from github.simul_bidding_env.Tracker.BiddingTracker import BiddingTracker
 from github.simul_bidding_env.Tracker.PlayerAnalysis import PlayerAnalysis
 from github.simul_bidding_env.Controller.Controller import Controller
-from collections import Iterable
+from collections.abc import Iterable
 import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,29 +23,24 @@ logger = logging.getLogger(__name__)
 def initialize_player_agent() -> Optional['PlayerAgent']:
     """Initializes the PlayerAgent with appropriate strategy.
 
+    学習済みのプレイヤー戦略（bidding_train_env.strategy.PlayerBiddingStrategy）を使う。
+    import できない・学習済みモデルが無いなどで読み込めないときは、PID 戦略にフォールバックする。
+
     Returns:
         Optional[PlayerAgent]: An instance of PlayerAgent.
     """
     try:
-        # raise ImportError("")
         from bidding_train_env.strategy import PlayerBiddingStrategy as PlayerAgent
+        agent = PlayerAgent()
         logger.info("Successfully imported PlayerBiddingStrategy as PlayerAgent.")
-        return PlayerAgent()
-    except ImportError as import_error:
-        logger.error(f"Failed to import PlayerAgent: {import_error}")
-        try:
-            from github.simul_bidding_env.strategy.pid_bidding_strategy import PidBiddingStrategy as PlayerAgent
-            import numpy as np
-            agent = PlayerAgent(exp_tempral_ratio=np.ones(48))
-            agent.name += "0"
-            logger.info("Successfully loaded PidBiddingStrategy as PlayerAgent in local run mode.")
-            return agent
-        except ImportError as e:
-            logger.error(f"Failed to import PidBiddingStrategy: {e}")
-        sys.exit(1)
-    except Exception as e:
-        logger.error(f"Unexpected error during PlayerAgent initialization: {e}")
-        sys.exit(1)
+        return agent
+    except Exception as error:
+        logger.error(f"Failed to load PlayerAgent ({type(error).__name__}): {error}")
+    from github.simul_bidding_env.strategy.pid_bidding_strategy import PidBiddingStrategy as PlayerAgent
+    agent = PlayerAgent(exp_tempral_ratio=np.ones(48))
+    agent.name += "0"
+    logger.info("Successfully loaded PidBiddingStrategy as PlayerAgent in local run mode.")
+    return agent
 
 
 
@@ -132,7 +127,6 @@ def run_test(generate_log: bool = False,
     logger.info(
         f"playerAgentName:{agents[player_index].name} playerAgentCpa:{agents[player_index].cpa} playerAgentBudget:{agents[player_index].budget} playerAgentCategory:{agents[player_index].category} PlayerIndex:{player_index}")
 
-    total_pv_num = 0
     begin_time = time.time()
 
     for episode in range(num_episode):
@@ -151,6 +145,7 @@ def run_test(generate_log: bool = False,
         history_least_winning_costs = []
 
         bidding_controller.reset(episode=episode)
+        total_pv_num = 0  # pvIndex は 1 エピソード（delivery period）内で通し番号
 
 
         for tick_index in range(num_tick):
@@ -219,6 +214,8 @@ def run_test(generate_log: bool = False,
                     xi_pit, slot_pit, cost_pit, is_exposed_pit,
                     conversion_action_pit, least_winning_cost_pit, done_list
                 )
+
+            total_pv_num += pv_values.shape[0]
 
             if player_analysis:
                 tick_win_pv = np.sum(is_exposed_pit[player_index])

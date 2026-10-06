@@ -41,7 +41,7 @@ def test():
     market_prices = np.array([12, 22, 32, 42, 52])
 
     env = OfflineEnv()
-    tick_value, tick_cost, tick_status,tick_conversion = env.simulate_ad_bidding(pv_values, bids, market_prices)
+    tick_value, tick_cost, tick_status,tick_conversion = env.simulate_ad_bidding(pv_values, pv_values_sigma, bids, market_prices)
 
     print(f"Tick Value: {tick_value}")
     print(f"Tick Cost: {tick_cost}")

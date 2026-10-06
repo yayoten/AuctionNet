@@ -100,6 +100,6 @@ if __name__ == '__main__':
     state_dim = 3
     normalize_indices = [0, 2]
     stats = normalize_state(training_data, state_dim, normalize_indices)
-    normalize_reward(training_data)
+    normalize_reward(training_data, "reward")
     print(training_data)
     print(stats)

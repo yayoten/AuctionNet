@@ -3,6 +3,7 @@ import torch
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))  # リポジトリ直下（github. で import するため）
 from github.strategy_train_env.run.run_decision_transformer import run_dt
 
 

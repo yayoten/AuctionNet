@@ -272,12 +272,9 @@ class DecisionTransformer(nn.Module):
         torch.save(self.state_dict(), file_path)
 
     def save_jit(self, save_path):
-        if not os.path.isdir(save_path):
-            os.makedirs(save_path)
-        jit_model = torch.jit.script(self.cpu())
-        torch.jit.save(jit_model, f'{save_path}/dt_model.pth')
+        raise NotImplementedError("DecisionTransformer は torch.jit.script できない。save_net(dir/dt.pt) を使う。")
 
     def load_net(self, load_path="saved_model/DTtest", device='cpu'):
-        file_path = load_path
+        file_path = os.path.join(load_path, "dt.pt") if os.path.isdir(load_path) else load_path
         self.load_state_dict(torch.load(file_path, map_location=device))
         print(f"Model loaded from {self.device}.")

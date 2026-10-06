@@ -166,7 +166,9 @@ class NeurIPSPvGen:
 
     def reset(self, episode: int = 0):
         """Resets the generator with a new episode."""
-        self.__init__(episode=episode)
+        self.__init__(episode=episode, num_tick=self.NUM_TICK, num_agent=self.NUM_AGENT,
+                      num_agent_category=self.NUM_AGENT_CATEGORY, num_category=self.NUM_CATEGORY,
+                      pv_num=self.PV_NUM)
 
     def load_traffic_num_ratio_base(self) -> np.ndarray:
         """Loads the base traffic number ratio."""
@@ -211,7 +213,7 @@ def test():
     for i in range(7):
         NeurIPS_gen = NeurIPSPvGen(episode=i)
         pv_values = NeurIPS_gen.pv_values
-        pv_sigma = NeurIPS_gen.pvalue_sigmas
+        pv_sigma = NeurIPS_gen.pValueSigmas
         logger.info(f"Episode {i}")
         logger.info(f"PV Values: {pv_values[0][0][:10]}")
         logger.info(f"PV Sigmas: {pv_sigma[0][0][:10]}")

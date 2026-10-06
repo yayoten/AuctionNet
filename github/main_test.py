@@ -1,6 +1,9 @@
+import os
 import sys
 
-sys.path.append("./strategy_train_env")
+_HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(_HERE))  # リポジトリ直下（`github.` で import するため）
+sys.path.append(os.path.join(_HERE, "strategy_train_env"))
 import gin
 from github.run.run_test import run_test
 import torch
@@ -12,7 +15,7 @@ np.random.seed(1)
 
 @gin.configurable
 def main():
-    gin_file = ["./config/test.gin"]
+    gin_file = [os.path.join(_HERE, "config", "test.gin")]
     gin.parse_config_files_and_bindings(gin_file, None)
     all_results = []
     for player_index in range(0, 2):

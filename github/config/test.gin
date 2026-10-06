@@ -1,7 +1,7 @@
 import gin
-import run.run_test
-import simul_bidding_env.Controller.Controller
-import simul_bidding_env.Environment.BiddingEnv
+import github.run.run_test
+import github.simul_bidding_env.Controller.Controller
+import github.simul_bidding_env.Environment.BiddingEnv
 
 
 # Reserve price
@@ -37,6 +37,7 @@ BiddingEnv.min_remaining_budget = %MIN_REMAINING_BUDGET
 Controller.num_agent_category = %NUM_AGENT_CATERORY
 Controller.num_category = %NUM_CATERORY
 Controller.num_tick = %NUM_TICK
+Controller.pv_num = %PVNUM
 
 # neuripsPvGen: the PvGen for neurips competition modelPvGen: the PvGen which employs deep generative models
 Controller.pv_generator_type = "neuripsPvGen"

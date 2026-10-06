@@ -18,7 +18,7 @@ from github.simul_bidding_env.strategy.mbrl_mopo_bidding_strategy import MbrlMop
 
 @gin.configurable
 class Controller:
-    def __init__(self, player_index: int = 0, player_agent=None, num_tick=24, num_agent_category=6, num_category=5,pv_num=500000,pv_generator_type="neuripsPvGen"):
+    def __init__(self, player_index: int = 0, player_agent=None, num_tick=48, num_agent_category=8, num_category=6,pv_num=500000,pv_generator_type="neuripsPvGen"):
         self.player_index = player_index
         self.num_agent_category = num_agent_category
         self.num_category = num_category
@@ -77,7 +77,7 @@ class Controller:
         elif self.pv_generator_type=="modelPvGen":
             select_category = np.random.choice(np.arange(1, 45), size=6, replace=False)
             return ModelPvGenerator(num_tick=self.num_tick, num_agent_category=self.num_agent_category,
-                                    select_category=select_category, episode=0)
+                                    select_category=select_category, pv_num=self.pv_num, episode=0)
 
     def load_bidding_env(self) -> BiddingEnv:
         """Load the bidding environment."""
@@ -95,6 +95,7 @@ class Controller:
         self.player_agent.budget = self.budget_list[self.player_index]
         self.player_agent.cpa = self.cpa_constraint_list[self.player_index]
         self.player_agent.category = self.category[self.player_index]
+        self.player_agent.reset()
 
         self.agent_list[self.player_index] = PlayerAgentWrapper(player_agent=self.player_agent)
 

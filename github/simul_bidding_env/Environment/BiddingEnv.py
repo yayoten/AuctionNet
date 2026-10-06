@@ -20,6 +20,7 @@ class BiddingEnv:
         self.MAGIC_NUMBER = 1019
         self.NUM_SLOTS = 3
         self.DEFAULT_SEED = 1
+        self.CONVERSION_SEED = 2  # 露出・pValue ノイズの乱数列と共有しない
 
     def generate_trunc_values(self, advertiser_index: int, time_step_index: int, episode: int) -> tuple[
         int, float, float]:
@@ -107,7 +108,7 @@ class BiddingEnv:
 
     def _calculate_conversion_action(self, values: np.ndarray, is_exposed: np.ndarray) -> np.ndarray:
         """Calculates conversion actions based on values and exposure."""
-        rng = np.random.default_rng(seed=self.DEFAULT_SEED)
+        rng = np.random.default_rng(seed=self.CONVERSION_SEED)
         conversion_action = rng.binomial(n=1, p=np.clip(values, 0, 1))
         return conversion_action * is_exposed
 
