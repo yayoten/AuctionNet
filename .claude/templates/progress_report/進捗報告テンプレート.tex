@@ -1,11 +1,10 @@
-% 進捗報告テンプレート（1報告＝1ページ。検証と探索を同じ連番で並べる）
-% 1ページ目：仮説検証型（検証N）／2ページ目：探索型（探索N）。必要な型のページだけを使い，
-% 好きな順に並べる（検証→探索→検証，など）。番号は \beginverification のたびに自動で進む。
-% 書き方のルールは .claude/commands/make_progress_report.md。
-% 単独の報告として使うときは，使わない型のページを削除し，
-% \beginverification の前に \setcounter{reportno}{N-1}（Nは報告番号）を書く。
-% コンパイル：uplatex を2回 → dvipdfmx。progress_report.sty は
-% TEXINPUTS=.claude/templates/progress_report// で参照する（コピーしない）。
+% 進捗報告テンプレート（1報告＝1ページ。REP1つにつき1本）
+% 1ページ目：仮説検証型（検証）／2ページ目：探索型（探索）。
+% 使うときは，使わない型のブロックと \clearpage を削除し，REPごとに1ファイルにする。
+% IDは自動では振らない。\reportid に REP のID（例 REP003），\questionid に問いのID（例 Q001-A）を書く。
+% 書き方のルールは .claude/commands/make_progress_report.md，置き場所とIDは research/README.md。
+% コンパイル：uplatex を2回 → dvipdfmx。progress_report.sty は TEXINPUTS で
+% .claude/templates/progress_report// を参照する（コピーしない）。
 \documentclass[twocolumn, 10pt]{ujarticle}
 \usepackage{progress_report}
 
@@ -14,6 +13,8 @@
 % ################################################################
 % 仮説検証型（検証したい仮説が1つあるとき）
 % ################################################################
+\reportid{REP000}
+\questionid{Q000-A}
 \verification{ここに検証のタイトルを書く}
 \reportdate{20261006}
 \summary{%
@@ -38,7 +39,7 @@
 \subsection{観測した事実}\label{sec:fact}
 
 仮説の根拠になった事実だけを，簡潔に書く。条件・図表・数値をそのまま
-記載し，解釈はここに書かない。前の報告から引き継いだ事実には報告番号を付ける。
+記載し，解釈はここに書かない。前の報告から引き継いだ事実には，その報告のID（例 REP002）を付ける。
 
 % 図の例
 % \begin{figure}[H]
@@ -130,6 +131,8 @@
 % 探索型（仮説がないとき。動くか確認したい／新しすぎて仮説が立たない／
 %         仮説を立てるために現象を見たい）
 % ################################################################
+\reportid{REP000}
+\questionid{Q000-A}
 \exploration{ここに確認したい現象をタイトルに書く}
 \reportdate{20261006}
 \summary{%

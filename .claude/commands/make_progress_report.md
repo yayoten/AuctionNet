@@ -1,18 +1,20 @@
 # make_progress_report
 
-研究の進捗報告（1報告＝1ページ）を、テンプレートに沿って LaTeX で作成し、PDF にする。
+研究の進捗報告（REP1つ＝検証または探索1つ＝1ページ）を、テンプレートに沿って LaTeX で作成し、PDF にする。
 仮説検証型と探索型の2つの型を持つ。書き方のルールは、この文書の「ルール」節に従う。
+置き場所とIDは `research/README.md` に従う（REPは問いのフォルダの中に作る）。
 
 ## 使い方
 
 ```
-/make_progress_report [検証|探索] [題材のメモや結果のパス]
+/make_progress_report [検証|探索] [問いのID または REPのID] [題材のメモや結果のパス]
 ```
 
 例：
 ```
-/make_progress_report 検証 MTG/2026_10_06/memo.md
-/make_progress_report 探索
+/make_progress_report 検証 Q001-A research/Q001_xxx/Q001-A_yyy/REP002_zzz/REP002.md
+/make_progress_report 探索 Q001
+/make_progress_report REP003        # 既にあるREPの報告を書き直す
 ```
 
 テンプレート一式は `.claude/templates/progress_report/` にある。
@@ -20,7 +22,7 @@
 | ファイル | 役割 |
 |---|---|
 | `進捗報告テンプレート.tex` | 1ページ目が仮説検証型、2ページ目が探索型 |
-| `progress_report.sty` | 体裁と、`\verification` `\exploration` `\summary` `\hypothesis` `\beginverification` などの命令 |
+| `progress_report.sty` | 体裁と、`\reportid` `\questionid` `\verification` `\exploration` `\summary` `\hypothesis` `\beginverification` などの命令 |
 
 ---
 
@@ -35,41 +37,45 @@
 
 ### Step 1: 題材の把握
 
-報告に使う材料（実験条件、結果、図表、前の報告の「今後の展望」または「結果から生まれた問い」）を、
-`$ARGUMENTS` のパスや会話から把握する。足りない情報は、作り話で埋めずにユーザーへ確認する。
+報告に使う材料（実験条件、結果、図表、前のREPの「今後の展望」または「結果から生まれた問い」）を、
+`$ARGUMENTS` のパス、REPのmd、会話から把握する。足りない情報は、作り話で埋めずにユーザーへ確認する。
 
 - 仮説検証型で、仮説を作るために**既に見た結果**がある場合は、そのことを明記し、
   仮説を作るために使った結果（観測した事実）と、今回の検証で得る結果を分ける。
 - 実験が未実施なら、実験前の章（目的・仮説・予測・検証方法・判断指標）までを書き、サマリーの3文目は「実験は未実施である」にする。
 
-### Step 2: 出力先と報告番号の決定
+### Step 2: 出力先とIDの決定
 
-1. 出力先は `MTG/{YYYY_MM_DD}/`（今日の日付）を既定とする。フォルダがなければ作る。別の場所を指定されたらそれに従う。
-2. ファイル名は `進捗報告_{検証または探索}{番号}_{短い題}.tex` とする。
-3. 報告番号は、検証と探索を通した連番にする。`MTG/` 以下の既存の進捗報告（`進捗報告_*.tex`）から最大の番号を探して +1 する。
-   見つからない、または判断できないときはユーザーに確認する。
+1. 報告は、問いのフォルダの下の `REP{番号}_{短い題}/` に置く（例 `research/Q001_xxx/Q001-A_yyy/REP002_zzz/`）。
+   親の問いは、`$ARGUMENTS` の問いのID、または会話から決める。決まらなければユーザーに確認する。
+   問いのフォルダが未作成なら、`research/README.md`「5. ディレクトリ構成」「6.1 問いのmd」に従って先に作る。
+2. REPの番号は、検証と探索を通した連番。`research/` 以下の既存のREPフォルダ（`REP*_*`）から最大の番号を探して +1 する。
+   既にあるREPの報告を書き直すときは、そのREPの番号を使う。
+3. ファイル名は `REP{番号}.tex`（PDFは `REP{番号}.pdf`）。mdは `REP{番号}.md`（作業用の記録。この報告の元になる）。
+4. `research/` の外（`MTG/` など）には、報告を作らない。会議用のPDFは、REPのPDFを束ねて別に作る。
 
 ### Step 3: .tex の作成
 
-1. `.claude/templates/progress_report/進捗報告テンプレート.tex` を、Step 2 のパスにコピーする。
+1. `.claude/templates/progress_report/進捗報告テンプレート.tex` を、Step 2 のパスに `REP{番号}.tex` としてコピーする。
 2. **使わない型のページを削除する**（1ファイル＝1報告）。`\clearpage` と、もう一方の型のブロックも消す。
-   複数の報告を1つの PDF にまとめるときだけ、複数のブロックを残す。
-3. `\beginverification` の直前に `\setcounter{reportno}{N-1}`（N は Step 2 の番号）を書く。
+3. `\reportid{REP{番号}}`、`\questionid{問いのID}` を書く（例 `\reportid{REP002}`、`\questionid{Q001-A}`）。IDは自動では振られない。
 4. `\verification{}` または `\exploration{}`、`\reportdate{}`（今日の日付、yyyymmdd）、`\summary{}`、各章の本文を、ルールに従って書く。
    テンプレートの説明文は、すべて実際の本文で置き換える。説明文を残さない。
-5. 図は報告書と同じフォルダに置き、`\includegraphics` で読み込む。
+5. 図は `fig/` に置き、`\includegraphics{fig/...}` で読み込む。
+6. REPのmdがあれば、その内容を元にする。mdと食い違う内容を書かない。
 
 ### Step 4: コンパイル
 
-`.tex` のあるフォルダで、次を実行する。`.sty` はコピーせず、`TEXINPUTS` で `.claude/templates/progress_report/` を参照する。
+REPのフォルダで、次を実行する。`.sty` はコピーせず、`TEXINPUTS` で `.claude/templates/progress_report/` を参照する。
+リポジトリのどこから呼んでも動くよう、`git rev-parse --show-toplevel` で絶対パスにする。
 `ujarticle` は upLaTeX 前提なので、`pdflatex` は使わない。
 
 ```bash
-cd MTG/{YYYY_MM_DD}
-export TEXINPUTS=../../.claude/templates/progress_report//:
-uplatex -interaction=nonstopmode 進捗報告_....tex
-uplatex -interaction=nonstopmode 進捗報告_....tex
-dvipdfmx 進捗報告_....dvi
+cd research/{問い}/.../REP{番号}_{題}
+export TEXINPUTS="$(git rev-parse --show-toplevel)/.claude/templates/progress_report//:"
+uplatex -interaction=nonstopmode REP{番号}.tex
+uplatex -interaction=nonstopmode REP{番号}.tex
+dvipdfmx REP{番号}.dvi
 rm -f *.aux *.dvi *.log
 ```
 
@@ -81,9 +87,11 @@ rm -f *.aux *.dvi *.log
 2. 「ルール 5. 書き終えたあとの確認」のチェックリストを1つずつ確認する。
 3. 次を報告する。
    - 作成した .tex と PDF のパス
-   - 報告の型と番号
+   - 報告の型と、付けたID（REPのID、親の問いのID）
    - 判断（仮説検証型なら「支持された／支持されなかった／まだ判断できない」、実験前なら未実施）
    - 確認できなかった点、ユーザーに確認したい点
+4. 問いのまとめPDFと flow.md は、このコマンドでは作らない。必要なら `research/README.md`「9. 研究の進め方」の7・8に進む
+   （`python3 research/src/build_summary.py {問いのID}`、`python3 research/src/make_flow.py`）。
 
 ---
 
@@ -115,8 +123,9 @@ rm -f *.aux *.dvi *.log
 
 - **1回の報告＝1つの検証（または探索）＝1つの仮説＝1ページ。** 目標は1ページ、多くても2ページ。
   大きな成果ではなく、着実な進捗を積む。複数のことを1本で確かめない。
-- **報告が変わるときは改ページする。** 複数を1つのPDFにまとめるときは、各報告の先頭で `\beginverification` を呼ぶ。
-- **番号は連番。** 検証と探索は同じ番号列で数える（検証1、探索2、検証3、…）。番号は `\beginverification` が自動で進める。
+- **REPごとに単体のPDFを作る。** 複数のREPをまとめた「問いのまとめ」は、REPのPDFを結合して作る（`research/src/build_summary.py`）。
+  1つのtexに複数の報告を入れる場合だけ、各報告の先頭で `\beginverification` を呼ぶ（改ページし、章・図表の番号が戻る）。
+- **IDは検証と探索で通し番号（REP001、REP002、…）。** IDは `\reportid` で明示的に書く（自動では振られない）。
   型の順序は自由で、検証→探索→検証のような流れもありうる。
 - **報告の最後は、次の報告への接続にする。** 報告の「今後の展望」（探索型は「結果から生まれた問い」）が、
   次の報告の「目的」に対応する。仮説と仮説を対応させるのではない。次の報告の目的は、前の報告の展望のどれを受けたものかが
@@ -129,8 +138,8 @@ rm -f *.aux *.dvi *.log
 
 | 型 | 使う場面 | テンプレートの位置 | 見出し |
 |---|---|---|---|
-| 仮説検証型 | 検証したい仮説を1文で書ける | 1ページ目（`\verification`） | 検証N |
-| 探索型 | 仮説がない。動くか確認したい／対象が新しすぎて仮説が立たない／仮説を立てるために現象を見たい | 2ページ目（`\exploration`） | 探索N |
+| 仮説検証型 | 検証したい仮説を1文で書ける | 1ページ目（`\verification`） | REP{番号} 検証：題 |
+| 探索型 | 仮説がない。動くか確認したい／対象が新しすぎて仮説が立たない／仮説を立てるために現象を見たい | 2ページ目（`\exploration`） | REP{番号} 探索：題 |
 
 迷ったら、仮説を1文で書いてみる。書けなければ探索型で始める。無理に仮説を作らない。
 探索型で見えた現象から仮説が立ったら、その現象を次の検証の「観測した事実」に引き継ぐ。型は報告ごとに選び、検証→探索→検証のように行き来してよい。
@@ -155,7 +164,7 @@ rm -f *.aux *.dvi *.log
 
 - 仮説の根拠になった事実だけを書く。条件・図表・数値をそのまま載せる。
 - **解釈・考察は書かない。**
-- 前の報告から引き継いだ事実には、報告番号を付ける。
+- 前の報告から引き継いだ事実には、そのREPのID（例 REP002）を付ける。
 - 最初の検証など、前提となる事実がなければ「これまでに観測した事実はない」とだけ書く。
 
 #### 2.2 事実から考えた仮説（**最も丁寧**）
@@ -275,4 +284,4 @@ rm -f *.aux *.dvi *.log
 - [ ] 性能の改善だけで、原因の説明が正しいと結論していないか
 - [ ] 今後の展望（探索型は結果から生まれた問い）が、事実・予想・知りたいことの3段落で、ラベルなしで書かれているか
 - [ ] 知りたいことが1つで、次の報告の目的に繋がるか。次の報告の目的が、前の展望を受けて書き出されているか
-- [ ] 番号が、検証と探索を通した連番になっているか
+- [ ] REPのIDが既存の最大値の次で、親の問いのIDが正しく書かれているか（`\reportid`、`\questionid`）

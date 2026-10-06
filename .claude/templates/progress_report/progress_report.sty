@@ -28,18 +28,22 @@
 \makeatother
 
 % # タイトル設定 ###############################################################
-% \verification{タイトル}  -> 「検証N：タイトル」（仮説検証型）
-% \exploration{タイトル}   -> 「探索N：タイトル」（探索型。仮説がない回）
-%   番号Nは検証と探索で共通の連番。\beginverification を呼ぶたびに自動で1つ増える。
-%   途中の番号から始めるときは，\beginverification の前に \setcounter{reportno}{N-1} と書く。
-% \reportdate{yyyymmdd}              -> タイトル直下の日付
-% \summary{...}                      -> 1段組の枠内に出すサマリー（全体で2〜3文の平文）
+% \reportid{REP001}     -> 報告のID（検証・探索で通し番号。research/README.md「4. IDの付け方」）
+% \questionid{Q001-A}   -> この報告が属する問いのID
+% \verification{タイトル} -> 「REP001 検証：タイトル」（仮説検証型）
+% \exploration{タイトル}  -> 「REP001 探索：タイトル」（探索型。仮説がない回）
+% \reportdate{yyyymmdd}  -> タイトル直下の日付
+% \summary{...}          -> 1段組の枠内に出すサマリー（全体で2〜3文の平文）
+%   IDは自動で振らない。\reportid と \questionid は省略できる（省略すると表示されない）。
 \makeatletter
 \def\@verifkind{検証}
 \def\@veriftitle{}
 \def\@reportdate{}
 \def\@summary{}
-\newcounter{reportno}
+\def\@reportid{}
+\def\@questionid{}
+\newcommand{\reportid}[1]{\def\@reportid{#1}}
+\newcommand{\questionid}[1]{\def\@questionid{#1}}
 \newcommand{\verification}[1]{\def\@verifkind{検証}\def\@veriftitle{#1}}
 \newcommand{\exploration}[1]{\def\@verifkind{探索}\def\@veriftitle{#1}}
 \newcommand{\reportdate}[1]{\def\@reportdate{#1}}
@@ -47,11 +51,15 @@
 \renewcommand{\maketitle}{%
     \vspace{-2.5ex}
     \begin{center}
-      {\fontsize{14pt}{19pt}\selectfont\gtfamily\sffamily\bfseries \@verifkind\arabic{reportno}：\@veriftitle}
+      {\fontsize{14pt}{19pt}\selectfont\gtfamily\sffamily\bfseries
+        \ifx\@reportid\@empty\else\@reportid\hspace{1zw}\fi
+        \@verifkind：\@veriftitle}
     \end{center}
     \vspace{-2.5ex}
     \begin{flushright}
-      {\fontsize{11pt}{14pt}\selectfont\@reportdate}
+      {\fontsize{11pt}{14pt}\selectfont
+        \ifx\@questionid\@empty\else\@questionid\hspace{2zw}\fi
+        \@reportdate}
     \end{flushright}
     \vspace{-1ex}
     \begingroup
@@ -78,11 +86,10 @@
     \endgroup
     \par\vspace{3pt}}
 
-% 検証または探索を1件始める。必ず新しいページから始まり，章・式・図表の番号を1に戻し，
-% 報告番号（reportno）を1つ進める。
-% 複数の検証を1つのPDFにまとめるときは，検証ごとにこの命令を呼ぶ。
+% 検証または探索を1件始める。必ず新しいページから始まり，章・式・図表の番号を1に戻す。
+% 複数の報告を1つの PDF にまとめるときは，報告ごとにこの命令を呼ぶ。
+% （通常は REP ごとに単体の PDF を作り，まとめは PDF を結合して作る。research/src/build_summary.py）
 \newcommand{\beginverification}{%
-    \stepcounter{reportno}%
     \twocolumn[\maketitle]%
     \setcounter{section}{0}\setcounter{equation}{0}%
     \setcounter{table}{0}\setcounter{figure}{0}}
