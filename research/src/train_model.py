@@ -56,6 +56,19 @@ def sha1_of(path):
     return h.hexdigest()
 
 
+def weights_sha1(path):
+    """重みのテンソルそのものの SHA-1（名前の順に、形と中身をつなげたもの）。
+    torch.jit の保存ファイルには、同じプロセスでそれまでに保存したモデルの数で変わる連番（___torch_mangle_N）が入るので、
+    ファイルの SHA-1（model_sha1）は、重みが同じでも一致しないことがある。重みが同じかは、こちらで比べる。"""
+    import torch
+    sd = torch.jit.load(str(path), map_location="cpu").state_dict()
+    h = hashlib.sha1()
+    for k in sorted(sd):
+        t = sd[k].detach().cpu().contiguous()
+        h.update(k.encode()); h.update(str(tuple(t.shape)).encode()); h.update(str(t.dtype).encode()); h.update(t.numpy().tobytes())
+    return h.hexdigest()
+
+
 def train_function(algo):
     import importlib
     if str(REPO) not in sys.path:

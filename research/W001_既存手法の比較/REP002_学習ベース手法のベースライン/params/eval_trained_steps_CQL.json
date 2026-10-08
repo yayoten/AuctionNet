@@ -1,0 +1,32 @@
+{
+  "work": "W001",
+  "rep": "REP002",
+  "name": "eval_trained_steps_CQL",
+  "note": "L5 追加2: 20000ステップで学習した重み（6位置）",
+  "player": {
+    "strategy": "CQL",
+    "kwargs": {
+      "model_dir": "DB/models/M347c02000f"
+    }
+  },
+  "sweep": {
+    "player.kwargs.model_dir": [
+      "DB/models/M347c02000f"
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed": 1
+}

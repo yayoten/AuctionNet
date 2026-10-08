@@ -1,0 +1,33 @@
+{
+  "work": "W001",
+  "rep": "REP002",
+  "name": "eval_trained_seeds_BC",
+  "note": "L5 追加3: seed 2, 3 で学習した重み（6位置）",
+  "player": {
+    "strategy": "BC",
+    "kwargs": {
+      "model_dir": "DB/models/M11bf0a4860"
+    }
+  },
+  "sweep": {
+    "player.kwargs.model_dir": [
+      "DB/models/M11bf0a4860",
+      "DB/models/M3087314aa5"
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed": 1
+}

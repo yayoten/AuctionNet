@@ -71,16 +71,20 @@ def test_sweep_expands_to_one_model_per_point(tmp_path, rl_csv, models):
 def test_same_spec_gives_same_weights_and_is_skipped_next_time(algo, tmp_path, rl_csv, models):
     p = write_spec(tmp_path, rl_csv, algo=algo)
     (a,), _ = run(p)
+    weights_before = tm.weights_sha1(models / a["model_id"] / tm.ALGOS[algo][2])
     again, skipped = run(p)
     assert again == [] and skipped == [a["model_id"]]
     (b,), _ = run(p, force=True)
-    assert b["model_id"] == a["model_id"] and b["model_sha1"] == a["model_sha1"]   # 乱数を固定しているので重みが一致する
+    assert b["model_id"] == a["model_id"]
+    w = tm.weights_sha1(models / a["model_id"] / tm.ALGOS[algo][2])
+    assert w == weights_before      # 乱数を固定しているので、学習し直しても重みが一致する
 
 
 def test_seed_changes_model_id_and_weights(tmp_path, rl_csv, models):
     (a,), _ = run(write_spec(tmp_path, rl_csv, algo="IQL"))
     (b,), _ = run(write_spec(tmp_path, rl_csv, algo="IQL", seed=2))
-    assert a["model_id"] != b["model_id"] and a["model_sha1"] != b["model_sha1"]
+    assert a["model_id"] != b["model_id"]
+    assert tm.weights_sha1(models / a["model_id"] / "iql_model.pth") != tm.weights_sha1(models / b["model_id"] / "iql_model.pth")
 
 
 def test_failure_is_recorded_not_raised(tmp_path, rl_csv, models, monkeypatch):

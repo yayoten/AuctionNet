@@ -1,0 +1,48 @@
+{
+  "model_id": "M3087314aa5",
+  "spec_name": "train_seeds",
+  "work": "W001",
+  "rep": "REP002",
+  "note": "L5 追加3: 5手法を、既定のステップ数で、乱数シードだけ変えて学習する",
+  "sweep_point": {
+    "algo": "BC",
+    "seed": 3
+  },
+  "algo": "BC",
+  "step_num": 20000,
+  "step_num_is_default": true,
+  "seed": 3,
+  "train_data": "dataset/traffic/training_data_rlData_folder/training_data_all-rlData.csv",
+  "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+  "spec_file": "research/W001_既存手法の比較/REP002_学習ベース手法のベースライン/params/train_seeds.json",
+  "created_at": "2026-10-08T13:56:13",
+  "head_commit": "23b21534d2941c65b33994176564c70024f934f4",
+  "github_tree": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "github_dirty": false,
+  "github_version": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "repo_dirty_paths": [
+    "M CLAUDE.md",
+    " M \"research/W001_\\346\\227\\242\\345\\255\\230\\346\\211\\213\\346\\263\\225\\343\\201\\256\\346\\257\\224\\350\\274\\203/REP002_\\345\\255\\246\\347\\277\\222\\343\\203\\231\\343\\203\\274\\343\\202\\271\\346\\211\\213\\346\\263\\225\\343\\201\\256\\343\\203\\231\\343\\203\\274\\343\\202\\271\\343\\203\\251\\343\\202\\244\\343\\203\\263/params/train_steps.json\"",
+    "?? DB/models/",
+    "?? Docs/research_paper/README.md",
+    "?? Docs/research_paper/papers.json",
+    "?? Docs/research_paper/papers/",
+    "?? Docs/research_paper/request_to_user.md"
+  ],
+  "host": "BariKata",
+  "os": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+  "status": "ok",
+  "python": "3.9.16",
+  "numpy": "1.24.2",
+  "torch": "1.12.0+cu102",
+  "pandas": "2.0.3",
+  "device": "cpu",
+  "model_file": "bc_model.pth",
+  "model_sha1": "ced6945410552e69535f473be2a2f3e019f18114",
+  "n_loss_rows": 20000,
+  "loss_last10pct_mean": {
+    "Action_loss": 1098.3808609873452
+  },
+  "loss_all_finite": true,
+  "train_seconds": 65.41977453231812
+}

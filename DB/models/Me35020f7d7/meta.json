@@ -1,0 +1,47 @@
+{
+  "model_id": "Me35020f7d7",
+  "spec_name": "train_default",
+  "work": "W001",
+  "rep": "REP002",
+  "note": "L2/L4: 5手法を本家の既定のステップ数・seed=1で学習する",
+  "sweep_point": {
+    "algo": "CQL"
+  },
+  "algo": "CQL",
+  "step_num": 100,
+  "step_num_is_default": true,
+  "seed": 1,
+  "train_data": "dataset/traffic/training_data_rlData_folder/training_data_all-rlData.csv",
+  "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+  "spec_file": "research/W001_既存手法の比較/REP002_学習ベース手法のベースライン/params/train_default.json",
+  "created_at": "2026-10-08T13:54:23",
+  "head_commit": "23b21534d2941c65b33994176564c70024f934f4",
+  "github_tree": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "github_dirty": false,
+  "github_version": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "repo_dirty_paths": [
+    "M CLAUDE.md",
+    "?? Docs/research_paper/README.md",
+    "?? Docs/research_paper/papers.json",
+    "?? Docs/research_paper/papers/",
+    "?? Docs/research_paper/request_to_user.md"
+  ],
+  "host": "BariKata",
+  "os": "Linux-6.8.0-124-generic-x86_64-with-glibc2.35",
+  "status": "ok",
+  "python": "3.9.16",
+  "numpy": "1.24.2",
+  "torch": "1.12.0+cu102",
+  "pandas": "2.0.3",
+  "device": "cpu",
+  "model_file": "cql_model.pth",
+  "model_sha1": "c23237728d8c084fed9fae2078c536a29ac95d19",
+  "n_loss_rows": 100,
+  "loss_last10pct_mean": {
+    "Q_loss": 1.2752660632133483,
+    "V_loss": 1.318200147151947,
+    "A_loss": -1.4213265895843505
+  },
+  "loss_all_finite": true,
+  "train_seconds": 12.986419916152954
+}

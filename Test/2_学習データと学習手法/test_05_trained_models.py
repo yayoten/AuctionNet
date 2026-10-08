@@ -71,7 +71,9 @@ def test_strategy_loads_and_bids_are_finite(meta):
 @pytest.mark.slow
 @pytest.mark.parametrize("algo", ALGOS)
 def test_default_model_is_reproduced_by_retraining(algo, tmp_path, monkeypatch):
-    """既定設定の重みを、同じ学習データ・同じ乱数シードで学習し直すと、同じ重み（SHA-1）になる。"""
+    """既定設定の重みを、同じ学習データ・同じ乱数シードで学習し直すと、同じ重みになる（重みのテンソルの SHA-1 が一致）。
+    保存ファイルの SHA-1（model_sha1）では比べない。torch.jit のファイルには、同じプロセスでそれまでに保存したモデルの数で
+    変わる連番が入り、重みが同じでもファイルが一致しないことがある（コマンドから学習し直せば、ファイルの SHA-1 も一致する）。"""
     ms = [m for m in METAS if m["algo"] == algo and m["step_num_is_default"] and m["seed"] == 1]
     if not ms:
         pytest.skip("既定設定の重みが無い")
@@ -83,4 +85,7 @@ def test_default_model_is_reproduced_by_retraining(algo, tmp_path, monkeypatch):
     assert task["resolved"]["train_data_sha1"] == m["train_data_sha1"]
     again = tm.execute(task)
     assert again["status"] == "ok", again.get("traceback")
-    assert again["model_sha1"] == m["model_sha1"]
+    new = tmp_path / "models" / again["model_id"]
+    assert again["model_id"] == m["model_id"]
+    assert tm.weights_sha1(new / m["model_file"]) == tm.weights_sha1(MODELS_DIR / m["model_id"] / m["model_file"])
+    pd.testing.assert_frame_equal(pd.read_csv(new / "loss.csv"), pd.read_csv(MODELS_DIR / m["model_id"] / "loss.csv"))
