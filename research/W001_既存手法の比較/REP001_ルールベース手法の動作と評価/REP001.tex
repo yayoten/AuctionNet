@@ -28,18 +28,26 @@
 
 \subsection{対象のアルゴリズム}\label{sec:e-algo}
 
-3手法とも，各ティックの頭に，そのティックの広告機会（PV）ごとの入札額を「$\alpha\times$価値」の形で決める
-（価値は購入確率。ABidだけ価値の2乗を使う）。手法の違いは，入札係数$\alpha$の決め方である。
-\begin{itemize}[leftmargin=1.2em, itemsep=0pt, topsep=2pt]
-\item \textbf{PID}：予算の使うペースで$\alpha$を上げ下げする。最初は$\alpha=15$。
-  毎ティック $x=$（前のティックの支払い$\times$残りティック数）$\div$残り予算 を計算し，
-  $x<0.7$なら$\alpha$を1.2倍，$x>1.1$なら0.7倍にする。CPA制約は使わない。
-\item \textbf{ABid}：予算も履歴も見ない。入札額$=$CPA制約$\times$価値$\times$（価値$\div$そのティックの価値の平均）。
-  価値が平均より高いPVほど強気に入札する。全体の倍率（\texttt{bid\_scale}）は既定で1。
-\item \textbf{Online LP}：過去の1日の記録から作った早見表を引く。表は，購入1件あたりの値段が安いPVから順に
-  買ったときの，支払いの累計である。今の残り予算で買える範囲の境目の値段を$\alpha$にする
-  （上限はCPA制約の1.5倍）。残り予算が多いほど$\alpha$は大きくなる。
-\end{itemize}
+3手法とも，各ティックの頭に，広告機会（PV）ごとの入札額を「$\alpha\times$価値」で決める（価値は購入確率）。
+違いは，入札係数$\alpha$の決め方である（表\ref{tab:algo}）。
+
+\begin{table}[H]
+\centering
+\caption{3手法の$\alpha$の決め方（数値は既定値）}
+\label{tab:algo}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+手法 & 見るもの & $\alpha$の決め方 \\
+\midrule
+PID & 残り予算，前のティックの支払い & 最初は15。今のペースで使い切る量が残り予算の0.7倍未満なら1.2倍，1.1倍超なら0.7倍 \\
+\addlinespace
+ABid & CPA制約，今のティックの価値 & CPA制約$\times$（価値$\div$価値の平均）。価値が高いPVほど強気。予算は見ない \\
+\addlinespace
+Online LP & 残り予算，早見表，CPA制約 & 過去の1日の記録で，割安なPVから順に買ったとき，残り予算で買える境目の値段。上限はCPA制約の1.5倍 \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 % 2段抜きの図は，2ページ目の上に出すためにここで宣言する
 \begin{figure*}[t]
@@ -57,30 +65,57 @@
 
 \subsection{実験環境}\label{sec:e-env}
 
-シミュレータは既定の設定のまま使い，48社のうち1社（プレイヤー）を対象の手法に差し替えた。
-残りの47社は，環境に同梱の手法のままである。乱数はseed=1に固定した。変えた条件は次の2つである。
-\begin{itemize}[leftmargin=1.2em, itemsep=0pt, topsep=2pt]
-\item \textbf{比較}：3手法（既定のパラメータ）$\times$プレイヤーの位置48$\times$エピソード0〜3。
-  1手法あたり192セル，計144 run（1 run$=$1位置$\times$4エピソード）。
-\item \textbf{掃引}：位置0, 8, 16, 24, 32, 40（各カテゴリに1つ）$\times$エピソード0〜3で，パラメータを1つずつ振った。
-  PIDは最初の$\alpha$，上げ下げの倍率，2つの閾値。ABidは倍率。Online LPは$\alpha$の上限と早見表の日。計126 run。
-\end{itemize}
+48社のうち1社（プレイヤー）を対象の手法に差し替え，残りの47社は環境に同梱の手法のままにした（表\ref{tab:cond}）。
 成績は，エピソードごとの「購入数$\times$ペナルティ係数」（以下，score）で見る。
 ペナルティ係数は，実績CPAが制約を超えたときだけ（制約$\div$実績CPA）$^2$になり，超えなければ1である。
-実行はWindows 11，Python 3.9.25，CPU版torchで，結果はすべて\texttt{DB/}に記録した。
+
+\begin{table}[H]
+\centering
+\caption{実験の条件（1 run$=$1位置$\times$4エピソード）}
+\label{tab:cond}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+固定 & シミュレータは既定の設定，乱数seed=1 \\
+ & Windows 11，Python 3.9.25，CPU \\
+\midrule
+比較 & 3手法（既定のパラメータ） \\
+ & 位置48$\times$エピソード0〜3（192セル） \\
+ & 計144 run \\
+\midrule
+掃引 & パラメータを1つずつ振る（他は既定） \\
+ & 位置0, 8, 16, 24, 32, 40$\times$エピソード0〜3 \\
+ & PID：最初の$\alpha$，上げ下げの倍率，2つの閾値 \\
+ & ABid：全体の倍率 \\
+ & Online LP：$\alpha$の上限，早見表の日 \\
+ & 計126 run \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{取った特徴量}\label{sec:e-feat}
 
-成績のほかに，あとから原因を考えるための量を，ティックごとに記録した。
-\begin{itemize}[leftmargin=1.2em, itemsep=0pt, topsep=2pt]
-\item \textbf{入札の強さ}：実効の$\alpha$（入札額の和$\div$価値の和），その順位，他の47社の$\alpha$の中央値。
-\item \textbf{市場}：最低落札価格，予算が残っている広告主の数，市場全体の支出。
-\item \textbf{予算のペース}：支払い，残り予算，PV数，予算消化率，最後に落札したティック。
-\item \textbf{落札の中身}：落札数（スロット別），露出数，価値の平均とばらつき。
-\item \textbf{CPA}：実績CPA，ペナルティ係数，ペナルティ前の購入数。
-\item \textbf{位置と他社}：予算，CPA制約，カテゴリ，全48社の成績と順位。
-\item \textbf{規模}：所要時間（全体と\texttt{bidding()}1回），最大メモリ。
-\end{itemize}
+成績のほかに，あとから原因を考えるための量を，ティックごとに記録した（表\ref{tab:feat}）。
+
+\begin{table}[H]
+\centering
+\caption{取った特徴量}
+\label{tab:feat}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+種類 & 記録した量 \\
+\midrule
+入札の強さ & 実効の$\alpha$（入札額の和$\div$価値の和），その順位，他47社の$\alpha$の中央値 \\
+市場 & 最低落札価格，予算が残る広告主の数，全体の支出 \\
+予算のペース & 支払い，残り予算，PV数，予算消化率，最後に落札したティック \\
+落札の中身 & 落札数（スロット別），露出数，価値の平均とばらつき \\
+CPA & 実績CPA，ペナルティ係数，ペナルティ前の購入数 \\
+位置と他社 & 予算，CPA制約，カテゴリ，全48社の成績と順位 \\
+規模 & 所要時間（全体，\texttt{bidding()}1回），最大メモリ \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 % ============================================================
 \section{結果}\label{sec:e-result}

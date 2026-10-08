@@ -154,29 +154,66 @@
 
 \subsection{対象のアルゴリズム}\label{sec:e-algo}
 
-実験の条件の前に，動かす手法がどんなものかを，手法ごとに2〜4行で説明する。
-何を見て何を決めるのか，手法どうしで何が違うのかが分かるように書く。
-\begin{itemize}[leftmargin=1.2em, itemsep=0pt, topsep=2pt]
-\item \textbf{手法A}：ここに説明を書く。既定のパラメータの値を入れる。
-\item \textbf{手法B}：ここに説明を書く。
-\end{itemize}
+手法に共通すること（何を決めるのか，手法どうしで何が違うのか）を，1〜2文で書く。手法ごとの中身は表にする。
+
+\begin{table}[H]
+\centering
+\caption{対象の手法（数値は既定値）}
+\label{tab:e-algo}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+手法 & 見るもの & 決め方 \\
+\midrule
+手法A & 入力を短く & 決め方を1〜2行で \\
+\addlinespace
+手法B & 入力を短く & 決め方を1〜2行で \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{実験環境}\label{sec:e-env}
 
-固定した条件と変えた条件を書く。表にこだわらず，箇条書きでよい。既定のまま使ったものは
-「既定のまま」と書けば足りる。評価に使う量の定義も，ここに1〜2文で書く。
-\begin{itemize}[leftmargin=1.2em, itemsep=0pt, topsep=2pt]
-\item \textbf{変えた条件1}：何を，どの範囲で，何回（run数，セル数）。
-\item \textbf{変えた条件2}：同上。
-\end{itemize}
+評価に使う量の定義を，1〜2文で書く。固定した条件と変えた条件は表にする。セルは1行1項目で短く書く。
+
+\begin{table}[H]
+\centering
+\caption{実験の条件}
+\label{tab:e-cond}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+固定 & 既定のまま使ったものは「既定の設定」と書く \\
+\midrule
+比較 & 何を \\
+ & どの範囲で \\
+ & 計何 run \\
+\midrule
+掃引 & 何を振るか \\
+ & どの範囲で \\
+ & 計何 run \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{取った特徴量}\label{sec:e-feat}
 
-成績のほかに記録した量を，種類ごとに1行で書く。取る理由（仮定）はREPのmdに書く。
-\begin{itemize}[leftmargin=1.2em, itemsep=0pt, topsep=2pt]
-\item \textbf{種類1}：量の名前を並べる。
-\item \textbf{種類2}：量の名前を並べる。
-\end{itemize}
+成績のほかに記録した量を，表にする（1種類1行）。取る理由（仮定）はREPのmdに書く。
+
+\begin{table}[H]
+\centering
+\caption{取った特徴量}
+\label{tab:e-feat}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+種類 & 記録した量 \\
+\midrule
+種類1 & 量の名前を並べる \\
+種類2 & 量の名前を並べる \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 % ============================================================
 \section{結果}\label{sec:e-result}
