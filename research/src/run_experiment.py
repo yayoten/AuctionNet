@@ -1,13 +1,15 @@
 """params.json から AuctionNet のシミュレーションを回し、結果を DB/runs/ に記録する。
 
-    .venv/Scripts/python.exe research/src/run_experiment.py <spec.json> [--workers 4] [--force] [--dry-run]
+    .venv/bin/python research/src/run_experiment.py <spec.json>   # Windows は .venv/Scripts/python.exe [--workers 4] [--force] [--dry-run]
 
 spec.json（人が書く。変える値だけを書く。固定する値は書かない）
     {
       "name": "pid_default",                       # 人が読む名前（DB の spec_name に入る）
       "work": "W001", "rep": "REP001",             # どの作業・REPの実験か（任意）
       "note": "自由記述",
-      "player": {"strategy": "PID", "kwargs": {"base_action": 15}},   # PID / ABid / OnlineLP
+      "player": {"strategy": "PID", "kwargs": {"base_action": 15}},   # PID / ABid / OnlineLP / BC / IQL / CQL / BCQ / TD3_BC
+                                                   # 学習ベースは kwargs.model_dir（リポジトリ直下からの相対パス。例 "DB/models/M..."）で
+                                                   # 自前で学習した重みを指定する。書かなければ同梱の重み
       "player_indices": [0, 8, 16],                # プレイヤーを置く広告主の番号（0..47）
       "episodes": [0, 1],                          # エピソード番号（広告機会生成・環境ノイズの乱数シードになる）
       "seed": 1,                                   # numpy / torch の乱数シード
@@ -38,7 +40,42 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 GITHUB = REPO / "github"
 DB_RUNS = REPO / "DB" / "runs"
-STRATEGIES = {"PID": "PidBiddingStrategy", "ABid": "AbidBiddingStrategy", "OnlineLP": "OnlineLpBiddingStrategy"}
+# 戦略名 → (github.simul_bidding_env.strategy のモジュール名, クラス名)
+STRATEGIES = {"PID": ("pid_bidding_strategy", "PidBiddingStrategy"), "ABid": ("abid_bidding_strategy", "AbidBiddingStrategy"),
+              "OnlineLP": ("onlinelp_bidding_strategy", "OnlineLpBiddingStrategy"),
+              "BC": ("bc_bidding_strategy", "BcBiddingStrategy"), "IQL": ("iql_bidding_strategy", "IqlBiddingStrategy"),
+              "CQL": ("cql_bidding_strategy", "CqlBiddingStrategy"), "BCQ": ("bcq_bidding_strategy", "BcqBiddingStrategy"),
+              "TD3_BC": ("td3_bc_bidding_strategy", "TD3_BCBiddingStrategy")}
+
+# 評価は CPU で行う（REP001 と同じ条件。ロックの torch 1.12.0 は、新しい GPU では CUDA の計算が落ちる）。torch の import より前に隠す
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
+
+
+def strategy_class(name):
+    import importlib
+    mod, cls = STRATEGIES[name]
+    return getattr(importlib.import_module(f"github.simul_bidding_env.strategy.{mod}"), cls)
+
+
+def make_strategy(player):
+    """spec の player から戦略を作る。model_dir はリポジトリ直下からの相対パスで書き、ここで絶対パスにする。"""
+    kw = dict(player.get("kwargs", {}))
+    if kw.get("model_dir"):
+        kw["model_dir"] = str(REPO / kw["model_dir"])
+    return strategy_class(player["strategy"])(**kw)
+
+
+def model_info(player):
+    """自前で学習した重みを使う run の、重みの出どころ（DB/models/<model_id>/meta.json から）。"""
+    md = player.get("kwargs", {}).get("model_dir")
+    if not md:
+        return {"model_id": None, "model_dir": None}
+    out = {"model_id": Path(md).name, "model_dir": md}
+    mp = REPO / md / "meta.json"
+    if mp.exists():
+        m = json.loads(mp.read_text(encoding="utf-8"))
+        out.update(model_sha1=m.get("model_sha1"), model_step_num=m.get("step_num"), model_spec_name=m.get("spec_name"))
+    return out
 
 
 # ----------------------------------------------------------------------------- 設定の展開
@@ -167,12 +204,8 @@ def effective_params(resolved):
     from github.simul_bidding_env.Controller.Controller import Controller
     from github.simul_bidding_env.Environment.BiddingEnv import BiddingEnv
     from github.simul_bidding_env.Tracker.PlayerAnalysis import PlayerAnalysis
-    import github.simul_bidding_env.strategy.pid_bidding_strategy as pid
-    import github.simul_bidding_env.strategy.abid_bidding_strategy as abid
-    import github.simul_bidding_env.strategy.onlinelp_bidding_strategy as olp
-    cls = {"PID": pid.PidBiddingStrategy, "ABid": abid.AbidBiddingStrategy, "OnlineLP": olp.OnlineLpBiddingStrategy}
     s = resolved["player"]["strategy"]
-    kw = _defaults_of(cls[s].__init__)
+    kw = _defaults_of(strategy_class(s).__init__)
     kw.update(resolved["player"].get("kwargs", {}))
     # gin で束ねた値（macro 解決後）。束ねていないものは各クラスの既定値
     eff_env = {}
@@ -211,9 +244,6 @@ def execute_run(task):
         import psutil
         import torch
         from github.run.run_test import run_test
-        import github.simul_bidding_env.strategy.pid_bidding_strategy as pid
-        import github.simul_bidding_env.strategy.abid_bidding_strategy as abid
-        import github.simul_bidding_env.strategy.onlinelp_bidding_strategy as olp
         torch.set_num_threads(1)
         meta.update(python=platform.python_version(), numpy=np.__version__, torch=torch.__version__,
                     pandas=pd.__version__)
@@ -227,8 +257,8 @@ def execute_run(task):
         eff = effective_params(resolved)
         (tmp_dir / "params.json").write_text(json.dumps({"spec": resolved, "effective": eff}, ensure_ascii=False,
                                                         indent=2), encoding="utf-8")
-        cls = {"PID": pid.PidBiddingStrategy, "ABid": abid.AbidBiddingStrategy, "OnlineLP": olp.OnlineLpBiddingStrategy}
-        strategy = TimedStrategy(cls[resolved["player"]["strategy"]](**resolved["player"].get("kwargs", {})))
+        meta.update(model_info(resolved["player"]))
+        strategy = TimedStrategy(make_strategy(resolved["player"]))
 
         min_remaining_budget = eff["env"]["BiddingEnv"]["min_remaining_budget"]
         beta = eff["env"]["PlayerAnalysis"]["penalty_beta"]
@@ -337,10 +367,7 @@ def execute_run(task):
 def strategy_defaults(strategy):
     """戦略のコンストラクタの既定値（github を import して調べる。重い依存は読まない）。"""
     _setup_imports_light()
-    import importlib
-    mod = {"PID": "pid_bidding_strategy", "ABid": "abid_bidding_strategy", "OnlineLP": "onlinelp_bidding_strategy"}[strategy]
-    cls = getattr(importlib.import_module(f"github.simul_bidding_env.strategy.{mod}"), STRATEGIES[strategy])
-    return _defaults_of(cls.__init__)
+    return _defaults_of(strategy_class(strategy).__init__)
 
 
 def _setup_imports_light():

@@ -1,6 +1,6 @@
 """DB/runs/ の記録から DuckDB（DB/auctionnet.duckdb）を作り直す。派生物なので、いつ消して作り直してもよい。
 
-    .venv/Scripts/python.exe DB/build_db.py
+    .venv/bin/python DB/build_db.py   # Windows は .venv/Scripts/python.exe
 
 原本は DB/runs/<run_id>/{params.json, meta.json, *.parquet}。ここで作る .duckdb は、それを SQL で横断して読むための索引。
 表と列の意味は DB/columns.json（DB/README.md）。表・列には COMMENT として入れてある。
@@ -14,6 +14,7 @@ import pandas as pd
 
 H = Path(__file__).resolve().parent
 RUNS = H / "runs"
+MODELS = H / "models"
 DB = H / "auctionnet.duckdb"
 JSON_FIELDS = ("sweep_point", "repo_dirty_paths")
 
@@ -50,6 +51,20 @@ def load_runs():
     return pd.DataFrame(rows), pd.DataFrame(longs, columns=["run_id", "key", "value_json", "value_num"])
 
 
+def load_models():
+    """DB/models/<model_id>/meta.json（学習した重みの記録）を 1 行ずつ。"""
+    rows = []
+    for d in sorted(MODELS.iterdir()) if MODELS.is_dir() else []:
+        mp = d / "meta.json"
+        if not d.is_dir() or d.name.endswith(".tmp") or not mp.exists():
+            continue
+        m = json.loads(mp.read_text(encoding="utf-8"))
+        for f in ("sweep_point", "repo_dirty_paths", "loss_last10pct_mean"):
+            m[f] = json.dumps(m.get(f), ensure_ascii=False)
+        rows.append(m)
+    return pd.DataFrame(rows)
+
+
 def main():
     cols = json.loads((H / "columns.json").read_text(encoding="utf-8"))
     runs, longs = load_runs()
@@ -60,6 +75,10 @@ def main():
     con.execute("CREATE TABLE runs AS SELECT * FROM runs_df")
     con.register("longs_df", longs)
     con.execute("CREATE TABLE params_long AS SELECT * FROM longs_df")
+    models = load_models()
+    if len(models):
+        con.register("models_df", models)
+        con.execute("CREATE TABLE models AS SELECT * FROM models_df")
     ok = runs[runs.status == "ok"].run_id.tolist() if len(runs) else []
     for t in ("episodes", "ticks", "agents"):
         files = [str(RUNS / r / f"{t}.parquet") for r in ok]
@@ -99,7 +118,7 @@ def main():
         for c in spec["columns"]:
             if c not in actual and t != "runs":
                 print(f"警告: columns.json の {t}.{c} が実データにありません")
-    n = {t: con.execute(f"SELECT count(*) FROM {t}").fetchone()[0] for t in ("runs", "episodes", "ticks", "agents", "params_long")
+    n = {t: con.execute(f"SELECT count(*) FROM {t}").fetchone()[0] for t in ("runs", "episodes", "ticks", "agents", "params_long", "models")
          if t in [r[0] for r in con.execute("SHOW TABLES").fetchall()]}
     print("作成:", DB, n)
     con.close()

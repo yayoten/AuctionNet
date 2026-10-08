@@ -20,3 +20,6 @@ DB/auctionnet.duckdb
 DB/auctionnet.duckdb.wal
 DB/runs/*/raw/
 DB/runs/*.tmp/
+
+# 学習用の公開データ（Test/2_学習データと学習手法/download_data.sh で取得。約80GB）
+/dataset/
