@@ -25,12 +25,12 @@ def run_bc():
     # load_model()
 
 
-def train_model():
+def train_model(train_data_path="./data/traffic/training_data_rlData_folder/training_data_all-rlData.csv",
+                save_path="saved_model/BCtest", step_num=20000):
     """
     train BC model
     """
 
-    train_data_path = "./data/traffic/training_data_rlData_folder/training_data_all-rlData.csv"
     training_data = pd.read_csv(train_data_path)
 
     def safe_literal_eval(val):
@@ -52,7 +52,7 @@ def train_model():
 
     normalize_dic = normalize_state(training_data, state_dim, normalize_indices)
     normalize_reward(training_data, "reward_continuous")
-    save_normalize_dict(normalize_dic, "saved_model/BCtest")
+    save_normalize_dict(normalize_dic, save_path)
 
     replay_buffer = ReplayBuffer()
     add_to_replay_buffer(replay_buffer, training_data, is_normalize)
@@ -61,7 +61,6 @@ def train_model():
     logger.info(f"Replay buffer size: {len(replay_buffer.memory)}")
 
     model = BC(dim_obs=state_dim)
-    step_num = 20000
     batch_size = 100
     for i in range(step_num):
         states, actions, _, _, _ = replay_buffer.sample(batch_size)
@@ -69,7 +68,7 @@ def train_model():
         logger.info(f"Step: {i} Action loss: {np.mean(a_loss)}")
 
     # model.save_net("saved_model/BCtest")
-    model.save_jit("saved_model/BCtest")
+    model.save_jit(save_path)
     test_trained_model(model, replay_buffer)
 
 

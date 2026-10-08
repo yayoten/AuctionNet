@@ -217,8 +217,7 @@ def trained_bc(work):
 @pytest.fixture(scope="module")
 def trained_iql(work):
     mod = importlib.import_module(f"{RUN}.run_iql")
-    train(work, mod.train_iql_model,
-          patch=lambda mp: mp.setattr(mod, "train_model_steps", functools.partial(mod.train_model_steps, step_num=100)))
+    train(work, functools.partial(mod.train_iql_model, step_num=100))  # 既定は 20000。引数で縮める（test_18）
     return work
 
 

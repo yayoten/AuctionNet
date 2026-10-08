@@ -6,8 +6,13 @@
 - 実験の生成物（CSV・モデル）は、すべて tmp_path に出す。github/ 配下を汚さない。
 - クローン直後にあった不具合は github/ 側で修正済み。該当テストは「修正後の正しい挙動」を検証する回帰テストにしてある。
 """
+import os
 import sys
 from pathlib import Path
+
+# テストは CPU 前提で書いてある。GPU 搭載機では、学習側（CQL・TD3_BC・BCQ など）が自動で CUDA を使い、
+# ロックの torch 1.12.0（Linux の PyPI 版は CUDA 10.2）が新しい GPU に対応していないと落ちる。torch の import より前に隠す。
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "")
 
 import numpy as np
 import pytest

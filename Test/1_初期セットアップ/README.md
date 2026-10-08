@@ -19,6 +19,7 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 ```
 
 最終結果（2026-10-07、macOS arm64 / Python 3.9.6 / torch 1.12.0 / numpy 1.24.2）: **1049 passed, 1 skipped, xfail 0**。
+2026-10-08、Linux x86_64（RTX 3090 搭載）/ Python 3.9.16 / torch 1.12.0+cu102、`setup_env.sh --pip`: **1079 passed, 9 skipped**（test_18 を追加。スキップは、macOS で取った基準値との比較 8 件と、BCQ の飽和 1 件）。
 
 ## 別の端末で動かす
 
@@ -42,8 +43,9 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 - **依存を変えたらロックを作り直す。** `uv pip freeze --python .venv/bin/python > Test/1_初期セットアップ/requirements.lock.txt`（`test_01` が、requirements・ロック・実環境の 3 つの一致を確認する）。
 - **確認済みなのは macOS arm64 だけ。** uv 経路・pip 経路・`--no-lock` の 3 通りで環境を作り、テストが通ることを確認した。Linux / Windows / GPU 搭載機では未確認（下記）。
   - Windows は Git Bash か WSL で実行する想定（PowerShell 用のスクリプトは無い）。
-  - GPU 搭載機では、学習側の一部（CQL・TD3_BC・BCQ）が自動で CUDA を使う。CPU 前提で書いたテストが落ちる可能性がある。
-  - Linux では PyPI の `torch==1.12.0` が CUDA 同梱版（大きい）になる。
+  - GPU 搭載機では、学習側（BC・IQL・CQL・TD3_BC・BCQ）が自動で CUDA を使う。テストは CPU 前提なので、`conftest.py` が `CUDA_VISIBLE_DEVICES=""` で GPU を隠す（Linux + RTX 3090 で確認）。
+  - Linux では PyPI の `torch==1.12.0` が CUDA 10.2 同梱版になる。RTX 3090 のような新しい GPU には対応しておらず、GPU で計算すると `no kernel image is available` で落ちる（`torch.cuda.is_available()` は True を返す）。
+  - uv 0.12 では、`gin==0.1.6` の配布物のファイル名が拒否されて uv 経路が通らない。`setup_env.sh --pip` を使う（Linux で確認）。
 
 ## ファイル
 
@@ -63,6 +65,8 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 | test_14 | **README の手順そのまま** `cd github && python main_test.py`（500000PV・2エピソード・2プレイヤー、約100秒、基準値 `golden_full_scale.json`） |
 | test_15 | 学習側：BC/IQL/CQL/BCQ/TD3_BC/DT、共通utils、オフライン環境 |
 | test_16 | シミュレータ → 学習データ → 学習 → 保存 → 戦略として読込 → オフライン評価 の通し |
+| test_17 | 直書きだった値を引数に出した変更（PID / ABid / OnlineLP / 環境 / スコア式）の回帰 |
+| test_18 | 学習ベース 5 戦略の `model_dir`（既定は同梱の重み）、学習スクリプトの `train_data_path` / `save_path` / `step_num`（既定は従来の値）、BCQ の 2 つの保存形式 |
 | test_99 | `github/` が無変更であること |
 
 ## 結論

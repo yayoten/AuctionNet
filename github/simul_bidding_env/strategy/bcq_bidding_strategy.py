@@ -17,15 +17,22 @@ class BcqBiddingStrategy(BaseBiddingStrategy):
     BCQ Strategy
     """
 
-    def __init__(self, budget=100, name="Bcq-PlayerStrategy", cpa=2, category=1):
+    def __init__(self, budget=100, name="Bcq-PlayerStrategy", cpa=2, category=1, model_dir=None):
         super().__init__(budget, name, cpa, category)
 
         file_name = os.path.dirname(os.path.realpath(__file__))
         dir_name = file_name
-        model_path = os.path.join(dir_name, "official_agent", "BCQtest", "bcq_model.pth")
-        dict_path = os.path.join(dir_name, "official_agent", "BCQtest", "normalize_dict.pkl")
+        # model_dir=None なら同梱の学習済み重み。指定すれば、そのフォルダの重みを読む（自前で学習した重みの評価用）
+        if model_dir is None:
+            model_dir = os.path.join(dir_name, "official_agent", "BCQtest")
+        self.model_dir = model_dir
+        model_path = os.path.join(model_dir, "bcq_model.pth")
+        dict_path = os.path.join(model_dir, "normalize_dict.pkl")
         # self.model = torch.load(model_path)
         self.model = torch.jit.load(model_path)
+        # 同梱の重みは forward(states, eval_flag)。このリポジトリの学習コード（baseline/bcq）が保存する重みは
+        # forward(states) で eval_flag を受け取らない。どちらも呼べるように、保存された形を見て決める
+        self._takes_eval_flag = "eval_flag" in str(self.model.forward.schema)
         with open(dict_path, 'rb') as file:
             self.normalize_dict = pickle.load(file)
 
@@ -106,7 +113,7 @@ class BcqBiddingStrategy(BaseBiddingStrategy):
 
         test_state = torch.tensor(test_state, dtype=torch.float).unsqueeze(0)
 
-        alpha = self.model(test_state, eval_flag=True)
+        alpha = self.model(test_state, eval_flag=True) if self._takes_eval_flag else self.model(test_state)
         alpha = alpha.cpu().detach().numpy()
         bids = alpha * pValues
 
