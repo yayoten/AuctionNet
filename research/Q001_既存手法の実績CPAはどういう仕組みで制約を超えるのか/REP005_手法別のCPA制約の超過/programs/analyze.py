@@ -155,6 +155,26 @@ ax.set_title("(b) 超過率の分布（購入数が 1 以上のセル）")
 fig.tight_layout()
 fig.savefig(FIG / "fig_exceedance.png", dpi=200)
 
+# 報告用（1 段の幅に収める）：超過率の分布だけ。落札した 6 手法
+SIX = [s for s in ORDER if s not in ("CQL", "TD3_BC")]
+fig, ax = plt.subplots(figsize=(5.2, 2.0))
+rng = np.random.default_rng(0)
+for i, s in enumerate(SIX):
+    xs = d[d.strategy == s].x.values
+    ys = i + rng.uniform(-0.3, 0.3, len(xs))
+    ax.scatter(np.minimum(xs, CLIP), ys, s=5, alpha=0.5, color=np.where(xs > 0, CLASS_COLORS[0], CLASS_COLORS[1]), linewidths=0)
+    lo, med, hi = np.quantile(xs, [0.25, 0.5, 0.75])
+    ax.plot([lo, min(hi, CLIP)], [i, i], color="k", lw=2)
+    ax.plot([med], [i], marker="|", color="k", ms=12, mew=2)
+ax.axvline(0, color="k", lw=0.8, ls="--")
+ax.set_yticks(range(len(SIX)))
+ax.set_yticklabels(SIX)
+ax.invert_yaxis()
+ax.set_xlim(-1, CLIP + 0.05)
+ax.set_xlabel("超過率 = 実績 CPA ÷ 制約 − 1")
+fig.tight_layout()
+fig.savefig(FIG / "fig_exceedance_rate.png", dpi=250)
+
 print(json.dumps({k: out[k] for k in ("S1_pass", "S2_pass", "S3_pass", "S3_max_abs_diff", "S4_pass", "all_pass", "S1_n_cells")},
                  ensure_ascii=False))
 pd.set_option("display.width", 250)
