@@ -1,0 +1,14 @@
+{
+  "servers": [
+    {"name": "BariKata", "method": "local", "disks": ["/", "/mnt/hdd0"]}
+  ],
+  "interval_minutes": 15,
+  "stale_minutes": 30,
+  "retention_days": 90,
+  "thresholds": {
+    "cpu_load_ratio": [0.7, 1.0],
+    "mem_available_pct_below": [20, 10],
+    "vram_used_pct": [50, 90],
+    "disk_used_pct": [80, 90]
+  }
+}
