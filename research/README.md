@@ -138,7 +138,7 @@ research/
 - **research/ に置かないもの。**
   - 本家の AuctionNet のコード → `github/`（変更してよい）
   - 会議メモ・会議用の資料 → `MTG/`
-  - 論文の翻訳・要約 → `Docs/research_paper/`
+  - 論文（PDF、翻訳・要約、一覧）→ `Docs/research_paper/`（決まりは `Docs/research_paper/README.md`）
 
 ## 6. 各ファイルに何を書くか
 

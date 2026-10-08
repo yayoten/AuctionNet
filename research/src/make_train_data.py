@@ -60,6 +60,12 @@ def process_period(args):
     summary = dict(
         period=n, raw_file=raw_path.name, raw_bytes=raw_path.stat().st_size, columns=list(df.columns),
         n_rows=int(len(df)), n_nan=int(df.isna().sum().sum()),
+        # 欠損のある列と、その行の中身。公開データには、終盤のティックで入札額が NaN の行がある（その行は落札していない）
+        nan_by_column={c: int(v) for c, v in df.isna().sum().items() if v > 0},
+        nan_rows=dict(n_rows=int(df.isna().any(axis=1).sum()), n_won=float(df[df.isna().any(axis=1)].xi.sum()),
+                      cost=float(df[df.isna().any(axis=1)].cost.sum()),
+                      ticks=sorted(int(t) for t in df[df.isna().any(axis=1)].timeStepIndex.unique()),
+                      advertisers=sorted(int(a) for a in df[df.isna().any(axis=1)].advertiserNumber.unique())),
         delivery_period_values=sorted(float(x) for x in df.deliveryPeriodIndex.unique()),
         n_advertisers=int(df.advertiserNumber.nunique()), n_ticks=int(df.timeStepIndex.nunique()),
         n_pv=int(len(df) // max(df.advertiserNumber.nunique(), 1)),
@@ -114,7 +120,8 @@ def main():
         results = mp.get_context("spawn").Pool(a.workers, maxtasksperchild=1).imap_unordered(process_period, tasks)
     for n, rows, sec in results:
         print(f"period-{n}: rlData {rows} 行 {sec:.0f}s", flush=True)
-    info = combine(out_dir, [period_of(f) for f in files])
+    # 結合は、--periods で絞ったときも、出来ている period を全部使う
+    info = combine(out_dir, [period_of(f) for f in out_dir.glob("period-*-rlData.csv")])
     print("結合:", info, flush=True)
 
 

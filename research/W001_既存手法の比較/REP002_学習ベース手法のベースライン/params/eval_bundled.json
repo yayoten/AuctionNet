@@ -1,0 +1,34 @@
+{
+  "work": "W001",
+  "rep": "REP002",
+  "name": "eval_bundled",
+  "note": "L5 追加1: シミュレータに同梱の学習済み重みをプレイヤーに使う（6位置）",
+  "player": {
+    "strategy": "BC",
+    "kwargs": {}
+  },
+  "sweep": {
+    "player.strategy": [
+      "BC",
+      "IQL",
+      "CQL",
+      "BCQ",
+      "TD3_BC"
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "seed": 1
+}

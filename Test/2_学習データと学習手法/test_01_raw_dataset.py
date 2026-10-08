@@ -63,8 +63,20 @@ def test_summary_columns_and_period_index(summary, period):
     assert summary["delivery_period_values"] == [float(period)]
 
 
-def test_summary_has_no_missing_values(summary):
-    assert summary["n_nan"] == 0
+def test_summary_missing_values_are_only_unwon_bids(summary):
+    """欠損は bid 列にだけある（period 9・13・27 の終盤のティック）。その行は落札も支払いもしていない。他の列に欠損はない。"""
+    if summary["n_nan"] == 0:
+        return
+    assert set(summary["nan_by_column"]) == {"bid"}
+    assert summary["nan_rows"]["n_won"] == 0 and summary["nan_rows"]["cost"] == 0
+    assert min(summary["nan_rows"]["ticks"]) >= 40
+    assert summary["n_nan"] / summary["n_rows"] < 0.002
+
+
+def test_missing_values_appear_in_exactly_three_periods():
+    have = sorted(n for n in PERIODS if (SUMMARY_DIR / f"period-{n}.json").exists()
+                  and json.loads((SUMMARY_DIR / f"period-{n}.json").read_text(encoding="utf-8"))["n_nan"] > 0)
+    assert have == [9, 13, 27]
 
 
 def test_summary_shape_is_48_advertisers_times_about_500k_pv(summary):

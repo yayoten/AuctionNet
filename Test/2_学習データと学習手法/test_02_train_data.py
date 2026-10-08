@@ -94,7 +94,18 @@ def test_done_and_next_state(rl):
             assert a.next_state == b.state
 
 
-def test_category_heads_start_with_alpha_15(rl):
-    """各カテゴリの先頭（位置 0, 8, …, 40）は、最初のティックの α が 15（シミュレータの PID の初期値と同じ）。"""
+def test_category_heads_start_with_alpha_15_in_periods_7_to_13(rl):
+    """period 7〜13 は、各カテゴリの先頭（位置 0, 8, …, 40）の最初のティックの α が 15（シミュレータの PID の初期値と同じ）。
+    period 14 以降は、広告主の並び（どの位置にどの手法がいるか）が違い、先頭が 15 とは限らない。"""
     first = rl[(rl.timeStepIndex == 0) & (rl.advertiserNumber % 8 == 0)]
-    np.testing.assert_allclose(first.action, 15.0, rtol=1e-6)
+    np.testing.assert_allclose(first[first.deliveryPeriodIndex <= 13].action, 15.0, rtol=1e-6)
+    later = first[first.deliveryPeriodIndex >= 14].action
+    assert (np.abs(later - 15.0) > 1e-6).mean() > 0.5
+
+
+def test_nan_bids_in_raw_data_become_zero_actions(rl):
+    """原本で入札額が NaN の広告主・ティック（period 9・13・27 の終盤）は、本家の生成コードが 0 に置き換える。NaN は残らない。"""
+    assert rl.drop(columns="next_state").notna().all().all()
+    for period, adv, tick in ((13, 1, 47), (27, 44, 47)):
+        row = rl[(rl.deliveryPeriodIndex == period) & (rl.advertiserNumber == adv) & (rl.timeStepIndex == tick)]
+        assert len(row) == 1 and row.action.iloc[0] == 0

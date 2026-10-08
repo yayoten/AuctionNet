@@ -1,0 +1,16 @@
+{
+  "work": "W001",
+  "rep": "REP002",
+  "name": "train_default",
+  "note": "L2/L4: 5手法を本家の既定のステップ数・seed=1で学習する",
+  "algo": "BC",
+  "sweep": {
+    "algo": [
+      "BC",
+      "IQL",
+      "CQL",
+      "BCQ",
+      "TD3_BC"
+    ]
+  }
+}

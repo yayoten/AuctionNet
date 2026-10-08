@@ -1,0 +1,15 @@
+{
+  "work": "W001",
+  "rep": "REP002",
+  "name": "train_steps",
+  "note": "L5 追加2: 既定が100ステップの3手法を、BC・IQLと同じ20000ステップで学習する",
+  "algo": "CQL",
+  "step_num": 20000,
+  "sweep": {
+    "algo": [
+      "CQL",
+      "BCQ",
+      "TD3_BC"
+    ]
+  }
+}

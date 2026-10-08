@@ -1,0 +1,11 @@
+{
+  "work": "W001",
+  "rep": "REP002",
+  "name": "check_rule_based",
+  "note": "REP001（Windows）のルールベース3手法の結果が、この端末（Linux）で同じ値になるかの確認。位置0・24、既定設定",
+  "player": {"strategy": "PID", "kwargs": {}},
+  "sweep": {"player.strategy": ["PID", "ABid", "OnlineLP"]},
+  "player_indices": [0, 24],
+  "episodes": [0, 1, 2, 3],
+  "seed": 1
+}
