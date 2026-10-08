@@ -116,7 +116,7 @@ def main():
             txt += f" ／ なぜ取るか: {s['why']}"
             con.execute(f"COMMENT ON COLUMN {t}.{c} IS '{txt.replace(chr(39), chr(39)*2)}'")
         for c in spec["columns"]:
-            if c not in actual and t != "runs":
+            if c not in actual and t not in ("runs", "models"):   # error / traceback などは、該当する行があるときだけ出来る
                 print(f"警告: columns.json の {t}.{c} が実データにありません")
     n = {t: con.execute(f"SELECT count(*) FROM {t}").fetchone()[0] for t in ("runs", "episodes", "ticks", "agents", "params_long", "models")
          if t in [r[0] for r in con.execute("SHOW TABLES").fetchall()]}

@@ -1,0 +1,171 @@
+{
+  "spec": {
+    "work": "W001",
+    "rep": "REP002",
+    "name": "eval_rule_based",
+    "note": "L4: ルールベース3手法（既定）を、この端末で48位置×エピソード0-3で流し直す（REP001はWindows）",
+    "player": {
+      "strategy": "ABid",
+      "kwargs": {}
+    },
+    "player_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47
+    ],
+    "episodes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seed": 1,
+    "sweep_point": {
+      "player.strategy": "ABid"
+    },
+    "spec_file": "research/W001_既存手法の比較/REP002_学習ベース手法のベースライン/params/eval_rule_based.json"
+  },
+  "effective": {
+    "player": {
+      "strategy": "ABid",
+      "kwargs": {
+        "budget": 100,
+        "name": "AbidBiddingStrategy",
+        "cpa": 0.6666666666666666,
+        "category": 0,
+        "exp_tempral_ratio": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "bid_scale": 1.0
+      }
+    },
+    "env": {
+      "Controller": {
+        "player_index": 0,
+        "player_agent": null,
+        "num_tick": 48,
+        "num_agent_category": 8,
+        "num_category": 6,
+        "pv_num": 500000,
+        "pv_generator_type": "neuripsPvGen",
+        "budget_ratio": 1
+      },
+      "BiddingEnv": {
+        "reserve_pv_price": 0.0001,
+        "min_remaining_budget": 0.1,
+        "slot_coefficients": [
+          1,
+          0.8,
+          0.6
+        ],
+        "default_seed": 1,
+        "conversion_seed": 2
+      },
+      "PlayerAnalysis": {
+        "name": "PlayerAnalysis",
+        "penalty_beta": 2,
+        "score_normalizer": 20000
+      }
+    },
+    "episodes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seed": 1,
+    "gin_bindings": []
+  }
+}

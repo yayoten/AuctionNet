@@ -1,0 +1,123 @@
+{
+  "spec": {
+    "work": "W001",
+    "rep": "REP002",
+    "name": "eval_trained_default_BCQ",
+    "note": "L4: 既定設定で自前学習した重み（48位置）",
+    "player": {
+      "strategy": "BCQ",
+      "kwargs": {
+        "model_dir": "DB/models/M13eff9e472"
+      }
+    },
+    "player_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47
+    ],
+    "episodes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seed": 1,
+    "sweep_point": {
+      "player.kwargs.model_dir": "DB/models/M13eff9e472"
+    },
+    "spec_file": "research/W001_既存手法の比較/REP002_学習ベース手法のベースライン/params/eval_trained_default_BCQ.json"
+  },
+  "effective": {
+    "player": {
+      "strategy": "BCQ",
+      "kwargs": {
+        "budget": 100,
+        "name": "Bcq-PlayerStrategy",
+        "cpa": 2,
+        "category": 1,
+        "model_dir": "DB/models/M13eff9e472"
+      }
+    },
+    "env": {
+      "Controller": {
+        "player_index": 0,
+        "player_agent": null,
+        "num_tick": 48,
+        "num_agent_category": 8,
+        "num_category": 6,
+        "pv_num": 500000,
+        "pv_generator_type": "neuripsPvGen",
+        "budget_ratio": 1
+      },
+      "BiddingEnv": {
+        "reserve_pv_price": 0.0001,
+        "min_remaining_budget": 0.1,
+        "slot_coefficients": [
+          1,
+          0.8,
+          0.6
+        ],
+        "default_seed": 1,
+        "conversion_seed": 2
+      },
+      "PlayerAnalysis": {
+        "name": "PlayerAnalysis",
+        "penalty_beta": 2,
+        "score_normalizer": 20000
+      }
+    },
+    "episodes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seed": 1,
+    "gin_bindings": []
+  }
+}

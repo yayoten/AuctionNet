@@ -52,6 +52,8 @@ def variant(r):
     return {"train_default": "default", "train_steps": "steps20000", "train_seeds": "seed"}[r.model_spec_name]
 
 
+for c in ("model_id", "model_spec_name"):      # 自前の重みの run がまだ無いと、列が無いか、型が数値になる
+    runs[c] = runs[c].astype(object) if c in runs else None
 runs["variant"] = runs.apply(variant, axis=1)
 runs = runs.merge(models[["model_id", "seed", "step_num"]].rename(columns={"seed": "model_seed"}), on="model_id", how="left")
 runs.loc[runs.variant == "seed", "variant"] = "seed" + runs.model_seed[runs.variant == "seed"].astype(int).astype(str)
