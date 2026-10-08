@@ -95,3 +95,40 @@ def test_failure_is_recorded_not_raised(tmp_path, rl_csv, models, monkeypatch):
     assert m["status"] == "error" and "missing.csv" in m["error"]
     again, skipped = run(p)                                        # 失敗した学習は、次の実行で流し直される
     assert len(again) == 1 and skipped == []
+
+
+# ---------- チェックポイント（学習の途中の重み）とスレッド数 ----------
+@pytest.mark.parametrize("algo", ALGOS)
+def test_checkpoints_are_saved_and_do_not_change_the_final_weights(algo, tmp_path, rl_csv, models):
+    (plain,), _ = run(write_spec(tmp_path, rl_csv, algo=algo))
+    w_plain = tm.weights_sha1(models / plain["model_id"] / tm.ALGOS[algo][2])
+    (ck,), _ = run(write_spec(tmp_path, rl_csv, algo=algo, checkpoints=[4, 8, 12, 99]), force=True)
+    assert ck["model_id"] == plain["model_id"]                  # checkpoints は model_id に入らない（最後の重みが同じなので）
+    assert ck["checkpoints"] == [4, 8]                          # step_num（12）以上は無視する
+    d = models / ck["model_id"]
+    assert tm.weights_sha1(d / tm.ALGOS[algo][2]) == w_plain    # 途中で保存しても、最後の重みは変わらない
+    for step in (4, 8):
+        c = d / "ckpt" / f"{ck['model_id']}_s{step:06d}"
+        meta = json.loads((c / "meta.json").read_text(encoding="utf-8"))
+        assert meta["step_num"] == step and meta["parent_model_id"] == ck["model_id"] and meta["is_checkpoint"] is True
+        assert meta["weights_sha1"] == tm.weights_sha1(c / tm.ALGOS[algo][2]) != w_plain
+        assert (c / "normalize_dict.pkl").is_file()
+
+
+@pytest.mark.parametrize("algo", ALGOS)
+def test_checkpoint_equals_a_shorter_training(algo, tmp_path, rl_csv, models):
+    """8 ステップ目のチェックポイントは、8 ステップだけ学習した重みと同じ（乱数の列が同じなので）。"""
+    (ck,), _ = run(write_spec(tmp_path, rl_csv, algo=algo, checkpoints=[8]))
+    spec = dict(name="t", algo=algo, step_num=8, train_data=str(rl_csv))
+    p = tmp_path / "short.json"
+    p.write_text(json.dumps(spec), encoding="utf-8")
+    (short,), _ = run(p)
+    c = models / ck["model_id"] / "ckpt" / f"{ck['model_id']}_s000008" / tm.ALGOS[algo][2]
+    assert tm.weights_sha1(c) == tm.weights_sha1(models / short["model_id"] / tm.ALGOS[algo][2])
+
+
+def test_threads_enter_model_id_only_when_not_one(tmp_path, rl_csv, models):
+    a, _ = tm.build_tasks(str(write_spec(tmp_path, rl_csv, algo="BC")), False)
+    b, _ = tm.build_tasks(str(write_spec(tmp_path, rl_csv, algo="BC", threads=1)), False)
+    c, _ = tm.build_tasks(str(write_spec(tmp_path, rl_csv, algo="BC", threads=4)), False)
+    assert a[0]["model_id"] == b[0]["model_id"] != c[0]["model_id"]

@@ -9,12 +9,16 @@ spec.json（変える値だけを書く）
       "step_num": null,                  # 学習ステップ数。null（または書かない）なら本家の既定値
       "seed": 1,                         # random / numpy / torch の乱数シード
       "train_data": "dataset/traffic/training_data_rlData_folder/training_data_all-rlData.csv",   # 省略可
+      "checkpoints": [100, 1000, 10000],  # 任意。この学習ステップの時点の重みも ckpt/ に残す（学習の経過を見る用）
+      "threads": 1,                      # 任意。torch のスレッド数（既定 1。BCQ は 8 で約 4 倍速い。数値が変わりうるので model_id に入る）
       "sweep": {"algo": ["BC", "IQL"], "step_num": [null, 20000]}     # 任意。直積に展開する
     }
 
 学習そのものは、本家の `github/strategy_train_env/run/run_*.py` の学習関数を、データの場所・保存先・ステップ数だけ渡して呼ぶ。
 model_id は「手法・ステップ数・乱数シード・学習データの SHA-1・コードの版」から決まる。同じ条件なら同じ ID になり、既にあればスキップする。
 DB/models/<model_id>/ に、重み（*.pth）、normalize_dict.pkl、meta.json（条件・コミット・所要時間・重みの SHA-1）、loss.csv（ステップごとの損失）を書く。
+checkpoints を指定すると、DB/models/<model_id>/ckpt/<model_id>_s<ステップ>/ に、その時点の重み・normalize_dict.pkl・meta.json を書く
+（途中で保存しても、最後の重みは変わらない。Test/2 の test_03 で確かめている）。チェックポイントも model_dir に指定して評価できる。
 評価は run_experiment.py で、spec の player.kwargs.model_dir に "DB/models/<model_id>" を書いて行う。
 """
 import argparse
@@ -85,6 +89,8 @@ def default_step_num(algo):
 
 def make_model_id(resolved, version):
     key = {k: resolved[k] for k in ("algo", "step_num", "seed", "train_data_sha1")}
+    if resolved.get("threads", 1) != 1:        # 既定（1 スレッド）の model_id は、これまでと変えない
+        key["threads"] = resolved["threads"]
     return "M" + hashlib.sha1((canonical(key) + "|" + version).encode("utf-8")).hexdigest()[:10]
 
 
@@ -108,6 +114,38 @@ class LossCapture(logging.Handler):
         self.rows.append(row)
 
 
+def install_checkpoints(module, steps, tmp_dir, model_id, meta, algo):
+    """学習の 1 ステップ（model.step）を数え、指定のステップ数に達したら、その時点の重みを ckpt/ に保存する。元に戻す関数を返す。"""
+    if not steps:
+        return lambda: None
+    cls = next(getattr(module, n) for n in ("BC", "IQL", "CQL", "BCQ", "TD3_BC") if hasattr(module, n))
+    orig, count = cls.step, [0]
+
+    def step(self, *a, **k):
+        r = orig(self, *a, **k)
+        count[0] += 1
+        if count[0] in steps:
+            cid = f"{model_id}_s{count[0]:06d}"
+            d = tmp_dir / "ckpt" / cid
+            self.save_jit(str(d))
+            shutil.copy(tmp_dir / "normalize_dict.pkl", d / "normalize_dict.pkl")
+            w = d / ALGOS[algo][2]
+            (d / "meta.json").write_text(json.dumps(
+                {"model_id": cid, "parent_model_id": model_id, "is_checkpoint": True, "algo": algo, "step_num": count[0],
+                 "seed": meta["seed"], "spec_name": meta["spec_name"], "work": meta["work"], "rep": meta["rep"],
+                 "train_data_sha1": meta["train_data_sha1"], "github_version": meta["github_version"],
+                 "github_dirty": meta["github_dirty"], "head_commit": meta["head_commit"], "model_file": w.name,
+                 "model_sha1": sha1_of(w), "weights_sha1": weights_sha1(w), "status": "ok"}, ensure_ascii=False, indent=2),
+                encoding="utf-8")
+        return r
+
+    cls.step = step
+
+    def restore():
+        cls.step = orig
+    return restore
+
+
 def execute(task):
     resolved, model_id, version = task["resolved"], task["model_id"], task["version"]
     out_dir, tmp_dir = MODELS / model_id, MODELS / (model_id + ".tmp")
@@ -127,9 +165,10 @@ def execute(task):
         import numpy as np
         import pandas as pd
         import torch
-        torch.set_num_threads(1)
+        torch.set_num_threads(int(resolved.get("threads", 1)))
         module, fn = train_function(algo)
         cap = LossCapture()
+        restore = install_checkpoints(module, sorted(set(resolved.get("checkpoints") or [])), tmp_dir, model_id, meta, algo)
         module.logger.addHandler(cap)
         module.logger.propagate = False        # 1 ステップごとのログを画面に出さない
         seed = resolved["seed"]
@@ -141,11 +180,14 @@ def execute(task):
         with contextlib.redirect_stdout(io.StringIO()):
             fn(train_data_path=str(REPO / resolved["train_data"]), save_path=str(tmp_dir), step_num=resolved["step_num"])
         module.logger.removeHandler(cap)
+        restore()
         loss = pd.DataFrame(cap.rows)
         loss.to_csv(tmp_dir / "loss.csv", index=False)
         weight = tmp_dir / ALGOS[algo][2]
         tail = loss.tail(max(1, len(loss) // 10)).drop(columns="step").mean().to_dict() if len(loss) else {}
-        meta.update(status="ok", model_file=weight.name, model_sha1=sha1_of(weight), n_loss_rows=int(len(loss)),
+        meta.update(status="ok", model_file=weight.name, model_sha1=sha1_of(weight), weights_sha1=weights_sha1(weight),
+                    threads=int(resolved.get("threads", 1)), n_loss_rows=int(len(loss)),
+                    checkpoints=sorted(int(d.name.rsplit("_s", 1)[1]) for d in (tmp_dir / "ckpt").glob("*_s*")) if (tmp_dir / "ckpt").is_dir() else [],
                     loss_last10pct_mean={k: float(v) for k, v in tail.items()},
                     loss_all_finite=cap.n_nonfinite == 0)
     except Exception as e:  # 止めずに記録して先へ
@@ -174,6 +216,7 @@ def build_tasks(spec_path, force):
             sha_cache[resolved["train_data"]] = sha1_of(data)
         resolved["train_data_sha1"] = sha_cache[resolved["train_data"]]
         resolved["spec_file"] = str(Path(spec_path).as_posix())
+        resolved["checkpoints"] = sorted(c for c in set(resolved.get("checkpoints") or []) if c < resolved["step_num"])
         mid = make_model_id(resolved, version["github_version"])
         mp = MODELS / mid / "meta.json"
         if mp.exists() and not force and json.loads(mp.read_text(encoding="utf-8")).get("status") == "ok":

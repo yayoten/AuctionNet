@@ -54,11 +54,16 @@ def load_runs():
 def load_models():
     """DB/models/<model_id>/meta.json（学習した重みの記録）を 1 行ずつ。"""
     rows = []
-    for d in sorted(MODELS.iterdir()) if MODELS.is_dir() else []:
+    dirs = [d for d in sorted(MODELS.iterdir()) if d.is_dir() and not d.name.endswith(".tmp")] if MODELS.is_dir() else []
+    dirs += [c for d in dirs for c in sorted((d / "ckpt").glob("*")) if c.is_dir()]     # 学習の途中の重み（チェックポイント）
+    for d in dirs:
         mp = d / "meta.json"
-        if not d.is_dir() or d.name.endswith(".tmp") or not mp.exists():
+        if not mp.exists():
             continue
         m = json.loads(mp.read_text(encoding="utf-8"))
+        m.setdefault("is_checkpoint", False)
+        if "checkpoints" in m:
+            m["checkpoints"] = json.dumps(m["checkpoints"])
         for f in ("sweep_point", "repo_dirty_paths", "loss_last10pct_mean"):
             m[f] = json.dumps(m.get(f), ensure_ascii=False)
         rows.append(m)

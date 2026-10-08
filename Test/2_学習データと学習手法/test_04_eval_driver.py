@@ -94,3 +94,15 @@ def test_model_dir_is_resolved_from_repo_root():
     assert rx.make_strategy({"strategy": "IQL", "kwargs": {}}).model_dir.endswith("official_agent/IQLtest")
     rel = "github/simul_bidding_env/strategy/official_agent/IQLtest"
     assert rx.make_strategy({"strategy": "IQL", "kwargs": {"model_dir": rel}}).model_dir == str(rx.REPO / rel)
+
+
+def test_checkpoint_dir_can_be_evaluated_and_keeps_its_own_id(tmp_path, runs, rl_csv, monkeypatch):
+    monkeypatch.setattr(tm, "MODELS", tmp_path / "models")
+    p = tmp_path / "t.json"
+    p.write_text(json.dumps(dict(name="t", algo="IQL", step_num=8, checkpoints=[4], train_data=str(rl_csv))), encoding="utf-8")
+    (task,), _ = tm.build_tasks(str(p), False)
+    m = tm.execute(task)
+    ck = tmp_path / "models" / m["model_id"] / "ckpt" / f"{m['model_id']}_s000004"
+    r = run(tmp_path, "IQL", {"model_dir": str(ck)})
+    assert r["status"] == "ok", r.get("traceback")
+    assert r["model_id"] == f"{m['model_id']}_s000004" and r["model_step_num"] == 4

@@ -74,7 +74,8 @@ def model_info(player):
     mp = REPO / md / "meta.json"
     if mp.exists():
         m = json.loads(mp.read_text(encoding="utf-8"))
-        out.update(model_sha1=m.get("model_sha1"), model_step_num=m.get("step_num"), model_spec_name=m.get("spec_name"))
+        out.update(model_id=m.get("model_id", out["model_id"]), model_sha1=m.get("model_sha1"), model_step_num=m.get("step_num"),
+                   model_spec_name=m.get("spec_name"))
     return out
 
 
