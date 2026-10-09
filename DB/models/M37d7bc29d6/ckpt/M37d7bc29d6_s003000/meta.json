@@ -1,0 +1,20 @@
+{
+  "model_id": "M37d7bc29d6_s003000",
+  "parent_model_id": "M37d7bc29d6",
+  "is_checkpoint": true,
+  "algo": "BCQ",
+  "step_num": 3000,
+  "seed": 1,
+  "train_kwargs": {},
+  "spec_name": "candidate_train",
+  "work": "W001",
+  "rep": "REP003",
+  "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+  "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
+  "github_dirty": false,
+  "head_commit": "ed13c2276a9f8dfffad3612d831b5d6147b132ea",
+  "model_file": "bcq_model.pth",
+  "model_sha1": "19676a68bba49e44a295097fd52342bfec19de7e",
+  "weights_sha1": "c73401dc9fc840e3bb22f4d0e4a1b429cfb06709",
+  "status": "ok"
+}

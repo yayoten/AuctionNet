@@ -70,6 +70,29 @@
     86.06
    ]
   },
+  "BCQ": {
+   "n_seeds": 3,
+   "n_cells_per_seed": [
+    24,
+    24,
+    24
+   ],
+   "score_mean_by_seed": [
+    17.533,
+    17.533,
+    17.533
+   ],
+   "score_mean": 17.533,
+   "spread": 0.0,
+   "pass_i_all_seeds_win": true,
+   "pass_ii_spread_within_10pct": true,
+   "complete": true,
+   "alpha_eff_mean_by_seed": [
+    79.33,
+    79.33,
+    79.33
+   ]
+  },
   "TD3_BC": {
    "n_seeds": 3,
    "n_cells_per_seed": [

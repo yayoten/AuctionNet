@@ -1,0 +1,58 @@
+{
+ "tag": "cand_probe",
+ "spec_names": [
+  "candidate_train"
+ ],
+ "threshold_alpha": 5.0,
+ "n_probe_states": 2000,
+ "logged_alpha_mean": 81.49,
+ "logged_alpha_std": 51.03,
+ "logged_share_gt100": 0.249,
+ "by_algo": {
+  "BC": {
+   "S_star": null,
+   "last_step": 30000,
+   "alpha_mean_last": 83.11,
+   "seed_diff_last": 3.04,
+   "share_ge99_last": 0.291,
+   "share_le0_last": 0.046,
+   "corr_to_logged_last": 0.841
+  },
+  "BCQ": {
+   "S_star": 1000,
+   "last_step": 30000,
+   "alpha_mean_last": 100.0,
+   "seed_diff_last": 0.0,
+   "share_ge99_last": 1.0,
+   "share_le0_last": 0.0,
+   "corr_to_logged_last": NaN
+  },
+  "CQL": {
+   "S_star": null,
+   "last_step": 30000,
+   "alpha_mean_last": 91.27,
+   "seed_diff_last": 3.5,
+   "share_ge99_last": 0.303,
+   "share_le0_last": 0.0,
+   "corr_to_logged_last": 0.652
+  },
+  "IQL": {
+   "S_star": null,
+   "last_step": 30000,
+   "alpha_mean_last": 84.24,
+   "seed_diff_last": 1.64,
+   "share_ge99_last": 0.321,
+   "share_le0_last": 0.015,
+   "corr_to_logged_last": 0.798
+  },
+  "TD3_BC": {
+   "S_star": null,
+   "last_step": 30000,
+   "alpha_mean_last": 83.35,
+   "seed_diff_last": 6.97,
+   "share_ge99_last": 0.298,
+   "share_le0_last": 0.045,
+   "corr_to_logged_last": 0.87
+  }
+ }
+}
