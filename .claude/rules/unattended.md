@@ -18,7 +18,7 @@
 |---|---|
 | `/home/yayoten` の外のファイルを、作る・変える・消す | サーバーは共用で、ホームの外は他の人の領域である |
 | `sudo`、他の人のプロセスを止めること | 同上 |
-| `git push`、`git reset --hard`、`git clean`、履歴の書き換え（push 済みのコミット） | push はユーザーが行う。消したものは戻せない |
+| `git push --force` などの強制 push、AuctionNet の `main` 以外への push（`.claude/rules/git_push.md`）、`git reset --hard`、`git clean`、push 済みのコミットの書き換え | push は `.claude/rules/git_push.md` の範囲（AuctionNet の `main`）に限って、してよい。それ以外と、消したら戻せないものは、やらない |
 | `DB/dataset/`、`DB/runs/`、`DB/models/` の既存のファイルを消す・上書きする | 原本であり、作り直しに何時間もかかる |
 | 他のタスクが予約している場所を、断りなく編集する | 衝突を避けるため。編集しようとすると警告が出る |
 | 自分が作っていない未コミットの変更を、巻き込んでコミットする | 別の Claude の作業である可能性がある。`git add` は、自分のファイルを名前で指定する（`git add -A` や、ステージ済みのものごとの `git commit` をしない） |
