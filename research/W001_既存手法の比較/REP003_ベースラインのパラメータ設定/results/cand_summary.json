@@ -1,0 +1,97 @@
+{
+ "limit": 0.1,
+ "by_algo": {
+  "BC": {
+   "n_seeds": 3,
+   "n_cells_per_seed": [
+    24,
+    24,
+    24
+   ],
+   "score_mean_by_seed": [
+    21.024,
+    21.048,
+    20.952
+   ],
+   "score_mean": 21.008,
+   "spread": 0.0045,
+   "pass_i_all_seeds_win": true,
+   "pass_ii_spread_within_10pct": true,
+   "complete": true,
+   "alpha_eff_mean_by_seed": [
+    87.09,
+    88.85,
+    89.14
+   ]
+  },
+  "IQL": {
+   "n_seeds": 3,
+   "n_cells_per_seed": [
+    24,
+    24,
+    24
+   ],
+   "score_mean_by_seed": [
+    20.082,
+    19.471,
+    19.291
+   ],
+   "score_mean": 19.614,
+   "spread": 0.0403,
+   "pass_i_all_seeds_win": true,
+   "pass_ii_spread_within_10pct": true,
+   "complete": true,
+   "alpha_eff_mean_by_seed": [
+    87.92,
+    89.06,
+    87.68
+   ]
+  },
+  "CQL": {
+   "n_seeds": 3,
+   "n_cells_per_seed": [
+    24,
+    24,
+    24
+   ],
+   "score_mean_by_seed": [
+    19.086,
+    19.238,
+    18.861
+   ],
+   "score_mean": 19.061,
+   "spread": 0.0198,
+   "pass_i_all_seeds_win": true,
+   "pass_ii_spread_within_10pct": true,
+   "complete": true,
+   "alpha_eff_mean_by_seed": [
+    86.7,
+    87.47,
+    86.06
+   ]
+  },
+  "TD3_BC": {
+   "n_seeds": 3,
+   "n_cells_per_seed": [
+    24,
+    24,
+    24
+   ],
+   "score_mean_by_seed": [
+    17.994,
+    18.589,
+    19.874
+   ],
+   "score_mean": 18.819,
+   "spread": 0.0999,
+   "pass_i_all_seeds_win": true,
+   "pass_ii_spread_within_10pct": true,
+   "complete": true,
+   "alpha_eff_mean_by_seed": [
+    83.21,
+    87.09,
+    91.05
+   ]
+  }
+ }
+}

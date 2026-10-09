@@ -1,0 +1,34 @@
+{
+  "work": "W001",
+  "rep": "REP003",
+  "name": "cand_eval_CQL",
+  "note": "候補の設定を試す（6 節）: 30000 ステップ、学習の seed 1,2,3。評価に使わないエピソード 4〜7、6 位置",
+  "player": {
+    "strategy": "CQL",
+    "kwargs": {
+      "model_dir": "DB/models/M4c81bbf07d"
+    }
+  },
+  "sweep": {
+    "player.kwargs.model_dir": [
+      "DB/models/M4c81bbf07d",
+      "DB/models/M46cc6eb883",
+      "DB/models/Mcaa18f834a"
+    ]
+  },
+  "player_indices": [
+    0,
+    8,
+    16,
+    24,
+    32,
+    40
+  ],
+  "episodes": [
+    4,
+    5,
+    6,
+    7
+  ],
+  "seed": 1
+}
