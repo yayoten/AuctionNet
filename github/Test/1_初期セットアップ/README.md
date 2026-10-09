@@ -20,7 +20,7 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 
 最終結果（2026-10-07、macOS arm64 / Python 3.9.6 / torch 1.12.0 / numpy 1.24.2）: **1049 passed, 1 skipped, xfail 0**。
 2026-10-08、Linux x86_64（RTX 3090 搭載）/ Python 3.9.16 / torch 1.12.0+cu102、`setup_env.sh --pip`: **1079 passed, 9 skipped**（test_18 を追加。スキップは、macOS で取った基準値との比較 8 件と、BCQ の飽和 1 件）。
-2026-10-09、同じ端末、test_19 を追加：**1083 passed, 9 skipped**（全件を回した回は、別の作業が実行中に `github/Test/README.md` を編集したため、`github/` の無変更を見る 2 件だけ落ちた。その 2 件は、回し直して通った）。
+2026-10-09、同じ端末、test_19 を追加：全件で **1080 passed, 2 failed, 9 skipped**。落ちた 2 件は `github/` の無変更を見るテスト（test_14 の 1 件、test_99 の 1 件）で、別の作業が実行中に `github/Test/README.md` を編集したためである。その 2 件を含むファイルは、回し直して通った。
 
 ## 別の端末で動かす
 

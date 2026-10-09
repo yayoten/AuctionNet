@@ -1,0 +1,12 @@
+{
+  "work": "W001",
+  "rep": "REP003",
+  "name": "loop3a_bcq_max300",
+  "note": "ループ3a: BCQ の max_action を 300（ログの α の 99% 点 273.6 を 100 の単位に切り上げ）にして、短く学習する。生成モデルが飽和するかを見る",
+  "algo": "BCQ",
+  "step_num": 3000,
+  "threads": 4,
+  "train_kwargs": {"max_action": 300},
+  "checkpoints": [100, 300, 1000],
+  "sweep": {"seed": [1, 2, 3]}
+}
