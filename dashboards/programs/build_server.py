@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""履歴（history/*.csv）から dashboard.html を作る。
+"""履歴（history/*.csv）から server.html（サーバー負荷の画面）を作る。
 
 外部の CDN やフォントを読まない、1ファイルで完結した HTML を出す。
 """
@@ -12,8 +12,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-HERE = Path(__file__).resolve().parent
-JST = ZoneInfo("Asia/Tokyo")
+from common import CSS, JST, PROGRAMS, ROOT, nav, write_page
+
 CHART_DAYS = 7
 TABLE_HOURS = 24
 LEVELS = [("ok", "●", "余裕"), ("warn", "▲", "混雑"), ("crit", "■", "逼迫")]
@@ -201,9 +201,9 @@ def history_table(host, gpu, since):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--config", type=Path, default=HERE / "servers.json")
-    ap.add_argument("--data-dir", type=Path, default=HERE / "history")
-    ap.add_argument("--out", type=Path, default=HERE / "dashboard.html")
+    ap.add_argument("--config", type=Path, default=PROGRAMS / "servers.json")
+    ap.add_argument("--data-dir", type=Path, default=ROOT / "history")
+    ap.add_argument("--out", type=Path, default=ROOT / "server.html")
     args = ap.parse_args()
 
     config = json.loads(args.config.read_text())
@@ -223,6 +223,8 @@ def main():
     }
     th = config["thresholds"]
     page = (TEMPLATE
+            .replace("__CSS__", CSS)
+            .replace("__NAV__", nav("server.html"))
             .replace("__UPDATED__", updated.strftime("%Y-%m-%d %H:%M") if updated else "まだ収集されていません")
             .replace("__CURRENT__", current_rows(config, host, gpu, disk, latest))
             .replace("__HISTORY__", history_table(host, gpu, (now - timedelta(hours=TABLE_HOURS)).isoformat()))
@@ -233,9 +235,7 @@ def main():
             # </script> で閉じられないよう、JSON 中の < をエスケープする
             .replace("__DATA__", json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")))
 
-    tmp = args.out.with_suffix(".tmp")
-    tmp.write_text(page, encoding="utf-8")
-    os.replace(tmp, args.out)
+    write_page(args.out, page)
     print(f"{now.replace(microsecond=0).isoformat()} build {args.out.name} host_rows={len(host)}")
 
 
@@ -246,82 +246,11 @@ TEMPLATE = r"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>サーバー負荷</title>
 <style>
-:root {
-  color-scheme: light;
-  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781;
-  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10);
-  --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; --series-4: #eda100;
-  --series-5: #e87ba4; --series-6: #008300; --series-7: #4a3aa7; --series-8: #e34948;
-  --good: #0ca30c; --warning: #fab219; --critical: #d03b3b;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink2: #c3c2b7; --muted: #898781;
-    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10);
-    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
-    --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
-  }
-}
-* { box-sizing: border-box; }
-body { margin: 0; padding: 24px 16px 48px; background: var(--page); color: var(--ink);
-  font: 14px/1.6 system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif; }
-main { max-width: 1120px; margin: 0 auto; }
-h1 { font-size: 22px; margin: 0; }
-h2 { font-size: 16px; margin: 32px 0 12px; }
-.meta { color: var(--ink2); margin: 4px 0 0; }
-.meta button { font: inherit; font-weight: 600; color: var(--ink); background: var(--surface); cursor: pointer;
-  border: 1px solid var(--axis); border-radius: 6px; padding: 4px 16px; margin: 0 8px; }
-.meta button:disabled { color: var(--muted); cursor: default; }
-.stale { display: none; margin: 16px 0 0; padding: 12px 16px; border-radius: 8px;
-  border: 2px solid var(--critical); background: var(--surface); font-weight: 600; }
-.stale.on { display: block; }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
-.scroll { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; }
-th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--grid); }
-thead th { font-size: 12px; font-weight: 600; color: var(--ink2); white-space: nowrap; }
-tbody tr:last-child > * { border-bottom: 0; }
-.current td { min-width: 190px; }
-.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
-  padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border); }
-.badge .mark { font-size: 11px; }
-.badge.ok .mark { color: var(--good); }
-.badge.warn .mark { color: var(--warning); }
-.badge.crit .mark { color: var(--critical); }
-.badge.na { color: var(--muted); }
-.val { font-size: 16px; font-weight: 600; margin-top: 4px; }
-.sub { color: var(--ink2); font-size: 12px; }
-.disk + .disk { margin-top: 12px; }
-.procs { margin: 2px 0 0; padding-left: 18px; font-size: 12px; color: var(--ink2); }
-.err { color: var(--ink2); font-size: 12px; font-weight: 400; }
-.filters { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; }
-.filters button { font: inherit; color: var(--ink2); background: transparent; cursor: pointer;
-  border: 1px solid var(--border); border-radius: 6px; padding: 4px 12px; }
-.filters button[aria-pressed="true"] { color: var(--ink); font-weight: 600; background: var(--surface);
-  border-color: var(--axis); }
-.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-.chart { padding: 12px 16px 8px; position: relative; min-width: 0; }
-.chart h3 { font-size: 14px; margin: 0; }
-.chart p { margin: 0 0 4px; color: var(--ink2); font-size: 12px; }
-.chart svg { display: block; width: 100%; height: 170px; overflow: visible; }
-.chart text { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
-.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink2); }
-.key { display: inline-block; width: 14px; height: 2px; border-radius: 1px; vertical-align: middle; margin-right: 6px; }
-.tip { position: absolute; pointer-events: none; display: none; z-index: 1; background: var(--surface);
-  border: 1px solid var(--axis); border-radius: 6px; padding: 6px 10px; font-size: 12px; white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-.tip .when { color: var(--ink2); }
-.tip b { font-variant-numeric: tabular-nums; margin-right: 6px; }
-.empty { color: var(--muted); font-size: 12px; }
-details { margin-top: 24px; }
-summary { cursor: pointer; color: var(--ink2); }
-.history td, .history th { padding: 6px 16px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.notes { color: var(--ink2); font-size: 12px; margin-top: 24px; padding-left: 18px; }
-</style>
+__CSS__</style>
 </head>
 <body>
 <main>
+  __NAV__
   <h1>サーバー負荷</h1>
   <p class="meta">最終更新 __UPDATED__（日本時間）
     <button type="button" id="refresh" hidden>更新</button>
@@ -396,7 +325,7 @@ function fmtWhen(t) {
   const button = document.getElementById("refresh");
   const note = document.getElementById("refresh-note");
   if (!location.protocol.startsWith("http")) {
-    note.textContent = "・「更新」ボタンは、serve.py を動かして http://localhost:8765/ で開くと使えます";
+    note.textContent = "・「更新」ボタンは、programs/serve.py を動かして http://localhost:8765/ で開くと使えます";
     return;
   }
   button.hidden = false;

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""dashboard.html を配り、画面の「更新」ボタンで収集をやり直す小さなサーバー。
+"""3 つの画面（server.html / agents.html / usage.html）を配り、「更新」ボタンで作り直す小さなサーバー。
 
 標準ライブラリだけで動く。既定では、このサーバー自身（127.0.0.1）からしか開けない。
 """
@@ -10,7 +10,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-PAGE = HERE / "dashboard.html"
+ROOT = HERE.parent
+PAGES = {"/": "server.html", "/server.html": "server.html", "/agents.html": "agents.html", "/usage.html": "usage.html"}
 RUN_TIMEOUT_SECONDS = 120
 LOCK = threading.Lock()
 
@@ -31,12 +32,13 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        if self.path.split("?")[0] not in ("/", "/dashboard.html"):
+        name = PAGES.get(self.path.split("?")[0])
+        if name is None or not (ROOT / name).exists():
             return self.reply(404, b"not found")
-        self.reply(200, PAGE.read_bytes(), "text/html; charset=utf-8")
+        self.reply(200, (ROOT / name).read_bytes(), "text/html; charset=utf-8")
 
     def do_POST(self):
-        if self.path != "/refresh":
+        if self.path.split("?")[0].rsplit("/", 1)[-1] != "refresh":
             return self.reply(404, b"not found")
         # 他のサイトのページから勝手に呼ばれないよう、ボタンが付けるヘッダーを確かめる
         if self.headers.get("X-Refresh") != "1":
@@ -56,7 +58,7 @@ def main():
     ap.add_argument("--port", type=int, default=8765)
     args = ap.parse_args()
 
-    if not PAGE.exists():
+    if not all((ROOT / n).exists() for n in set(PAGES.values())):
         refresh()
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     print(f"http://{args.host}:{args.port}/ で待ち受けます（Ctrl+C で止まる）", flush=True)

@@ -1,0 +1,11 @@
+# 「更新」のたびに作り直される生成物
+server.html
+agents.html
+usage.html
+history/
+logs/
+*.tmp
+__pycache__/
+
+# 動いている Claude の記録（フックが自動で書く。端末ごとのもの）
+agents/sessions/

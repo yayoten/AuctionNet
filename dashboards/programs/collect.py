@@ -18,6 +18,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 HERE = Path(__file__).resolve().parent
+ROOT = HERE.parent          # dashboards/（history/ を置く）
 JST = ZoneInfo("Asia/Tokyo")
 CPU_SAMPLE_SECONDS = 3
 
@@ -143,7 +144,7 @@ def append_and_prune(path, cols, new_rows, cutoff):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--config", type=Path, default=HERE / "servers.json")
-    ap.add_argument("--data-dir", type=Path, default=HERE / "history")
+    ap.add_argument("--data-dir", type=Path, default=ROOT / "history")
     args = ap.parse_args()
 
     config = json.loads(args.config.read_text())
