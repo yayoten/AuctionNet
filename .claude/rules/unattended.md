@@ -7,9 +7,10 @@
 
 ## 1. 最初にやること
 
-1. この文書と、自分のタスクの指示書（`dashboards/agents/tasks/<ID>/指示書.md`）を読む。
-2. `CLAUDE.md` と、そこから参照される決まり（研究の作業なら `research/README.md` など）を読む。
-3. `python3 dashboards/programs/agentctl.py list` で、他のタスクの予約を確かめる。
+1. 自分のタスクの**経緯**（`dashboards/agents/tasks/<ID>/経緯.md`）を、最初に読む。このタスクが、どういう流れでできたか、何が決まっていて、何を検討して選ばなかったかが書いてある。**「決まっていること」は、変えない。** 経緯と食い違うことをするときは、先に `進捗.md` に理由を書く。
+2. この文書と、指示書（`dashboards/agents/tasks/<ID>/指示書.md`）を読む。
+3. `CLAUDE.md` と、そこから参照される決まり（研究の作業なら `research/README.md` など）を読む。
+4. `python3 dashboards/programs/agentctl.py list` で、他のタスクの予約を確かめる。
 
 ## 2. 絶対にやらないこと
 

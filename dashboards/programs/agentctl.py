@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """エージェントのタスク（予約）を作り、tmux の中で Claude を起動し、終わらせる。
 
-    agentctl.py new --title 題 [--summary 概要] [--paths フォルダ ...] [--ids REP006 ...]   予約を作る（指示書.md のひな形つき）
+    agentctl.py new --title 題 [--summary 概要] [--paths フォルダ ...] [--ids REP006 ...]   予約を作る（経緯.md・指示書.md・進捗.md のひな形つき）
     agentctl.py list                                                                    一覧
     agentctl.py launch T001 [--model opus]                                              tmux の中で Claude を起動する（確認なしで実行）
     agentctl.py done T001 / cancel T001                                                 完了／中止にする（予約を外す）
@@ -21,9 +21,49 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import agents_lib as A  # noqa: E402
 
+UNWRITTEN = "<!-- 未記入 -->"       # 経緯.md がこの行を含んだままなら、launch は起動しない
+
+BACKGROUND_TEMPLATE = """# {id} 経緯（このタスクができるまでの流れ）
+
+{unwritten}
+
+> このファイルは、**起動する前に、指示を出す側が書く**。担当の Claude は、指示書より先にこれを読む。
+> 何を書くかは `dashboards/agents/README.md` の「経緯の書き方」に従う。書き終えたら、上の「未記入」の行を消す。
+> 元の会話の記録は 30 日で消えるので、**このファイルだけで、流れが分かるように**書く。
+
+## 1. 一言で（このタスクは、何のために、なぜ今あるのか）
+
+（2〜3 文）
+
+## 2. 決まっていること（ユーザーの決定。担当は変えない）
+
+| 日付 | 決まったこと | ユーザーの言葉（短く） | 理由 |
+|---|---|---|---|
+| | | | |
+
+## 3. 流れ（時系列）
+
+1. （いつ、何が問題になり、何を調べ、何が分かり、何を決めたか。数字と REP の ID を付ける）
+
+## 4. 検討して選ばなかった案と、その理由
+
+| 案 | 選ばなかった理由 | 誰が決めたか |
+|---|---|---|
+| | | |
+
+## 5. まだ決まっていないこと・確かめていないこと
+
+- 
+
+## 6. 元の会話
+
+- セッション ID：
+- 記録のパス：
+"""
+
 SPEC_TEMPLATE = """# {id} {title}
 
-> 無人で動く Claude への指示書。起動した Claude は、まずこの文書と `.claude/rules/unattended.md` を読む。
+> 無人で動く Claude への指示書。起動した Claude は、まず `経緯.md`（このタスクができるまでの流れ）、次にこの文書と `.claude/rules/unattended.md` を読む。
 > 進み具合は、下のチェックリストに印を付け（`- [x]`）、`進捗.md` に書く。画面の「進み具合」は、この印の数で出る。
 
 ## 目的
@@ -76,10 +116,12 @@ def cmd_new(a):
         sys.exit(f"予約が重なっています：{busy + ids_busy}。重ねてよければ --force を付けてください。")
     A.write_json(d / "task.json", {"id": tid, "title": a.title, "summary": a.summary, "status": "予約", "paths": paths, "ids": a.ids,
                                    "created_at": A.now(), "created_on": A.host(), "session_ids": []})
+    (d / "経緯.md").write_text(BACKGROUND_TEMPLATE.format(id=tid, unwritten=UNWRITTEN), encoding="utf-8")
     (d / "指示書.md").write_text(SPEC_TEMPLATE.format(id=tid, title=a.title, summary=a.summary or "（何のためにやるか）",
                                                    paths="\n".join(f"- `{p}/`" for p in paths) or "（予約なし）"), encoding="utf-8")
     (d / "進捗.md").write_text(f"# {tid} の進捗\n\n（Claude が、区切りごとに日時つきで足す）\n", encoding="utf-8")
-    print(f"{tid} を作りました。指示書を書いてください：{A.rel(d / '指示書.md')}")
+    print(f"{tid} を作りました。次の 2 つを書いてください（経緯.md が未記入のままだと、launch は起動しません）：\n"
+          f"  {A.rel(d / '経緯.md')}\n  {A.rel(d / '指示書.md')}")
 
 
 def cmd_list(a):
@@ -96,12 +138,18 @@ def cmd_launch(a):
     name = tmux_name(a.task)
     if tmux_alive(name):
         sys.exit(f"もう動いています。様子を見るには：tmux attach -t {name}")
+    bg = A.TASKS / a.task / "経緯.md"
+    if not bg.exists() or UNWRITTEN in bg.read_text(encoding="utf-8"):
+        sys.exit(f"経緯.md が未記入です（{A.rel(bg)}）。このタスクができるまでの流れを書いてから、起動してください。")
     spec = A.rel(A.TASKS / a.task / "指示書.md")
-    prompt = (f"あなたは、無人で動くエージェントです。タスク {a.task} を担当します。まず .claude/rules/unattended.md と {spec} を読み、"
+    prompt = (f"あなたは、無人で動くエージェントです。タスク {a.task} を担当します。まず {A.rel(bg)}（このタスクができるまでの流れ）、"
+              f".claude/rules/unattended.md、{spec} の順に読み、"
               f"指示書のとおりに最後まで進めてください。区切りごとに、指示書のチェックリストに印を付け、同じフォルダの 進捗.md に書いてください。"
               f"終わったら python3 dashboards/programs/agentctl.py done {a.task} を実行してください。")
     claude = ["claude", "--dangerously-skip-permissions"] + (["--model", a.model] if a.model else []) + [prompt]
-    inner = f"export AGENT_TASK={shlex.quote(a.task)}; cd {shlex.quote(str(A.REPO))} && {' '.join(shlex.quote(c) for c in claude)}"
+    # Claude が終わっても画面を閉じない（なぜ終わったかを、あとから tmux attach で読めるようにする）
+    inner = (f"export AGENT_TASK={shlex.quote(a.task)}; cd {shlex.quote(str(A.REPO))} && {' '.join(shlex.quote(c) for c in claude)}; "
+             f"echo; echo '=== Claude が終了しました（終了コード '$?'）。この画面は exit で閉じます ==='; exec bash")
     subprocess.run(["tmux", "new-session", "-d", "-s", name, "-x", "200", "-y", "50", inner], check=True)
     t.update(status="実行中", started_at=A.now(), tmux=name, host=A.host(), surface="tmux")
     t.pop("_dir", None)

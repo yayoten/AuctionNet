@@ -1,0 +1,21 @@
+{
+  "id": "T002",
+  "title": "REP003 ベースラインのパラメータ設定",
+  "summary": "既存8手法（ルールベース3＋学習ベース5）を公平に動かす設定を、理屈と方策の出力の測定から決め、成果物のjsonにまとめる",
+  "status": "予約",
+  "paths": [
+    "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定",
+    "research/src",
+    "research/MASTER.md",
+    "research/flow.md",
+    "research/W001_既存手法の比較/W001.md",
+    "github/strategy_train_env",
+    "github/Test/2_学習データと学習手法"
+  ],
+  "ids": [
+    "REP003"
+  ],
+  "created_at": "2026-10-09T16:37:49+09:00",
+  "created_on": "BariKata",
+  "session_ids": []
+}

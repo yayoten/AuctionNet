@@ -73,9 +73,12 @@ def task_rows(tasks, now):
         if t.get("ids"):
             reserve += f'<div class="sub">番号：{esc("、".join(t["ids"]))}</div>'
         spec = A.rel(os.path.join(t["_dir"], "指示書.md"))
+        bgp = os.path.join(t["_dir"], "経緯.md")
+        bg = ("経緯：記入済み" if os.path.exists(bgp) and "<!-- 未記入 -->" not in open(bgp, encoding="utf-8").read()
+              else "経緯：未記入（起動できません）" if os.path.exists(bgp) else "経緯：なし")
         rows.append(
             f'<tr><td class="nowrap"><b>{esc(t["id"])}</b></td><td>{pill(cls, mark, t.get("status", ""))}</td>'
-            f'<td><b>{esc(t.get("title"))}</b><div class="sub">{esc(t.get("summary"))}</div><div class="mono sub">{esc(spec)}</div></td>'
+            f'<td><b>{esc(t.get("title"))}</b><div class="sub">{esc(t.get("summary"))}</div><div class="mono sub">{esc(spec)}</div><div class="sub">{esc(bg)}</div></td>'
             f'<td>{place}</td><td class="nowrap">{when(t.get("started_at") or t.get("created_at"))}'
             f'<div class="sub">{"終了 " + when(t["finished_at"]) if t.get("finished_at") else ""}</div></td>'
             f'<td>{reserve or "–"}</td><td>{progress}</td></tr>')
