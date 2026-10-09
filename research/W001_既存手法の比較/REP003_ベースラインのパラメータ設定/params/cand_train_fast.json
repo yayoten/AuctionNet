@@ -1,0 +1,9 @@
+{
+  "work": "W001",
+  "rep": "REP003",
+  "name": "candidate_train",
+  "note": "候補の設定: BC・IQL・CQL・TD3_BC を、共通の長さ 30000 ステップで学習する（seed 1,2,3）。ほかは本家の既定のまま",
+  "algo": "BC",
+  "step_num": 30000,
+  "sweep": {"algo": ["BC", "IQL", "CQL", "TD3_BC"], "seed": [1, 2, 3]}
+}

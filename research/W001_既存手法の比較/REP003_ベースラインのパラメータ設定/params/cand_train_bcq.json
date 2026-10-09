@@ -1,0 +1,11 @@
+{
+  "work": "W001",
+  "rep": "REP003",
+  "name": "candidate_train",
+  "note": "候補の設定: BCQ を、共通の長さ 30000 ステップで学習する（seed 1,2,3、スレッド 4、max_action は既定の 100）。途中の重みを残す",
+  "algo": "BCQ",
+  "step_num": 30000,
+  "threads": 4,
+  "checkpoints": [100, 300, 1000, 3000, 10000, 20000],
+  "sweep": {"seed": [1, 2, 3]}
+}
