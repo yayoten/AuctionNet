@@ -1,0 +1,185 @@
+% REP003 探索：ベースラインのパラメータ設定（親：W001。問いは未確定）
+% コンパイル：uplatex を2回 → dvipdfmx（TEXINPUTS で .claude/templates/progress_report// を参照）
+% この報告は，最終的に決めた設定のまとめである。決めるまでの過程（ループ1〜3）は REP003.md に書いてある。
+\documentclass[twocolumn, 10pt]{ujarticle}
+\usepackage{progress_report}
+
+\begin{document}
+
+\reportid{REP003}
+\questionid{W001}
+\exploration{既存8手法を，どの設定で動かせば，以後の比較の相手にできるか}
+\reportdate{20261009}
+\summary{%
+以後の比較の相手にする既存8手法（ルールベース3，学習ベース5）の，パラメータ設定を決めた。
+評価に使う日のscoreを見ずに，方策の出力（入札係数$\alpha$）が学習の長さと乱数シードでどれだけ動くかを測って候補を決め，評価に使わない日（エピソード4〜7）で試した。
+ルールベースは本家の既定値のまま，学習ベースは5手法とも30,000ステップ・seed 1〜3の平均とし，5手法とも，seedによるscoreの幅が事前に決めた10\%以内であった（BC 0.45\%〜TD3\_BC 9.99\%）。BCQは状態によらず$\alpha=100$を出しており，ここから，学習ベースの手法と一定の$\alpha$の入札との差が何から来るのかを知りたい，という問いが生まれた。
+}
+\beginverification
+
+% ============================================================
+\section{目的}\label{sec:e-purpose}
+% ============================================================
+
+REP002で，本家の既定設定のCQL・TD3\_BCが落札できなかったことを受けて，既存8手法を公平に動かせるパラメータ設定を決め，以後の比較のベースラインにする。
+
+% ============================================================
+\section{実験}\label{sec:e-exp}
+% ============================================================
+
+\subsection{対象のアルゴリズム}\label{sec:e-algo}
+
+8手法とも，入札額を「$\alpha\times$価値」で決める。設定を決めるうえで関わる点（方策がログの$\alpha$に引き寄せられるか，出力に上限があるか）を，表\ref{tab:algo}にまとめる。
+
+\begin{table}[H]
+\centering
+\caption{対象の8手法（本家の実装。設定を決めるうえで関わる点）}
+\label{tab:algo}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+PID・ABid・Online LP & 学習しない。規則で$\alpha$を決める \\
+\midrule
+BC & ログの$\alpha$との二乗誤差だけで学ぶ \\
+IQL & 報酬が大きかったログの$\alpha$を，重く見て真似る \\
+TD3\_BC & 二乗誤差$+$Q値の項 \\
+CQL & Q値の傾きだけで$\alpha$を動かす。ログに引き寄せる項は無い \\
+BCQ & 生成モデルが$\alpha$の候補を作り，Q値が最大のものを選ぶ。出力の上限は100 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{実験環境}\label{sec:e-env}
+
+設定は，表\ref{tab:rule}の4つの条件（実験の前に決めた）を満たすように決めた。scoreは，セル（位置$\times$エピソード）ごとの「CPAのペナルティ係数$\times$獲得価値」である。
+
+\begin{table}[H]
+\centering
+\caption{設定を決めるときの条件（「公平」の定義）}
+\label{tab:rule}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+F1 & 評価の日（エピソード0〜3）のscoreで選ばない \\
+F2 & 学習ベースは，出力が落ち着いた重みを使う \\
+F3 & 全手法に，同じデータと同じ決め方を使う \\
+F4 & 変えるのは，理屈かデータから決まるものだけ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{実験の条件}
+\label{tab:cond}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+固定 & 学習データ：公開データ21日分（48,384行） \\
+ & 学習率などは本家の既定，CPU，Linux \\
+\midrule
+出力の測定 & 学習データから抜いた2,000状態への$\alpha$ \\
+ & 5手法$\times$seed 1〜3 \\
+ & 100〜50,000ステップの8時点（BCQは20,000まで） \\
+\midrule
+落ち着きの基準 & 状態ごとの$\alpha$の差の平均が5以内 \\
+ & （以降の時点どうし，seedどうし） \\
+\midrule
+候補を試す & 30,000ステップ，seed 1〜3 \\
+ & エピソード4〜7$\times$位置0, 8, 16, 24, 32, 40 \\
+ & 計90 run \\
+\midrule
+合格の基準 & 全seedが落札する \\
+ & 3 seedの平均scoreの幅が，平均の10\%以内 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{取った特徴量}\label{sec:e-feat}
+
+scoreのほかに，方策の出力そのものと，その内訳を記録した（表\ref{tab:feat}）。
+
+\begin{table}[H]
+\centering
+\caption{取った特徴量}
+\label{tab:feat}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+種類 & 記録した量 \\
+\midrule
+方策の出力 & $\alpha$の平均，時点間の差，seed間の差，ログの$\alpha$との相関，上限への集中 \\
+出力の内訳 & BCQの生成モデルの出力，TD3\_BCの損失の項ごとの傾き，CQLのQ値が最大になる$\alpha$ \\
+評価 & score，予算消化率，評価中の$\alpha$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+\section{結果}\label{sec:e-result}
+% ============================================================
+
+\textbf{決めた設定}　表\ref{tab:set}のとおりである。ルールベース3手法は，本家の既定値のままにした（評価の日のscoreで調整していない）。
+学習ベース5手法は，学習の長さだけを変え，5手法とも30,000ステップにした。30,000は，落ち着きの基準を満たしたBC・IQLの，満たし始めのステップである。
+設定は\texttt{research/src/baseline\_params.json}にまとめた。
+
+\begin{table}[H]
+\centering
+\caption{確定したベースラインの設定（学習ベースはseed 1〜3の平均で報告する）}
+\label{tab:set}
+\footnotesize\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\linewidth}{@{}lll>{\raggedright\arraybackslash}X@{}}
+\toprule
+手法 & 学習の長さ & 基準 & 但し書き \\
+\midrule
+PID & ― & ― & 既定値。調整していない \\
+ABid & ― & ― & 同上 \\
+Online LP & ― & ― & 同上 \\
+\midrule
+BC & 30,000（既定20,000） & 満たす & 30,000と50,000の1組の比較による \\
+IQL & 30,000（既定20,000） & 満たす & 同上 \\
+CQL & 30,000（既定100） & 満たさない & 出力の水準が学習の長さで動く \\
+TD3\_BC & 30,000（既定100） & 満たさない & Q値の項が効かず，実質はBC \\
+BCQ & 30,000（既定100） & 一定の出力 & 状態によらず$\alpha=100$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{方策の出力}　学習データの状態への$\alpha$の平均は，BC・IQL・TD3\_BCでは，到達したあと82〜86の範囲にあった（ログの$\alpha$の平均は82）。100ステップの時点では，BC 5.3，IQL 0.1，CQL $-0.8$，TD3\_BC 17.8であった。
+30,000ステップと50,000ステップの出力の差は，BC 4.9，IQL 4.2，TD3\_BC 10.3，CQL 21.0であった。CQLは，$\alpha$の平均が10,000ステップで91，20,000で101，50,000で73と動いた。
+TD3\_BCは，方策の損失のうちQ値の項の傾きが，二乗誤差の項の0.1\%未満であった。
+BCQは，1,000ステップ以降，3 seedとも，ほぼ全状態で100.0を出した。生成モデルの出力そのものが上限に張り付いていた。上限をログの$\alpha$の99\%点から決めた300に変えると，seed 1つは300に張り付き，残りの2つは，生成モデルの出力がログの$\alpha$と負の相関（$-0.42$，$-0.39$）になったため，上限は既定の100のままにした。
+
+\textbf{候補を試した結果}　表\ref{tab:try}のとおり，5手法とも，全seedが落札し，seedによるscoreの幅は10\%以内であった。TD3\_BCの幅は9.99\%で，基準との差は0.01ポイントであった。
+BCQは，3 seedの結果が全セルで同じで，評価中の$\alpha$は，予算が残っている間は100.0であった。
+実験の前に決めた合格の基準を，5手法とも満たした（達成）。
+
+\begin{table}[H]
+\centering
+\caption{候補を試した結果（エピソード4〜7，6位置，24セルの平均score）}
+\label{tab:try}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}Xrrrrr@{}}
+\toprule
+ & seed 1 & seed 2 & seed 3 & 平均 & 幅 \\
+\midrule
+BC & 21.02 & 21.05 & 20.95 & 21.01 & 0.45\% \\
+IQL & 20.08 & 19.47 & 19.29 & 19.61 & 4.0\% \\
+CQL & 19.09 & 19.24 & 18.86 & 19.06 & 2.0\% \\
+TD3\_BC & 17.99 & 18.59 & 19.87 & 18.82 & 9.99\% \\
+BCQ & 17.53 & 17.53 & 17.53 & 17.53 & 0.0\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+\section{結果から生まれた問い}\label{sec:e-question}
+% ============================================================
+
+既定の100ステップで落札できなかったCQL・TD3\_BCは，30,000ステップでは，全seedが落札し，seedによるscoreの幅が10\%以内であった。評価中の$\alpha$の平均は，BC・IQL・CQL・TD3\_BCの12個の重みで83〜91に収まり，ログの$\alpha$の平均（82）に近かった。BCQは，予算が残っている間，状態によらず$\alpha=100$を出した。24セルの平均scoreは，BC 21.0，IQL 19.6，CQL 19.1，TD3\_BC 18.8，BCQ 17.5であった。
+
+学習ベースの4手法は，どれも「ログの$\alpha$を真似る」のに近い方策になっていると考えられる。そうなら，手法どうしのscoreの差は，$\alpha$の水準のわずかな違いか，状態に応じた$\alpha$の変え方の違いから来ている可能性がある。一定の$\alpha$を出すBCQが，BCの0.83倍のscoreを取っていることは，状態に応じて$\alpha$を変えることの効果が，それほど大きくない可能性を示す。ただし，BCQとBCは$\alpha$の水準も違う（100と87）ので，この比較からは切り分けられない。また，CQLのscoreが学習の長さでどう変わるかは，確かめていない。
+
+学習ベースの手法が，一定の$\alpha$を出すだけの入札に対して持つscoreの差は，$\alpha$の水準の違いによるのか，状態に応じて$\alpha$を変えることによるのかを知りたい。
+
+\end{document}
