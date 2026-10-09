@@ -11,6 +11,7 @@ spec.json（変える値だけを書く）
       "train_data": "DB/dataset/traffic/training_data_rlData_folder/training_data_all-rlData.csv",   # 省略可
       "checkpoints": [100, 1000, 10000],  # 任意。この学習ステップの時点の重みも ckpt/ に残す（学習の経過を見る用）
       "threads": 1,                      # 任意。torch のスレッド数（既定 1。BCQ は 8 で約 4 倍速い。数値が変わりうるので model_id に入る）
+      "train_kwargs": {"max_action": 300},   # 任意。本家の学習関数にそのまま渡す追加の引数（例：BCQ の max_action）。書けば model_id に入る
       "sweep": {"algo": ["BC", "IQL"], "step_num": [null, 20000]}     # 任意。直積に展開する
     }
 
@@ -91,6 +92,8 @@ def make_model_id(resolved, version):
     key = {k: resolved[k] for k in ("algo", "step_num", "seed", "train_data_sha1")}
     if resolved.get("threads", 1) != 1:        # 既定（1 スレッド）の model_id は、これまでと変えない
         key["threads"] = resolved["threads"]
+    if resolved.get("train_kwargs"):           # 追加の引数が無いときの model_id は、これまでと変えない
+        key["train_kwargs"] = resolved["train_kwargs"]
     return "M" + hashlib.sha1((canonical(key) + "|" + version).encode("utf-8")).hexdigest()[:10]
 
 
@@ -132,7 +135,7 @@ def install_checkpoints(module, steps, tmp_dir, model_id, meta, algo):
             w = d / ALGOS[algo][2]
             (d / "meta.json").write_text(json.dumps(
                 {"model_id": cid, "parent_model_id": model_id, "is_checkpoint": True, "algo": algo, "step_num": count[0],
-                 "seed": meta["seed"], "spec_name": meta["spec_name"], "work": meta["work"], "rep": meta["rep"],
+                 "seed": meta["seed"], "train_kwargs": meta.get("train_kwargs") or {}, "spec_name": meta["spec_name"], "work": meta["work"], "rep": meta["rep"],
                  "train_data_sha1": meta["train_data_sha1"], "github_version": meta["github_version"],
                  "github_dirty": meta["github_dirty"], "head_commit": meta["head_commit"], "model_file": w.name,
                  "model_sha1": sha1_of(w), "weights_sha1": weights_sha1(w), "status": "ok"}, ensure_ascii=False, indent=2),
@@ -156,6 +159,7 @@ def execute(task):
     meta = {"model_id": model_id, "spec_name": resolved.get("name"), "work": resolved.get("work"), "rep": resolved.get("rep"),
             "note": resolved.get("note"), "sweep_point": resolved.get("sweep_point", {}), "algo": algo,
             "step_num": resolved["step_num"], "step_num_is_default": resolved["step_num_is_default"], "seed": resolved["seed"],
+            "train_kwargs": resolved.get("train_kwargs") or {},
             "train_data": resolved["train_data"], "train_data_sha1": resolved["train_data_sha1"],
             "spec_file": resolved.get("spec_file"), "created_at": datetime.now().isoformat(timespec="seconds"),
             **{k: version[k] for k in ("head_commit", "github_tree", "github_dirty", "github_version", "repo_dirty_paths")},
@@ -178,7 +182,8 @@ def execute(task):
         meta.update(python=platform.python_version(), numpy=np.__version__, torch=torch.__version__, pandas=pd.__version__,
                     device="cuda" if torch.cuda.is_available() else "cpu")
         with contextlib.redirect_stdout(io.StringIO()):
-            fn(train_data_path=str(REPO / resolved["train_data"]), save_path=str(tmp_dir), step_num=resolved["step_num"])
+            fn(train_data_path=str(REPO / resolved["train_data"]), save_path=str(tmp_dir), step_num=resolved["step_num"],
+               **(resolved.get("train_kwargs") or {}))
         module.logger.removeHandler(cap)
         restore()
         loss = pd.DataFrame(cap.rows)

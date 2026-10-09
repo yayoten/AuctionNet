@@ -132,3 +132,26 @@ def test_threads_enter_model_id_only_when_not_one(tmp_path, rl_csv, models):
     b, _ = tm.build_tasks(str(write_spec(tmp_path, rl_csv, algo="BC", threads=1)), False)
     c, _ = tm.build_tasks(str(write_spec(tmp_path, rl_csv, algo="BC", threads=4)), False)
     assert a[0]["model_id"] == b[0]["model_id"] != c[0]["model_id"]
+
+
+def test_train_kwargs_are_passed_recorded_and_enter_model_id(tmp_path, rl_csv, models):
+    """spec の train_kwargs は、本家の学習関数に渡り、meta に残り、model_id を変える。書かないときの model_id は従来どおり。"""
+    plain, = tm.build_tasks(str(write_spec(tmp_path, rl_csv, algo="BCQ")), False)[0]
+    empty, = tm.build_tasks(str(write_spec(tmp_path, rl_csv, algo="BCQ", train_kwargs={})), False)[0]
+    wide, = tm.build_tasks(str(write_spec(tmp_path, rl_csv, algo="BCQ", train_kwargs={"max_action": 300})), False)[0]
+    assert plain["model_id"] == empty["model_id"] != wide["model_id"]
+    m = tm.execute(wide)
+    assert m["status"] == "ok", m.get("traceback")
+    assert m["train_kwargs"] == {"max_action": 300}
+    model = torch.jit.load(str(models / m["model_id"] / "bcq_model.pth"))
+    assert model.vae.max_action == 300 and model.actor.max_action == 300
+    m0 = tm.execute(plain)
+    assert m0["train_kwargs"] == {} and torch.jit.load(str(models / m0["model_id"] / "bcq_model.pth")).vae.max_action == 100
+
+
+def test_train_kwargs_reach_checkpoint_meta(tmp_path, rl_csv, models):
+    (m,), _ = run(write_spec(tmp_path, rl_csv, algo="BCQ", train_kwargs={"max_action": 300}, checkpoints=[5]))
+    assert m["status"] == "ok", m.get("traceback")
+    c, = (models / m["model_id"] / "ckpt").glob("*/meta.json")
+    assert json.loads(c.read_text(encoding="utf-8"))["train_kwargs"] == {"max_action": 300}
+

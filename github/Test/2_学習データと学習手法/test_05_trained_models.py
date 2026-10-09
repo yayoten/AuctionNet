@@ -88,6 +88,9 @@ def test_default_model_is_reproduced_by_retraining(algo, tmp_path, monkeypatch):
     again = tm.execute(task)
     assert again["status"] == "ok", again.get("traceback")
     new = tmp_path / "models" / again["model_id"]
-    assert again["model_id"] == m["model_id"]
+    # model_id には github/ の版が入る。学習した時点から github/ を変えていれば（例：BCQ の max_action を引数に出した）、
+    # ID は変わる。そのときも、重みと損失が一致すること（変更が既定の学習を変えていないこと）は、下で確かめる。
+    if again["github_version"] == m["github_version"]:
+        assert again["model_id"] == m["model_id"]
     assert tm.weights_sha1(new / m["model_file"]) == tm.weights_sha1(MODELS_DIR / m["model_id"] / m["model_file"])
     pd.testing.assert_frame_equal(pd.read_csv(new / "loss.csv"), pd.read_csv(MODELS_DIR / m["model_id"] / "loss.csv"))
