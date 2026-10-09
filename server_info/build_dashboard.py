@@ -217,15 +217,13 @@ def main():
     updated = datetime.fromisoformat(latest["ts"]) if latest.get("ts") else None
     data = {
         "updated": int(updated.timestamp() * 1000) if updated else None,
-        "interval_min": config["interval_minutes"],
+        "gap_min": config["line_gap_minutes"],
         "stale_min": config["stale_minutes"],
         "charts": chart_data(config, host, gpu, disk, (now - timedelta(days=CHART_DAYS)).isoformat()),
     }
     th = config["thresholds"]
     page = (TEMPLATE
             .replace("__UPDATED__", updated.strftime("%Y-%m-%d %H:%M") if updated else "まだ収集されていません")
-            .replace("__INTERVAL__", str(config["interval_minutes"]))
-            .replace("__STALE__", str(config["stale_minutes"]))
             .replace("__CURRENT__", current_rows(config, host, gpu, disk, latest))
             .replace("__HISTORY__", history_table(host, gpu, (now - timedelta(hours=TABLE_HOURS)).isoformat()))
             .replace("__TH_CPU__", f'{th["cpu_load_ratio"][0]:.0%} 以上で混雑、{th["cpu_load_ratio"][1]:.0%} 以上で逼迫')
@@ -272,6 +270,9 @@ main { max-width: 1120px; margin: 0 auto; }
 h1 { font-size: 22px; margin: 0; }
 h2 { font-size: 16px; margin: 32px 0 12px; }
 .meta { color: var(--ink2); margin: 4px 0 0; }
+.meta button { font: inherit; font-weight: 600; color: var(--ink); background: var(--surface); cursor: pointer;
+  border: 1px solid var(--axis); border-radius: 6px; padding: 4px 16px; margin: 0 8px; }
+.meta button:disabled { color: var(--muted); cursor: default; }
 .stale { display: none; margin: 16px 0 0; padding: 12px 16px; border-radius: 8px;
   border: 2px solid var(--critical); background: var(--surface); font-weight: 600; }
 .stale.on { display: block; }
@@ -322,7 +323,9 @@ summary { cursor: pointer; color: var(--ink2); }
 <body>
 <main>
   <h1>サーバー負荷</h1>
-  <p class="meta">最終更新 __UPDATED__（日本時間）・__INTERVAL__ 分ごとに更新・開き直すと最新になります</p>
+  <p class="meta">最終更新 __UPDATED__（日本時間）
+    <button type="button" id="refresh" hidden>更新</button>
+    <span id="refresh-note"></span></p>
   <div class="stale" id="stale" role="alert"></div>
 
   <h2>いまの状態</h2>
@@ -388,18 +391,43 @@ function fmtWhen(t) {
   return (d.getUTCMonth() + 1) + "/" + d.getUTCDate() + " " + pad(d.getUTCHours()) + ":" + pad(d.getUTCMinutes());
 }
 
-// 更新が止まっていないかを、開いた時点の時刻で判定する
+// 「更新」ボタン：serve.py 経由で開いたときだけ使える（ファイルを直接開いたときは、収集を頼む先がない）
+(function () {
+  const button = document.getElementById("refresh");
+  const note = document.getElementById("refresh-note");
+  if (!location.protocol.startsWith("http")) {
+    note.textContent = "・「更新」ボタンは、serve.py を動かして http://localhost:8765/ で開くと使えます";
+    return;
+  }
+  button.hidden = false;
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    button.textContent = "更新中…";
+    note.textContent = "";
+    try {
+      const res = await fetch("refresh", { method: "POST", headers: { "X-Refresh": "1" } });
+      if (!res.ok) throw new Error(await res.text());
+      location.reload();
+    } catch (e) {
+      note.textContent = "更新に失敗しました（" + e.message + "）。logs/run.log を見てください。";
+      button.disabled = false;
+      button.textContent = "更新";
+    }
+  });
+})();
+
+// 値が古くないかを、開いた時点の時刻で判定する
 (function () {
   const box = document.getElementById("stale");
   if (DATA.updated === null) {
-    box.textContent = "まだ一度も収集されていません。";
+    box.textContent = "まだ一度も収集されていません。「更新」を押してください。";
     box.classList.add("on");
     return;
   }
   const minutes = Math.floor((Date.now() - DATA.updated) / 60000);
   if (minutes >= DATA.stale_min) {
     const text = minutes >= 120 ? Math.floor(minutes / 60) + " 時間" : minutes + " 分";
-    box.textContent = "■ 更新が止まっています。最後の更新から " + text + " たっています。下の値は古い可能性があります。";
+    box.textContent = "■ 最後の更新から " + text + " たっています。下の値は古い可能性があります。「更新」を押すと最新になります。";
     box.classList.add("on");
   }
 })();
@@ -458,8 +486,8 @@ function drawChart(card, hours) {
     el("text", { x: x(t), y: H - 6, "text-anchor": "middle" }, svg).textContent = label;
   }
 
-  // 収集が抜けた区間は線をつながない
-  const gap = DATA.interval_min * 60000 * 2.5;
+  // 収集の間が空いた区間は線をつながない
+  const gap = DATA.gap_min * 60000;
   for (const s of series) {
     let seg = [];
     const segs = [];

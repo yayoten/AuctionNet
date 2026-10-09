@@ -1,5 +1,5 @@
 #!/bin/bash
-# cron から15分ごとに呼ぶ。収集 → dashboard.html の作り直し。
+# serve.py（画面の「更新」ボタン）から呼ぶ。手でも動かせる。収集 → dashboard.html の作り直し。
 # 収集に失敗しても、ダッシュボードは作り直す（取れた分と、失敗した旨を画面に出すため）。
 set -u
 export PATH=/usr/local/bin:/usr/bin:/bin

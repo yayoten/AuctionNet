@@ -2,7 +2,7 @@
   "servers": [
     {"name": "BariKata", "method": "local", "disks": ["/", "/mnt/hdd0"]}
   ],
-  "interval_minutes": 15,
+  "line_gap_minutes": 60,
   "stale_minutes": 30,
   "retention_days": 90,
   "thresholds": {
