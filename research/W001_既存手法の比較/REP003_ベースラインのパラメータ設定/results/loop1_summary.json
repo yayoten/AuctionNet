@@ -1,0 +1,58 @@
+{
+ "tag": "loop1",
+ "spec_names": [
+  "loop1_train"
+ ],
+ "threshold_alpha": 5.0,
+ "n_probe_states": 2000,
+ "logged_alpha_mean": 81.49,
+ "logged_alpha_std": 51.03,
+ "logged_share_gt100": 0.249,
+ "by_algo": {
+  "BC": {
+   "S_star": 30000,
+   "last_step": 50000,
+   "alpha_mean_last": 84.76,
+   "seed_diff_last": 2.67,
+   "share_ge99_last": 0.344,
+   "share_le0_last": 0.049,
+   "corr_to_logged_last": 0.872
+  },
+  "BCQ": {
+   "S_star": 1000,
+   "last_step": 20000,
+   "alpha_mean_last": 100.0,
+   "seed_diff_last": 0.0,
+   "share_ge99_last": 1.0,
+   "share_le0_last": 0.0,
+   "corr_to_logged_last": NaN
+  },
+  "CQL": {
+   "S_star": null,
+   "last_step": 50000,
+   "alpha_mean_last": 72.68,
+   "seed_diff_last": 5.48,
+   "share_ge99_last": 0.072,
+   "share_le0_last": 0.0,
+   "corr_to_logged_last": 0.333
+  },
+  "IQL": {
+   "S_star": 30000,
+   "last_step": 50000,
+   "alpha_mean_last": 83.67,
+   "seed_diff_last": 1.99,
+   "share_ge99_last": 0.314,
+   "share_le0_last": 0.03,
+   "corr_to_logged_last": 0.82
+  },
+  "TD3_BC": {
+   "S_star": null,
+   "last_step": 50000,
+   "alpha_mean_last": 81.93,
+   "seed_diff_last": 4.53,
+   "share_ge99_last": 0.277,
+   "share_le0_last": 0.042,
+   "corr_to_logged_last": 0.915
+  }
+ }
+}
