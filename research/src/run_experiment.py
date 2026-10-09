@@ -132,11 +132,25 @@ def _git(*args):
         return ""
 
 
+def _github_tree_without_tests():
+    """HEAD の github/ から Test/ を除いた tree のハッシュ。Test/ が無いときは `git rev-parse HEAD:github` と同じ値になる。"""
+    try:
+        ls = subprocess.run(["git", "ls-tree", "-z", "HEAD:github"], cwd=REPO, capture_output=True, timeout=60).stdout
+        kept = b"".join(e + b"\0" for e in ls.split(b"\0") if e and e.split(b"\t", 1)[1] != b"Test")
+        return subprocess.run(["git", "mktree", "-z"], cwd=REPO, input=kept, capture_output=True, timeout=60).stdout.decode().strip()
+    except Exception:
+        return ""
+
+
 def code_version():
-    """github/ の中身の版。コミット済みなら tree のハッシュ、未コミットの変更があれば差分のハッシュも足す。"""
-    tree = _git("rev-parse", "HEAD:github")
-    diff = _git("diff", "HEAD", "--", "github")
-    untracked = _git("ls-files", "--others", "--exclude-standard", "github")
+    """github/ の中身の版。コミット済みなら tree のハッシュ、未コミットの変更があれば差分のハッシュも足す。
+
+    github/Test/（pytest）は数えない。テストを足したり直したりしても、run_id・model_id は変わらない。
+    """
+    no_tests = ":(exclude)github/Test"
+    tree = _github_tree_without_tests()
+    diff = _git("diff", "HEAD", "--", "github", no_tests)
+    untracked = _git("ls-files", "--others", "--exclude-standard", "--", "github", no_tests)
     dirty = bool(diff or untracked)
     ver = tree + (("+" + hashlib.sha1((diff + untracked).encode("utf-8", "replace")).hexdigest()[:8]) if dirty else "")
     return {"github_tree": tree, "github_dirty": dirty, "github_version": ver, "head_commit": _git("rev-parse", "HEAD"),

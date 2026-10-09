@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import torch
 
-from conftest import GITHUB_DIR, SIM_DIR, TRAIN_DIR, REPO_ROOT
+from conftest import GITHUB_DIR, SIM_DIR, TRAIN_DIR, REPO_ROOT, github_py_files
 
 OFFICIAL = SIM_DIR / "strategy" / "official_agent"
 
@@ -195,7 +195,7 @@ def test_python_files_are_all_syntactically_valid():
     import ast
 
     bad = []
-    for f in GITHUB_DIR.rglob("*.py"):
+    for f in github_py_files():
         try:
             ast.parse(f.read_text(encoding="utf-8"))
         except SyntaxError as e:  # pragma: no cover
@@ -205,6 +205,6 @@ def test_python_files_are_all_syntactically_valid():
 
 def test_every_py_directory_is_a_package_or_script_dir():
     """__init__.py が無い、.py を含むディレクトリの一覧を把握しておく（増減の検知）。"""
-    dirs = {f.parent for f in GITHUB_DIR.rglob("*.py")}
+    dirs = {f.parent for f in github_py_files()}
     no_init = sorted(str(d.relative_to(GITHUB_DIR)) for d in dirs if not (d / "__init__.py").exists())
     assert "." in no_init  # github/ 直下は namespace package

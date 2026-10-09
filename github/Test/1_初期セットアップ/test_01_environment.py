@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 from packaging.version import Version
 
-from conftest import GITHUB_DIR
+from conftest import GITHUB_DIR, github_py_files
 
 
 def _parse_requirements():
@@ -131,7 +131,7 @@ def _third_party_modules_imported_by_github():
     """github/ 配下の .py が import している、site-packages 由来のトップレベルモジュール名。"""
     site_dirs = {Path(p).resolve() for p in (sysconfig.get_paths()["purelib"], sysconfig.get_paths()["platlib"])}
     tops = set()
-    for f in GITHUB_DIR.rglob("*.py"):
+    for f in github_py_files():
         tree = ast.parse(f.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):

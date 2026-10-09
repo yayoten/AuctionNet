@@ -6,7 +6,7 @@ import sys
 import numpy as np
 import pytest
 
-from conftest import GITHUB_DIR, REPO_ROOT
+from conftest import GITHUB_DIR, REPO_ROOT, github_py_files
 import github.run.run_test as rt
 from github.simul_bidding_env.Tracker.PlayerAnalysis import PlayerAnalysis
 
@@ -182,7 +182,7 @@ def test_run_test_module_does_not_use_removed_collections_alias():
 def test_no_module_imports_removed_collections_aliases():
     import re as _re
 
-    bad = [str(f) for f in GITHUB_DIR.rglob("*.py")
+    bad = [str(f) for f in github_py_files()
            if _re.search(r"^from collections import .*\b(Iterable|Mapping|Sequence|Callable)\b",
                          f.read_text(encoding="utf-8"), _re.M)]
     assert bad == []

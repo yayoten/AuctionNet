@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # 検証用の Python 3.9 仮想環境を作る（macOS / Linux / Windows の Git Bash・WSL）。
 #
-#   bash Test/1_初期セットアップ/setup_env.sh              # リポジトリ直下の .venv に作る
-#   bash Test/1_初期セットアップ/setup_env.sh --no-lock    # ロックを使わず github/requirements.txt から解決
-#   bash Test/1_初期セットアップ/setup_env.sh --pip        # uv があっても使わず、python3.9 + pip で作る
-#   bash Test/1_初期セットアップ/setup_env.sh 作成先DIR    # 作成先を変える
+#   bash github/Test/1_初期セットアップ/setup_env.sh              # リポジトリ直下の .venv に作る
+#   bash github/Test/1_初期セットアップ/setup_env.sh --no-lock    # ロックを使わず github/requirements.txt から解決
+#   bash github/Test/1_初期セットアップ/setup_env.sh --pip        # uv があっても使わず、python3.9 + pip で作る
+#   bash github/Test/1_初期セットアップ/setup_env.sh 作成先DIR    # 作成先を変える
 #
 # - uv があれば uv を使う（Python 3.9 が無くても uv が取得する）。無ければ、手元の Python 3.9 + pip で作る。
 # - 既定では requirements.lock.txt（全パッケージのバージョン固定）を入れる。どの端末でも同じ版になる。
@@ -12,7 +12,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$HERE/../.." && pwd)"
+ROOT="$(cd "$HERE/../../.." && pwd)"
 VENV="$ROOT/.venv"
 USE_LOCK=1
 FORCE_PIP=0

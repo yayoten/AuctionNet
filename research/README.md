@@ -223,10 +223,10 @@ REPのPDFがないとき、またはREPの tex より PDF が古いときは、�
   - 変更したら、本家からの差分が追えるよう、変更内容と理由をコミットメッセージに書く。実験の記録には、実行したコミットを残す。
   - パラメータを変えたいときは、コードを書き換えずに済むよう、`params.json` に書いて流し込むのを基本にする。本家の環境設定は gin（`github/config/test.gin`）で、json から gin の上書き指定へ変換して渡す（`research/src/run_experiment.py`）。コードに直書きだった値は、既定値を従来のままにして引数へ出していく（W001 で PID / ABid / OnlineLP / 環境 / スコア式の一部を出した。出していないものは `DB/README.md` の「固定されている値」）。
   - **実験結果は、リポジトリ直下の `DB/` に溜める。** REPごとに別々に持たず、後のREPが過去の結果を引けるようにする。`DB/runs/<run_id>/` が原本、`DB/auctionnet.duckdb` が索引。使い方は `DB/README.md`。
-  - クローン直後にあった不具合（`config/test.gin` が読めない等）は修正済み。修正の一覧と検証は `Test/1_初期セットアップ/README.md`。乱数と PID の修正で、結果の数値はクローン直後と変わっている。
-  - `github/` を変えたら、`Test/1_初期セットアップ/` の pytest を回して確認する。
+  - クローン直後にあった不具合（`config/test.gin` が読めない等）は修正済み。修正の一覧と検証は `github/Test/1_初期セットアップ/README.md`。乱数と PID の修正で、結果の数値はクローン直後と変わっている。
+  - `github/` を変えたら、`github/Test/1_初期セットアップ/` の pytest を回して確認する。
 - **実験は、コードをコミットしてから流す。** 結果は `github/` の版（tree）つきで記録され、未コミットの変更があると `runs.github_dirty = true` になる。報告・論文に使う結果は、`github_dirty = false` かつ `status = 'ok'` で絞って引く。
-- **学習ベースの手法は、学習も json から流す。** 公開データ（約80GB、`dataset/`、git 管理外）→ 学習データ（`research/src/make_train_data.py`）→ 学習（`research/src/train_model.py`、重みは `DB/models/<model_id>/`）→ 評価（`run_experiment.py` の `player.kwargs.model_dir`）。手順と道具の検証は `Test/2_学習データと学習手法/README.md`。学習も評価も CPU で行う。
+- **学習ベースの手法は、学習も json から流す。** 公開データ（約80GB、`DB/dataset/`、git 管理外）→ 学習データ（`research/src/make_train_data.py`）→ 学習（`research/src/train_model.py`、重みは `DB/models/<model_id>/`）→ 評価（`run_experiment.py` の `player.kwargs.model_dir`）。手順と道具の検証は `github/Test/2_学習データと学習手法/README.md`。学習も評価も CPU で行う。
 - **手法どうしを比べる run は、同じ端末で流す。** 端末（OS）をまたぐと、結果が完全には一致しないセルがある（REP002 で確認）。
 - **並列実行はメモリで決める。** 1プロセス約2.5GB（PV数50万）。16コア・32GBの端末では 6〜8 並列まで。実験の最中は、集計や pytest のような重い処理を同時に走らせない（W001 で13 runがメモリ不足で失敗した）。失敗した run は `status=error` で記録に残り、`run_experiment.py` を再実行すると、ok でない run だけ流し直す。
 - **Windows の注意。** Python は `PYTHONUTF8=1` を付ける（既定の cp932 だと gin・テキストの読み込みで落ちる）。gin ファイルは ASCII のみ（コメントの全角文字でも読めなくなる）。LaTeX は `TEXINPUTS` を `C:/…/progress_report//;`（`cygpath -m` で変換し、区切りはセミコロン）で渡す。PDF の確認は PyMuPDF（`fitz`）を使う（poppler の `pdftoppm` はこの端末で日本語を描画できない）。
@@ -291,8 +291,8 @@ Q001_既存手法で損失が大きいのはなぜか/
 - W（作業）の ID と、`research_tree.py` / `make_flow.py` の対応
 
 **作成済み（2026-10-08 追加）**
-- 公開データ（約80GB）の取得（`Test/2_学習データと学習手法/download_data.sh`）、学習データの生成（`src/make_train_data.py`）、学習の実行（`src/train_model.py`）。`run_experiment.py` は学習ベース 5 手法と `model_dir` に対応
-- `DB/models/`（学習した重み）、`DB/train_data/`（公開データの要約）、`Test/2_学習データと学習手法/`（上記の検証）
+- 公開データ（約80GB）の取得（`github/Test/2_学習データと学習手法/download_data.sh`）、学習データの生成（`src/make_train_data.py`）、学習の実行（`src/train_model.py`）。`run_experiment.py` は学習ベース 5 手法と `model_dir` に対応
+- `DB/models/`（学習した重み）、`DB/train_data/`（公開データの要約）、`github/Test/2_学習データと学習手法/`（上記の検証）
 - 探索型の報告の構成を変更（目的は 1〜2 文、対象のアルゴリズム／実験環境／取った特徴量。`/make_progress_report` のルール 4）
 
 **未作成**
@@ -316,7 +316,7 @@ Q001_既存手法で損失が大きいのはなぜか/
 | `.claude/templates/document/` | 上記のテンプレート（`doc_format.sty`：進捗報告と同じ体裁でサマリーの枠がない） |
 | `github/` | 本家 AuctionNet のコード。変更してよい（差分はコミットで追う） |
 | `DB/` | 実験結果のデータベース（原本は `DB/runs/`、索引は DuckDB）。`DB/README.md` に構造と使い方 |
-| `Test/` | `github/` の動作検証（pytest）。`Test/1_初期セットアップ/` に、修正の一覧と検証がある。`Test/2_学習データと学習手法/` は、公開データの取得から学習・評価までの検証 |
-| `dataset/` | 公開の学習データ（約80GB）。git 管理外。取得は `Test/2_学習データと学習手法/download_data.sh` |
+| `github/Test/` | `github/` の動作検証（pytest）。`github/Test/1_初期セットアップ/` に、修正の一覧と検証がある。`github/Test/2_学習データと学習手法/` は、公開データの取得から学習・評価までの検証 |
+| `DB/dataset/` | 公開の学習データ（約80GB）。git 管理外。取得は `github/Test/2_学習データと学習手法/download_data.sh` |
 | `MTG/` | 会議メモ・会議用の資料 |
 | `Docs/research_paper/` | 論文の翻訳・要約 |

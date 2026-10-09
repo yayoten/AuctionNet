@@ -25,7 +25,7 @@ import torch
 
 REPO = Path(__file__).resolve().parents[2]
 MODELS = REPO / "DB" / "models"
-DATA = REPO / "dataset" / "traffic" / "training_data_rlData_folder" / "training_data_all-rlData.csv"
+DATA = REPO / "DB" / "dataset" / "traffic" / "training_data_rlData_folder" / "training_data_all-rlData.csv"
 FILES = {"BC": "bc_model.pth", "IQL": "iql_model.pth", "CQL": "cql_model.pth", "BCQ": "bcq_model.pth", "TD3_BC": "td3_bc_model.pth"}
 
 

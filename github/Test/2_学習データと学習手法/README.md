@@ -3,23 +3,23 @@
 学習ベースの手法（BC / IQL / CQL / BCQ / TD3_BC）を、公開データ（約80GB）で学習し直して、シミュレータで評価するまでの道具が、
 段階ごとに正しく動くことを pytest で確かめる。前の段階が通ってから、次の段階へ進む。
 
-`github/` そのものの変更（重みの場所・学習ステップ数を引数に出した、など）の回帰テストは、`Test/1_初期セットアップ/test_18_model_dir_and_train_args.py` にある。
+`github/` そのものの変更（重みの場所・学習ステップ数を引数に出した、など）の回帰テストは、`github/Test/1_初期セットアップ/test_18_model_dir_and_train_args.py` にある。
 ここにあるのは、データと、研究側の実行スクリプト（`research/src/`）の検証。
 
 ## 手順
 
 ```bash
-bash Test/1_初期セットアップ/setup_env.sh --pip            # .venv（Python 3.9）。済んでいれば不要
+bash github/Test/1_初期セットアップ/setup_env.sh --pip            # .venv（Python 3.9）。済んでいれば不要
 .venv/bin/pip install -r research/requirements.txt          # duckdb / pyarrow
 
-bash Test/2_学習データと学習手法/download_data.sh           # 1. 公開データを dataset/ に取得・展開（zip 約18GB → 約80GB）
+bash github/Test/2_学習データと学習手法/download_data.sh           # 1. 公開データを DB/dataset/ に取得・展開（zip 約18GB → 約80GB）
 .venv/bin/python research/src/make_train_data.py --workers 2   # 2. 学習データ（rlData）と要約（DB/train_data/）を作る。約20分
 .venv/bin/python research/src/train_model.py <spec.json>       # 3. 学習。重みは DB/models/<model_id>/ に入る
 .venv/bin/python research/src/run_experiment.py <spec.json>    # 4. 評価。player.kwargs.model_dir に DB/models/<model_id> を書く
 
-cd Test/2_学習データと学習手法
-../../.venv/bin/python -m pytest                    # 全部
-../../.venv/bin/python -m pytest -m "not needs_data"   # 80GB の原本が無い端末で走るものだけ
+cd github/Test/2_学習データと学習手法
+../../../.venv/bin/python -m pytest                    # 全部
+../../../.venv/bin/python -m pytest -m "not needs_data"   # 80GB の原本が無い端末で走るものだけ
 ```
 
 ## ファイル
@@ -34,19 +34,19 @@ cd Test/2_学習データと学習手法
 | test_05_trained_models | 5 | `DB/models/` の本番の重み：記録どおりのファイル、コミット済みのコードで CPU 学習、損失が有限、戦略として読めて入札が有限。既定設定の重みは、学習し直すと同じ重み（テンソルのハッシュが一致）・同じ損失になる |
 | test_99_untouched | — | テストが `github/` と `DB/` を汚していない |
 
-`needs_data` の印が付いたテストは、`dataset/traffic/` が無い端末ではスキップする。原本の中身（行数、欠損、広告主の並び）は、
+`needs_data` の印が付いたテストは、`DB/dataset/traffic/` が無い端末ではスキップする。原本の中身（行数、欠損、広告主の並び）は、
 学習データを作るときに書き出した要約（`DB/train_data/period-N.json`、git 管理）で確かめるので、原本が無くても走る。
 
 ## 置き場所
 
 | もの | 場所 | git |
 |---|---|---|
-| 原本（period-7〜27.csv）と zip | `dataset/traffic/`、`dataset/zip/` | 管理外（約80GB＋18GB） |
-| 学習データ（rlData） | `dataset/traffic/training_data_rlData_folder/` | 管理外（原本から作り直せる） |
+| 原本（period-7〜27.csv）と zip | `DB/dataset/traffic/`、`DB/dataset/zip/` | 管理外（約80GB＋18GB） |
+| 学習データ（rlData） | `DB/dataset/traffic/training_data_rlData_folder/` | 管理外（原本から作り直せる） |
 | 原本の要約、学習データの SHA-1 | `DB/train_data/` | 管理 |
 | 学習した重み・条件・損失 | `DB/models/<model_id>/` | 管理（1 つ数百KB） |
 
-原本を `data/` ではなく `dataset/` に置くのは、`Test/1` の `test_16` が「リポジトリ直下に `data/traffic` が無い」ことを前提にしているため。
+原本を `data/` ではなく `DB/dataset/` に置くのは、`github/Test/1` の `test_16` が「リポジトリ直下に `data/traffic` が無い」ことを前提にしているため。
 
 ## 分かったこと（2026-10-08、Linux x86_64 / Python 3.9.16 / torch 1.12.0）
 

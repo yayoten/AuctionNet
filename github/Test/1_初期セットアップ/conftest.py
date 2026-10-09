@@ -18,10 +18,16 @@ import numpy as np
 import pytest
 
 HERE = Path(__file__).resolve().parent
-REPO_ROOT = HERE.parents[1]
+REPO_ROOT = HERE.parents[2]
 GITHUB_DIR = REPO_ROOT / "github"
 SIM_DIR = GITHUB_DIR / "simul_bidding_env"
 TRAIN_DIR = GITHUB_DIR / "strategy_train_env"
+TEST_DIR = HERE.parent  # github/Test。本家コードを調べるテストでは、ここを対象から外す
+
+
+def github_py_files():
+    """github/ 配下の .py のうち、本家コードのもの（テスト自身 github/Test/ は除く）。"""
+    return sorted(f for f in GITHUB_DIR.rglob("*.py") if TEST_DIR not in f.parents)
 
 # `github.simul_bidding_env...` を import できるようにする
 for p in (str(REPO_ROOT), str(HERE)):

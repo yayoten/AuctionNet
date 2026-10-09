@@ -1,6 +1,6 @@
-"""公開データ（dataset/traffic/period-N.csv）から、学習データ（rlData）を作る。
+"""公開データ（DB/dataset/traffic/period-N.csv）から、学習データ（rlData）を作る。
 
-    .venv/bin/python research/src/make_train_data.py [--raw dataset/traffic] [--workers 2] [--periods 7 8 ...]
+    .venv/bin/python research/src/make_train_data.py [--raw DB/dataset/traffic] [--workers 2] [--periods 7 8 ...]
 
 中身は本家の `TrainDataGenerator._generate_train_data`（1 行 = 広告主 1 社 × 1 ティック）をそのまま呼ぶ。
 本家の `batch_generate_train_data` と違うのは、次の 3 点だけ。
@@ -99,7 +99,7 @@ def combine(out_dir, periods):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--raw", default=str(REPO / "dataset" / "traffic"))
+    ap.add_argument("--raw", default=str(REPO / "DB" / "dataset" / "traffic"))
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--periods", type=int, nargs="*", help="処理する period（省略時は、ある period-N.csv を全部）")
     ap.add_argument("--force", action="store_true", help="既にある period も作り直す")

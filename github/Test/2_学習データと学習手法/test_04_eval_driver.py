@@ -106,3 +106,19 @@ def test_checkpoint_dir_can_be_evaluated_and_keeps_its_own_id(tmp_path, runs, rl
     r = run(tmp_path, "IQL", {"model_dir": str(ck)})
     assert r["status"] == "ok", r.get("traceback")
     assert r["model_id"] == f"{m['model_id']}_s000004" and r["model_step_num"] == 4
+
+
+def test_code_version_does_not_count_the_tests_under_github():
+    """github/Test/ は、コードの版（run_id・model_id の元）に数えない。テストを直しても、既存の run・重みの ID は変わらない。"""
+    import subprocess
+
+    def git(*args, **kw):
+        return subprocess.run(["git", *args], cwd=rx.REPO, capture_output=True, **kw).stdout
+
+    tree = rx._github_tree_without_tests()
+    names = git("ls-tree", "--name-only", tree).decode().split()
+    assert "Test" not in names and "main_test.py" in names
+    all_names = git("ls-tree", "--name-only", "HEAD:github").decode().split()
+    assert names == [n for n in all_names if n != "Test"]
+    if "Test" not in all_names:                                  # Test/ をコミットする前は、github/ の tree そのもの
+        assert tree == git("rev-parse", "HEAD:github").decode().strip()

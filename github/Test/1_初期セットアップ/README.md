@@ -5,11 +5,11 @@
 ## 実行
 
 ```bash
-bash Test/1_初期セットアップ/setup_env.sh        # リポジトリ直下に .venv（Python 3.9）を作る
-cd Test/1_初期セットアップ
-../../.venv/bin/python -m pytest                  # 全部（約8分）
-../../.venv/bin/python -m pytest -m "not slow"    # 速いものだけ（約3分）
-../../.venv/bin/python -m pytest -m "not full_scale"
+bash github/Test/1_初期セットアップ/setup_env.sh        # リポジトリ直下に .venv（Python 3.9）を作る
+cd github/Test/1_初期セットアップ
+../../../.venv/bin/python -m pytest                  # 全部（約8分）
+../../../.venv/bin/python -m pytest -m "not slow"    # 速いものだけ（約3分）
+../../../.venv/bin/python -m pytest -m "not full_scale"
 ```
 
 本体の実行（README の手順のまま。`PYTHONPATH` は不要）:
@@ -24,11 +24,11 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 ## 別の端末で動かす
 
 1. リポジトリを取得する（`.venv/` は git 管理外なので、端末ごとに作る）。
-2. `bash Test/1_初期セットアップ/setup_env.sh` を実行する。
+2. `bash github/Test/1_初期セットアップ/setup_env.sh` を実行する。
    - `uv` があれば uv を使う（Python 3.9 が入っていなくても uv が取得する）。
    - `uv` が無ければ、手元の Python 3.9 + pip で作る。どちらも無いときは、用意する方法を表示して止まる。
    - 既定で `requirements.lock.txt`（全 31 パッケージのバージョン固定）を入れるので、どの端末でも同じ版になる。
-3. `cd Test/1_初期セットアップ && ../../.venv/bin/python -m pytest` で確認する。
+3. `cd github/Test/1_初期セットアップ && ../../../.venv/bin/python -m pytest` で確認する。
 
 | オプション | 用途 |
 |---|---|
@@ -39,8 +39,8 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 **端末が違うときの注意**
 
 - **Python は 3.9 が必須。** `torch==1.12.0` は 3.10 以降に配布が無い。
-- **基準値（`golden_full_scale.json`）は macOS arm64 で取得した値。** OS や CPU が違うと乱数・浮動小数の実装差でずれうるので、違う端末では基準値との比較だけ自動でスキップする（理由を表示）。動作の検証と「同じ端末で 2 回回して同じ結果になる」ことの確認は、どの端末でも走る。その端末の基準値を作るには `UPDATE_GOLDEN=1 ../../.venv/bin/python -m pytest test_14_full_scale.py`。
-- **依存を変えたらロックを作り直す。** `uv pip freeze --python .venv/bin/python > Test/1_初期セットアップ/requirements.lock.txt`（`test_01` が、requirements・ロック・実環境の 3 つの一致を確認する）。
+- **基準値（`golden_full_scale.json`）は macOS arm64 で取得した値。** OS や CPU が違うと乱数・浮動小数の実装差でずれうるので、違う端末では基準値との比較だけ自動でスキップする（理由を表示）。動作の検証と「同じ端末で 2 回回して同じ結果になる」ことの確認は、どの端末でも走る。その端末の基準値を作るには `UPDATE_GOLDEN=1 ../../../.venv/bin/python -m pytest test_14_full_scale.py`。
+- **依存を変えたらロックを作り直す。** `uv pip freeze --python .venv/bin/python > github/Test/1_初期セットアップ/requirements.lock.txt`（`test_01` が、requirements・ロック・実環境の 3 つの一致を確認する）。
 - **確認済みなのは macOS arm64 だけ。** uv 経路・pip 経路・`--no-lock` の 3 通りで環境を作り、テストが通ることを確認した。Linux / Windows / GPU 搭載機では未確認（下記）。
   - Windows は Git Bash か WSL で実行する想定（PowerShell 用のスクリプトは無い）。
   - GPU 搭載機では、学習側（BC・IQL・CQL・TD3_BC・BCQ）が自動で CUDA を使う。テストは CPU 前提なので、`conftest.py` が `CUDA_VISIBLE_DEVICES=""` で GPU を隠す（Linux + RTX 3090 で確認）。

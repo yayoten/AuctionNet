@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # REP002 の全実験を順に流す。既にある学習・run はスキップされる（再実行しても安全）。
 #   bash programs/run_all.sh [評価の並列数=8] [学習の並列数=4]
-# 前提：公開データと学習データがある（Test/2_学習データと学習手法/README.md の手順 1, 2）。
+# 前提：公開データと学習データがある（github/Test/2_学習データと学習手法/README.md の手順 1, 2）。
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/../../../.." && pwd)"

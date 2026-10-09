@@ -2,7 +2,7 @@
 
 方針
 - 段階の順にファイルを並べる（01 原本 → 02 学習データ → 03 学習 → 04 評価 → 05 本番の重み）。前の段階が通ってから次へ進む。
-- 80GB の原本（dataset/）が要るテストは `needs_data`。原本が無い端末では、DB/train_data/ の要約で確かめられるものだけ走る。
+- 80GB の原本（DB/dataset/）が要るテストは `needs_data`。原本が無い端末では、DB/train_data/ の要約で確かめられるものだけ走る。
 - テストは DB/ にも github/ にも書かない。学習・評価の出力は tmp に出す。
 - CPU で動かす（ロックの torch 1.12.0 は、新しい GPU では CUDA の計算が落ちる）。
 """
@@ -17,9 +17,9 @@ import pandas as pd
 import pytest
 
 HERE = Path(__file__).resolve().parent
-REPO_ROOT = HERE.parents[1]
+REPO_ROOT = HERE.parents[2]
 GITHUB_DIR = REPO_ROOT / "github"
-DATASET = REPO_ROOT / "dataset" / "traffic"
+DATASET = REPO_ROOT / "DB" / "dataset" / "traffic"
 RL_DIR = DATASET / "training_data_rlData_folder"
 SUMMARY_DIR = REPO_ROOT / "DB" / "train_data"
 MODELS_DIR = REPO_ROOT / "DB" / "models"
@@ -45,7 +45,7 @@ STATUS_AT_START = _github_status()
 def pytest_collection_modifyitems(config, items):
     if DATASET.is_dir() and any(DATASET.glob("period-*.csv")):
         return
-    skip = pytest.mark.skip(reason="dataset/traffic が無い。bash Test/2_学習データと学習手法/download_data.sh で取得する")
+    skip = pytest.mark.skip(reason="DB/dataset/traffic が無い。bash github/Test/2_学習データと学習手法/download_data.sh で取得する")
     for item in items:
         if "needs_data" in item.keywords:
             item.add_marker(skip)

@@ -6,12 +6,12 @@ import sys
 
 import pytest
 
-from conftest import GITHUB_DIR, REPO_ROOT
+from conftest import GITHUB_DIR, REPO_ROOT, github_py_files
 
 
 def _all_modules():
     mods = []
-    for f in sorted(GITHUB_DIR.rglob("*.py")):
+    for f in github_py_files():
         if f.name == "__init__.py":
             continue
         rel = f.relative_to(REPO_ROOT).with_suffix("")

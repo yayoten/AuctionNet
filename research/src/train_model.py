@@ -8,7 +8,7 @@ spec.json（変える値だけを書く）
       "algo": "BC",                      # BC / IQL / CQL / BCQ / TD3_BC
       "step_num": null,                  # 学習ステップ数。null（または書かない）なら本家の既定値
       "seed": 1,                         # random / numpy / torch の乱数シード
-      "train_data": "dataset/traffic/training_data_rlData_folder/training_data_all-rlData.csv",   # 省略可
+      "train_data": "DB/dataset/traffic/training_data_rlData_folder/training_data_all-rlData.csv",   # 省略可
       "checkpoints": [100, 1000, 10000],  # 任意。この学習ステップの時点の重みも ckpt/ に残す（学習の経過を見る用）
       "threads": 1,                      # 任意。torch のスレッド数（既定 1。BCQ は 8 で約 4 倍速い。数値が変わりうるので model_id に入る）
       "sweep": {"algo": ["BC", "IQL"], "step_num": [null, 20000]}     # 任意。直積に展開する
@@ -18,7 +18,7 @@ spec.json（変える値だけを書く）
 model_id は「手法・ステップ数・乱数シード・学習データの SHA-1・コードの版」から決まる。同じ条件なら同じ ID になり、既にあればスキップする。
 DB/models/<model_id>/ に、重み（*.pth）、normalize_dict.pkl、meta.json（条件・コミット・所要時間・重みの SHA-1）、loss.csv（ステップごとの損失）を書く。
 checkpoints を指定すると、DB/models/<model_id>/ckpt/<model_id>_s<ステップ>/ に、その時点の重み・normalize_dict.pkl・meta.json を書く
-（途中で保存しても、最後の重みは変わらない。Test/2 の test_03 で確かめている）。チェックポイントも model_dir に指定して評価できる。
+（途中で保存しても、最後の重みは変わらない。github/Test/2 の test_03 で確かめている）。チェックポイントも model_dir に指定して評価できる。
 評価は run_experiment.py で、spec の player.kwargs.model_dir に "DB/models/<model_id>" を書いて行う。
 """
 import argparse
@@ -45,7 +45,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_experiment import canonical, code_version, expand_spec  # noqa: E402
 
 MODELS = REPO / "DB" / "models"
-DEFAULT_DATA = "dataset/traffic/training_data_rlData_folder/training_data_all-rlData.csv"
+DEFAULT_DATA = "DB/dataset/traffic/training_data_rlData_folder/training_data_all-rlData.csv"
 # 手法 → (学習モジュール, 学習関数, 重みのファイル名)
 ALGOS = {"BC": ("run_bc", "train_model", "bc_model.pth"), "IQL": ("run_iql", "train_iql_model", "iql_model.pth"),
          "CQL": ("run_cql", "train_cql_model", "cql_model.pth"), "BCQ": ("run_bcq", "train_bcq_model", "bcq_model.pth"),

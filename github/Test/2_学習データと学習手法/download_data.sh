@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 # 学習用の公開データ（period-7〜27、zip 11本で約18GB、展開後 約80GB）を取得して展開する。
 #
-#   bash Test/2_学習データと学習手法/download_data.sh            # リポジトリ直下の dataset/ に置く
-#   bash Test/2_学習データと学習手法/download_data.sh 置き場所DIR
+#   bash github/Test/2_学習データと学習手法/download_data.sh            # リポジトリ直下の DB/dataset/ に置く
+#   bash github/Test/2_学習データと学習手法/download_data.sh 置き場所DIR
 #
 # - URL の出どころは github/pre_generated_dataset/readme_dataset.md。
 # - 途中で止まっても、再実行すれば続きから取得する（aria2c -c / wget -c）。展開済みの zip は飛ばす。
 # - 展開先は <置き場所>/traffic/period-N.csv。zip は <置き場所>/zip/ に残す（消してよい）。
-# - dataset/ は git 管理外（.gitignore）。名前を data/ にしないのは、Test/1 の test_16 が
+# - DB/dataset/ は git 管理外（.gitignore）。名前を data/ にしないのは、github/Test/1 の test_16 が
 #   「リポジトリ直下に data/traffic が無い」ことを前提にしているため。
 set -euo pipefail
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-ROOT="$(cd "$HERE/../.." && pwd)"
-DEST="${1:-$ROOT/dataset}"
+ROOT="$(cd "$HERE/../../.." && pwd)"
+DEST="${1:-$ROOT/DB/dataset}"
 BASE="https://alimama-bidding-competition.oss-cn-beijing.aliyuncs.com/share/final"
 PARTS=(7-8 9-10 11-12 13 14-15 16-17 18-19 20-21 22-23 24-25 26-27)
 

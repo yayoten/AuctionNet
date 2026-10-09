@@ -79,7 +79,9 @@ def test_default_model_is_reproduced_by_retraining(algo, tmp_path, monkeypatch):
         pytest.skip("既定設定の重みが無い")
     m = ms[0]
     spec = tmp_path / "s.json"
-    spec.write_text(json.dumps(dict(name="retrain", algo=algo, train_data=m["train_data"])), encoding="utf-8")
+    # 学習データは今の置き場所（既定の DB/dataset/…）から読む。meta の train_data は学習した時点のパスで、置き場所を移す前の
+    # 記録（dataset/…）も残っている。同じデータであることは、下の SHA-1 の一致で確かめる。
+    spec.write_text(json.dumps(dict(name="retrain", algo=algo)), encoding="utf-8")
     monkeypatch.setattr(tm, "MODELS", tmp_path / "models")
     (task,), _ = tm.build_tasks(str(spec), False)
     assert task["resolved"]["train_data_sha1"] == m["train_data_sha1"]
