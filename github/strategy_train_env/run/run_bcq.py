@@ -18,9 +18,11 @@ STATE_DIM = 16
 
 
 def train_bcq_model(train_data_path="./data/traffic/training_data_rlData_folder/training_data_all-rlData.csv",
-                    save_path="saved_model/BCQtest", step_num=100):
+                    save_path="saved_model/BCQtest", step_num=100, max_action=100):
     """
     Train the BCQ model.
+
+    max_action: upper bound of the action (alpha) used by the generator / actor. Default 100 = original hard-coded value.
     """
     training_data = pd.read_csv(train_data_path)
 
@@ -50,7 +52,7 @@ def train_bcq_model(train_data_path="./data/traffic/training_data_rlData_folder/
     print(len(replay_buffer.memory))
 
     # Train model
-    model = BCQ(state_dim=STATE_DIM)
+    model = BCQ(state_dim=STATE_DIM, max_action=max_action)
     train_model_steps(model, replay_buffer, step_num=step_num)
 
     # Save model

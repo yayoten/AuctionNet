@@ -20,6 +20,7 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 
 最終結果（2026-10-07、macOS arm64 / Python 3.9.6 / torch 1.12.0 / numpy 1.24.2）: **1049 passed, 1 skipped, xfail 0**。
 2026-10-08、Linux x86_64（RTX 3090 搭載）/ Python 3.9.16 / torch 1.12.0+cu102、`setup_env.sh --pip`: **1079 passed, 9 skipped**（test_18 を追加。スキップは、macOS で取った基準値との比較 8 件と、BCQ の飽和 1 件）。
+2026-10-09、同じ端末、test_19 を追加：**1083 passed, 9 skipped**（全件を回した回は、別の作業が実行中に `github/Test/README.md` を編集したため、`github/` の無変更を見る 2 件だけ落ちた。その 2 件は、回し直して通った）。
 
 ## 別の端末で動かす
 
@@ -67,6 +68,7 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 | test_16 | シミュレータ → 学習データ → 学習 → 保存 → 戦略として読込 → オフライン評価 の通し |
 | test_17 | 直書きだった値を引数に出した変更（PID / ABid / OnlineLP / 環境 / スコア式）の回帰 |
 | test_18 | 学習ベース 5 戦略の `model_dir`（既定は同梱の重み）、学習スクリプトの `train_data_path` / `save_path` / `step_num`（既定は従来の値）、BCQ の 2 つの保存形式 |
+| test_19 | BCQ の学習の入口（`run_bcq.train_bcq_model`）の `max_action`（既定は従来の 100。渡さないときと同じ重みになる。渡すと、生成モデルと方策の上限がその値になる）。W001/REP003 のループ 3 で追加 |
 | test_99 | `github/` が無変更であること |
 
 ## 結論
