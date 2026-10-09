@@ -55,7 +55,8 @@ git fetch origin && git status -sb | head -1     # → ahead だけで、behind 
 
 - サーバーには、**この 1 つのリポジトリだけに権限を絞った**トークン（GitHub の Fine-grained token。Repository access は `AuctionNet` のみ、Permissions は `Contents: Read and write` のみ）を、`~/.git-credentials` に置く（`git config --global credential.helper store`）。
 - ファイルの権限は 600（自分だけ読める）にする：`chmod 600 ~/.git-credentials`。
-- トークンの期限が切れたら、`git push` が認証エラーになる。**Claude が直せることではない。** 無人なら、コミットだけして、`進捗.md` に「push できなかった（認証）」と書く。ユーザーが作り直す。
+- トークンに**期限は付けない**（無期限。ユーザーの決定、2026-10-09）。そのため、**漏れたときは、ユーザーが手で削除するまで、使われ続ける。** トークンは、サーバーの `~/.git-credentials` と、ユーザーの MacBook のキーチェーンにだけ置く。それ以外の場所（リポジトリ、ログ、メモ、会話）に出さない。
+- `git push` が認証エラーになったら、トークンが削除された（または権限が変わった）ということ。**Claude が直せることではない。** 無人なら、コミットだけして、`進捗.md` に「push できなかった（認証）」と書く。ユーザーが作り直す。
 - トークンの作り方は、ユーザーが GitHub の画面で行う。**トークンの文字列を、Claude との会話に貼らない**（記録に残る）。
 
 ## 6. 失敗したとき
