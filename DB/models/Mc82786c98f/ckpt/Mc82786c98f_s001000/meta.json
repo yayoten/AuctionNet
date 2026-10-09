@@ -1,0 +1,19 @@
+{
+  "model_id": "Mc82786c98f_s001000",
+  "parent_model_id": "Mc82786c98f",
+  "is_checkpoint": true,
+  "algo": "BC",
+  "step_num": 1000,
+  "seed": 3,
+  "spec_name": "loop1_train",
+  "work": "W001",
+  "rep": "REP003",
+  "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+  "github_version": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "github_dirty": false,
+  "head_commit": "a444e03ad9a6fc740191be2be4cdb5c9610bbc95",
+  "model_file": "bc_model.pth",
+  "model_sha1": "a02b7cd6e44c3d03cd599fdde51e4c4e8c9b83df",
+  "weights_sha1": "01a635851f8b5aba09a07a439c359eb09b2bfbdc",
+  "status": "ok"
+}

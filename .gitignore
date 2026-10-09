@@ -20,6 +20,7 @@ DB/auctionnet.duckdb
 DB/auctionnet.duckdb.wal
 DB/runs/*/raw/
 DB/runs/*.tmp/
+DB/models/*/ckpt/*/*.pth     # 学習の途中の重み（約1.3GB）。同じ条件で学習し直せば再現できる。条件・損失は meta.json と loss.csv に残る
 
 # 学習用の公開データ（github/Test/2_学習データと学習手法/download_data.sh で取得。約80GB）
 /DB/dataset/

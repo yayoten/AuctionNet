@@ -1,0 +1,19 @@
+{
+  "model_id": "M4f8b289d3d_s010000",
+  "parent_model_id": "M4f8b289d3d",
+  "is_checkpoint": true,
+  "algo": "BCQ",
+  "step_num": 10000,
+  "seed": 2,
+  "spec_name": "loop1_train",
+  "work": "W001",
+  "rep": "REP003",
+  "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+  "github_version": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "github_dirty": false,
+  "head_commit": "a444e03ad9a6fc740191be2be4cdb5c9610bbc95",
+  "model_file": "bcq_model.pth",
+  "model_sha1": "927b9001cd671885a6dd958628dd9aa38aa6293c",
+  "weights_sha1": "8ce2db3dca04f8fcb1b363d0aa691f0e4d9dbbe9",
+  "status": "ok"
+}

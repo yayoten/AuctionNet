@@ -1,0 +1,19 @@
+{
+  "model_id": "M9dfe16d82c_s000100",
+  "parent_model_id": "M9dfe16d82c",
+  "is_checkpoint": true,
+  "algo": "CQL",
+  "step_num": 100,
+  "seed": 2,
+  "spec_name": "loop1_train",
+  "work": "W001",
+  "rep": "REP003",
+  "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+  "github_version": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "github_dirty": false,
+  "head_commit": "a444e03ad9a6fc740191be2be4cdb5c9610bbc95",
+  "model_file": "cql_model.pth",
+  "model_sha1": "5728145fcca317f5113e6fdfc47c09f18d1166b8",
+  "weights_sha1": "4d3018ca3ae4863660f045e195c8b761c6a5bdd1",
+  "status": "ok"
+}

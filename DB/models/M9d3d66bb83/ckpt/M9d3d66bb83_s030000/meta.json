@@ -1,0 +1,19 @@
+{
+  "model_id": "M9d3d66bb83_s030000",
+  "parent_model_id": "M9d3d66bb83",
+  "is_checkpoint": true,
+  "algo": "IQL",
+  "step_num": 30000,
+  "seed": 3,
+  "spec_name": "loop1_train",
+  "work": "W001",
+  "rep": "REP003",
+  "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+  "github_version": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "github_dirty": false,
+  "head_commit": "a444e03ad9a6fc740191be2be4cdb5c9610bbc95",
+  "model_file": "iql_model.pth",
+  "model_sha1": "e49e32171f605e56b6376eef024eebbfd25a0e90",
+  "weights_sha1": "86d1ef239d5d83a7f78042e0f54146346900517c",
+  "status": "ok"
+}
