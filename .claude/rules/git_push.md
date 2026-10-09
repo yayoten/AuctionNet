@@ -33,6 +33,14 @@ git fetch origin && git status -sb | head -1     # → ahead だけで、behind 
 | 認証情報（トークン、鍵）を、画面・ログ・コミット・メモに出す、コミットに入れる | 漏れると、リポジトリを書き換えられる |
 | 他の Claude の未コミットの変更を、巻き込んでコミットして push する | コミットは、自分が変えたファイルを名前で指定する（`CLAUDE.md`） |
 
+### まだ push していないコミットを書き換えるとき
+
+1. バックアップの枝を作る（`git branch backup-<名前> HEAD`）。
+2. 作業ツリーに他の Claude の未コミットの変更があると、`git filter-branch` は拒否する。**その変更に触らず**、`git worktree add -b <枝> ~/wt-<名前> HEAD` で別の作業ツリーを作り、そこで書き直す。
+3. 差し替えは、`git update-ref refs/heads/main <新> <旧>`（旧の位置を指定するので、その間に `main` が動いていたら失敗する）。そのあと、メインの作業ツリーの索引（index）だけを、`git rm --cached` で合わせる。
+4. 書き直した結果の差が、意図したものだけか（`git diff --name-only <旧> <新>`）を確かめる。
+5. push が済んだら、バックアップの枝は消してよい（`git branch -D`、`git reflog expire --expire=now --all`、`git gc --prune=now`）。
+
 ## 3. push の前に確かめること
 
 1. **大きなファイルが入っていないか。** GitHub は、1 ファイル 100MB を超えると拒否する（50MB 超は警告）。
@@ -41,9 +49,10 @@ git fetch origin && git status -sb | head -1     # → ahead だけで、behind 
      | awk '$1=="blob" && $2>50000000' | sort -k2 -n -r | head
    ```
    何か出たら、push しない。学習した重みの途中のもの（`DB/models/*/ckpt/*/*.pth`）などは、`.gitignore` で外してある。
-2. **秘密が入っていないか。** トークン、鍵、パスワード（`.env`、`*.pem`、`id_*`、`.git-credentials`）が、コミットに入っていないこと。
-3. **テストが通っていること**（`github/` を変えたコミットを含むとき。`CLAUDE.md` の決まり）。
-4. `behind` が付いていたら（リモートが先に進んでいる）、`git pull --ff-only origin main` を試す。**混ぜる（merge）必要が出たら、止めて報告する。**
+2. **`.gitignore` の行末にコメントを書いていないか。** 行末のコメントは、パターンの一部になり、効かなくなる。コメントは、別の行に書く（2026-10-09、学習の途中の重み 約 1.3GB が、これでコミットに入った）。
+3. **秘密が入っていないか。** トークン、鍵、パスワード（`.env`、`*.pem`、`id_*`、`.git-credentials`）が、コミットに入っていないこと。
+4. **テストが通っていること**（`github/` を変えたコミットを含むとき。`CLAUDE.md` の決まり）。
+5. `behind` が付いていたら（リモートが先に進んでいる）、`git pull --ff-only origin main` を試す。**混ぜる（merge）必要が出たら、止めて報告する。**
 
 ## 4. いつ push するか
 
