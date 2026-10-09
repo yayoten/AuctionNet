@@ -26,6 +26,13 @@ def meta(request):
     return request.param
 
 
+def _needs_weights(meta):
+    """重みのファイルが無い端末では、ファイルが要る確認をスキップする。
+    1 つ 50MB を超える重み（BCQ の一部）は git に入れておらず、meta・損失だけがある（同じ spec で学習し直せば再現できる）。"""
+    if not (MODELS_DIR / meta["model_id"] / meta["model_file"]).is_file():
+        pytest.skip(f"{meta['model_id']} の重みが無い（git に入れていない大きな重み）")
+
+
 def test_models_exist():
     if not METAS:
         pytest.skip("DB/models が空。research/src/train_model.py で学習する")
@@ -43,6 +50,7 @@ def test_every_algo_has_a_default_model():
 def test_files_and_recorded_sha1(meta):
     d = MODELS_DIR / meta["model_id"]
     assert (d / "normalize_dict.pkl").is_file() and (d / "loss.csv").is_file()
+    _needs_weights(meta)
     assert tm.sha1_of(d / meta["model_file"]) == meta["model_sha1"]
 
 
@@ -57,6 +65,7 @@ def test_loss_is_finite_and_covers_every_step(meta):
 
 
 def test_strategy_loads_and_bids_are_finite(meta):
+    _needs_weights(meta)
     s = rx.make_strategy({"strategy": meta["algo"], "kwargs": {"model_dir": f"DB/models/{meta['model_id']}"}})
     s.budget, s.cpa = 3000.0, 100.0
     s.reset()

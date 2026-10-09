@@ -1,0 +1,316 @@
+{
+  "version": 1,
+  "decided_in": "REP003",
+  "decided_at": "2026-10-09",
+  "commit": "f2f6693ea9a531bb86fc0758603e43ceaced83a5",
+  "note": "以後の比較に使う、既存 8 手法のベースライン設定。決め方は REP003.md（research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/）。このファイルは programs/make_baseline_json.py で作る（手で書き換えない）",
+  "how_to_use": "評価の spec（run_experiment.py）の player に、strategy と kwargs を入れる。学習ベースは kwargs.model_dir に model_dirs の 3 つを順に入れ、3 seed の平均で報告する。手法どうしを比べる run は、同じ端末・同じコードの版で流す",
+  "rule_based": {
+    "PID": {
+      "strategy": "PID",
+      "kwargs": {}
+    },
+    "ABid": {
+      "strategy": "ABid",
+      "kwargs": {}
+    },
+    "OnlineLP": {
+      "strategy": "OnlineLP",
+      "kwargs": {}
+    },
+    "note": "kwargs が空 = 本家の既定値のまま。評価の日で調整していない（PID・ABid には、評価の日で測ると既定より良い値がある。REP001）"
+  },
+  "learned": {
+    "BC": {
+      "strategy": "BC",
+      "train": {
+        "step_num": 30000,
+        "official_default_step_num": 20000,
+        "seeds": [
+          1,
+          2,
+          3
+        ],
+        "threads": 1,
+        "other": {},
+        "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+        "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
+        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_fast.json"
+      },
+      "model_dirs": {
+        "1": "DB/models/M7e2d6b4dcc",
+        "2": "DB/models/M5eda353e80",
+        "3": "DB/models/Mcc8c39adb7"
+      },
+      "weights_sha1": {
+        "1": "2d52c026250b1c07d66bd52cd690a1d4af2af046",
+        "2": "2f3f5f57c05031f2379a17b319c3de3826175df1",
+        "3": "2ffa7cce8b876a622a5967db916622d0858b4102"
+      },
+      "weights_in_git": true,
+      "report": "seed 1〜3 の平均で報告する",
+      "settled": true,
+      "S_star": 30000,
+      "caveat": "S*=30000 は、30000 と 50000 ステップの 1 組の比較だけで決まっている",
+      "tried": {
+        "episodes": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "player_indices": [
+          0,
+          8,
+          16,
+          24,
+          32,
+          40
+        ],
+        "score_mean_by_seed": [
+          21.024,
+          21.048,
+          20.952
+        ],
+        "spread": 0.0045,
+        "passed": true
+      }
+    },
+    "IQL": {
+      "strategy": "IQL",
+      "train": {
+        "step_num": 30000,
+        "official_default_step_num": 20000,
+        "seeds": [
+          1,
+          2,
+          3
+        ],
+        "threads": 1,
+        "other": {},
+        "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+        "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
+        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_fast.json"
+      },
+      "model_dirs": {
+        "1": "DB/models/M779b4f7138",
+        "2": "DB/models/M812c6f5a18",
+        "3": "DB/models/M65e12cbdc5"
+      },
+      "weights_sha1": {
+        "1": "50796d61cc618f76f4f76903b887c39c04ddb10c",
+        "2": "5a65a9d9742512b2870e5184125209d186d6817d",
+        "3": "86d1ef239d5d83a7f78042e0f54146346900517c"
+      },
+      "weights_in_git": true,
+      "report": "seed 1〜3 の平均で報告する",
+      "settled": true,
+      "S_star": 30000,
+      "caveat": "S*=30000 は、30000 と 50000 ステップの 1 組の比較だけで決まっている",
+      "tried": {
+        "episodes": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "player_indices": [
+          0,
+          8,
+          16,
+          24,
+          32,
+          40
+        ],
+        "score_mean_by_seed": [
+          20.082,
+          19.471,
+          19.291
+        ],
+        "spread": 0.0403,
+        "passed": true
+      }
+    },
+    "CQL": {
+      "strategy": "CQL",
+      "train": {
+        "step_num": 30000,
+        "official_default_step_num": 100,
+        "seeds": [
+          1,
+          2,
+          3
+        ],
+        "threads": 1,
+        "other": {},
+        "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+        "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
+        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_fast.json"
+      },
+      "model_dirs": {
+        "1": "DB/models/M4c81bbf07d",
+        "2": "DB/models/M46cc6eb883",
+        "3": "DB/models/Mcaa18f834a"
+      },
+      "weights_sha1": {
+        "1": "5af010e88f82ab0fd3ebf5f9666f0909cd65f69c",
+        "2": "fbef8d5f5b921c339c4063c9d5f8c98d400d8565",
+        "3": "722e7d899d257290af495bea43add92aa3bf46e4"
+      },
+      "weights_in_git": true,
+      "report": "seed 1〜3 の平均で報告する",
+      "settled": false,
+      "S_star": null,
+      "caveat": "基準では落ち着かない。出力の水準が学習の長さで動く（プローブの平均の α：10000 で 91、20000 で 101、30000 で 91、50000 で 73）。seed の平均では消えない",
+      "tried": {
+        "episodes": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "player_indices": [
+          0,
+          8,
+          16,
+          24,
+          32,
+          40
+        ],
+        "score_mean_by_seed": [
+          19.086,
+          19.238,
+          18.861
+        ],
+        "spread": 0.0198,
+        "passed": true
+      }
+    },
+    "BCQ": {
+      "strategy": "BCQ",
+      "train": {
+        "step_num": 30000,
+        "official_default_step_num": 100,
+        "seeds": [
+          1,
+          2,
+          3
+        ],
+        "threads": 4,
+        "other": {},
+        "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+        "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
+        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_bcq.json"
+      },
+      "model_dirs": {
+        "1": "DB/models/M37d7bc29d6",
+        "2": "DB/models/M23b8c9bc81",
+        "3": "DB/models/M5168c9d743"
+      },
+      "weights_sha1": {
+        "1": "e43f976acbe03aad233586cd3187b4b8ad1b00ee",
+        "2": "b4e2492c6a4580b7978df4d69f99cbba587e8985",
+        "3": "25c82571ed3f03f41ab41aff311d8c84fdd19a79"
+      },
+      "weights_in_git": false,
+      "report": "seed 1〜3 の平均で報告する",
+      "settled": false,
+      "S_star": 1000,
+      "caveat": "1000 ステップ以降、状態を見ずに α=100（max_action）を出す。一定の入札の手法として読む。上限を 300 にしても直らなかった",
+      "tried": {
+        "episodes": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "player_indices": [
+          0,
+          8,
+          16,
+          24,
+          32,
+          40
+        ],
+        "score_mean_by_seed": [
+          17.533,
+          17.533,
+          17.533
+        ],
+        "spread": 0.0,
+        "passed": true
+      }
+    },
+    "TD3_BC": {
+      "strategy": "TD3_BC",
+      "train": {
+        "step_num": 30000,
+        "official_default_step_num": 100,
+        "seeds": [
+          1,
+          2,
+          3
+        ],
+        "threads": 1,
+        "other": {},
+        "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
+        "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
+        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_fast.json"
+      },
+      "model_dirs": {
+        "1": "DB/models/Mbe2ad40790",
+        "2": "DB/models/M81acfcffa0",
+        "3": "DB/models/Mf0d5a821d3"
+      },
+      "weights_sha1": {
+        "1": "05fabecfa8cd2c28a8db8f7edb87e3cf9969d37b",
+        "2": "3f063c9875ccb180bbe83c301cac97f98a4e2c85",
+        "3": "a0fde850c99e1b9c1a62e5e075d53728e7523883"
+      },
+      "weights_in_git": true,
+      "report": "seed 1〜3 の平均で報告する",
+      "settled": false,
+      "S_star": null,
+      "caveat": "基準では落ち着かない。この実装では Q の項がほとんど効かず、実質は BC。試した結果の幅は 9.99% で、基準 10% の際にある",
+      "tried": {
+        "episodes": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "player_indices": [
+          0,
+          8,
+          16,
+          24,
+          32,
+          40
+        ],
+        "score_mean_by_seed": [
+          17.994,
+          18.589,
+          19.874
+        ],
+        "spread": 0.0999,
+        "passed": true
+      }
+    }
+  },
+  "learned_note": "weights_in_git が false の重みは、1 つ 50MB を超えるので git に入れていない。train.spec で学習し直すと、同じ重み（weights_sha1）になる。settled は、REP003 の「落ち着いた」の基準（プローブへの出力の差が α で 5 以内）を満たしたか。BCQ は一定の出力で基準を満たしたので false にした",
+  "evaluation": {
+    "episodes_used_for_selection": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "episodes_reserved_for_evaluation": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "note": "設定の選択に使った日は 4〜7。評価の日（0〜3）の score は、選択に使っていない"
+  }
+}
