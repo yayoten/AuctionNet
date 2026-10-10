@@ -1,0 +1,10 @@
+{
+  "work": "W001",
+  "rep": "REP002new",
+  "name": "repro_pid_p0",
+  "note": "再現性の確認。check_same_as_old の PID・位置0 と同じ設定を --force で再実行し、結果が一致するかを見る",
+  "player": {"strategy": "PID", "kwargs": {}},
+  "player_indices": [0],
+  "episodes": [0, 1, 2, 3],
+  "seed": 1
+}

@@ -1,0 +1,11 @@
+{
+  "work": "W001",
+  "rep": "REP002new",
+  "name": "check_same_as_old",
+  "note": "今のコードの版で、ルールベース3手法（既定）を6位置×エピソード0-3で流し、Linux の既存の run（rep=REP002、github の版 0536c690ef）と一致するかを見る",
+  "player": {"strategy": "PID", "kwargs": {}},
+  "sweep": {"player.strategy": ["PID", "ABid", "OnlineLP"]},
+  "player_indices": [0, 8, 16, 24, 32, 40],
+  "episodes": [0, 1, 2, 3],
+  "seed": 1
+}
