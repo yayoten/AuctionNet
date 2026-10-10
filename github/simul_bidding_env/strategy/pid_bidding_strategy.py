@@ -27,15 +27,24 @@ class PidBiddingStrategy(BaseBiddingStrategy):
 
     def bidding(self, timeStepIndex, pValues, pValueSigmas, historyPValueInfo, historyBid,
                 historyAuctionResult, historyImpressionResult, historyLeastWinningCost):
+        # low_ratio / high_ratio / branch / self.last_internal は記録用（結果には影響しない）
+        last_tick_cost, low_ratio, high_ratio, branch = None, None, None, "init"
         if timeStepIndex == 0:
             self.alpha = self.base_action
         else:
             last_tick_cost = self.last_remaining_budget - self.remaining_budget
             self.last_remaining_budget -= last_tick_cost
-            if last_tick_cost * self.exp_budget_ratio[timeStepIndex:].sum() / self.exp_budget_ratio[timeStepIndex - 1] / self.remaining_budget < self.low_threshold:
+            low_ratio = last_tick_cost * self.exp_budget_ratio[timeStepIndex:].sum() / self.exp_budget_ratio[timeStepIndex - 1] / self.remaining_budget
+            high_ratio = last_tick_cost * (48 - timeStepIndex) / self.remaining_budget
+            branch = "keep"
+            if low_ratio < self.low_threshold:
                 self.alpha *= self.up_factor
-            elif last_tick_cost * (48 - timeStepIndex) / self.remaining_budget > self.high_threshold:
+                branch = "up"
+            elif high_ratio > self.high_threshold:
                 self.alpha *= self.down_factor
+                branch = "down"
+        self.last_internal = dict(alpha=float(self.alpha), branch=branch, last_tick_cost=last_tick_cost,
+                                  low_ratio=low_ratio, high_ratio=high_ratio)
         bids = self.alpha * pValues
         return bids
 

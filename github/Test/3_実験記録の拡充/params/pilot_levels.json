@@ -1,0 +1,9 @@
+{
+  "work": "T006",
+  "name": "t006_pilot",
+  "note": "記録の段ごとの、1 run のサイズと実行時間を測るパイロット（1 位置 × 4 エピソード）。--record と --runs-dir で段と出力先を変えて流す。設定は check_same_as_old の PID・位置 0 と同じ",
+  "player": {"strategy": "PID", "kwargs": {}},
+  "player_indices": [0],
+  "episodes": [0, 1, 2, 3],
+  "seed": 1
+}

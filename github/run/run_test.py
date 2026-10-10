@@ -162,37 +162,52 @@ def run_test(generate_log: bool = False,
             pv_values = pv_generator.pv_values[tick_index]
             pvalue_sigmas = pv_generator.pValueSigmas[tick_index]
 
-            bids = [
-                agent.bidding(
-                    tick_index,
-                    pv_values[:, i],
-                    pvalue_sigmas[:, i],
-                    [x[i] for x in history_pvalue_infos],
-                    [x[i] for x in history_bids],
-                    [x[i] for x in history_auction_results],
-                    [x[i] for x in history_impression_results],
-                    history_least_winning_costs
-                ) if agent.remaining_budget >= envs.min_remaining_budget
-                else np.zeros(pv_values.shape[0])
-                for i, agent in enumerate(agents)
-            ]
+            # bidding_seconds / internals / sim_iters などは、tick_hook に渡す記録用（結果には影響しない。乱数は引かない）
+            t_tick_begin = time.perf_counter()
+            bidding_seconds = np.zeros(num_agent)
+            internals = [None] * num_agent
+            bids = []
+            for i, agent in enumerate(agents):
+                if agent.remaining_budget >= envs.min_remaining_budget:
+                    t_bid = time.perf_counter()
+                    bids.append(agent.bidding(
+                        tick_index,
+                        pv_values[:, i],
+                        pvalue_sigmas[:, i],
+                        [x[i] for x in history_pvalue_infos],
+                        [x[i] for x in history_bids],
+                        [x[i] for x in history_auction_results],
+                        [x[i] for x in history_impression_results],
+                        history_least_winning_costs
+                    ))
+                    bidding_seconds[i] = time.perf_counter() - t_bid
+                    internals[i] = getattr(agent, "last_internal", None)
+                else:
+                    bids.append(np.zeros(pv_values.shape[0]))
 
             bids = np.array(bids).transpose()
             bids[bids < 0] = 0
+            bids_before_adjust = bids.copy() if tick_hook is not None else None
 
             remaining_budget_list = np.array([agent.remaining_budget for agent in agents])
             done_list = np.ones(len(agents), dtype=int) if tick_index == (num_tick - 1) else (
                 remaining_budget_list < envs.min_remaining_budget
             ).astype(int)
 
+            sim_iters = []
+            adjust_seconds = 0.0
             ratio_max = None
             while ratio_max is None or ratio_max > 0:
                 if ratio_max and ratio_max > 0:
                     over_cost_ratio = np.maximum((cost - remaining_budget_list) / (cost + 1e-4), 0)
+                    t_adj = time.perf_counter()
                     adjust_over_cost(bids, over_cost_ratio, envs.slot_coefficients,winner_pit)
+                    adjust_seconds += time.perf_counter() - t_adj
 
+                t_sim = time.perf_counter()
                 xi_pit, slot_pit, cost_pit, is_exposed_pit, conversion_action_pit, least_winning_cost_pit, market_price_pit = \
                     envs.simulate_ad_bidding(pv_values, pvalue_sigmas, bids)
+                t_sim = time.perf_counter() - t_sim
 
                 real_cost = cost_pit * is_exposed_pit
                 cost = real_cost.sum(axis=1)
@@ -201,6 +216,9 @@ def run_test(generate_log: bool = False,
                 winner_pit = get_winner(slot_pit)
                 over_cost_ratio = np.maximum((cost - remaining_budget_list) / (cost + 1e-4), 0)
                 ratio_max = over_cost_ratio.max()
+                if tick_hook is not None:
+                    sim_iters.append(dict(cost=cost, reward=reward, over_cost_ratio=over_cost_ratio, seconds=t_sim,
+                                          env_seconds=dict(getattr(envs, "last_record", {}).get("seconds", {}))))
 
             for i, agent in enumerate(agents):
                 agent.remaining_budget -= cost[i]
@@ -226,12 +244,23 @@ def run_test(generate_log: bool = False,
                 )
 
             if tick_hook is not None:
+                env_record = getattr(envs, "last_record", {})
                 tick_hook(dict(
                     episode=episode, tick=tick_index, num_pv=pv_values.shape[0], bids=bids,
                     pv_values=pv_values, slot=slot_pit, cost=cost, reward=reward,
                     pvalue_sigmas=pvalue_sigmas, is_exposed=is_exposed_pit, conversion=conversion_action_pit,
                     remaining_budget_before=remaining_budget_list,
-                    least_winning_cost=least_winning_cost_pit, agents=agents))
+                    least_winning_cost=least_winning_cost_pit, agents=agents,
+                    # ここから下は、2026-10-10 に足した記録用の量（T006）
+                    xi=xi_pit, cost_pit=cost_pit, market_prices=market_price_pit, winner=winner_pit,
+                    bids_before_adjust=bids_before_adjust, sim_iters=sim_iters, adjust_seconds=adjust_seconds,
+                    bidding_seconds=bidding_seconds, internals=internals, done=done_list,
+                    values_real=env_record.get("values"), conversion_draw=env_record.get("conversion_draw"),
+                    exposure_draw=env_record.get("exposure_draw"),
+                    sorted_bid_indices=env_record.get("sorted_bid_indices"),
+                    trunc_values=envs.advertiser_trunc_values,
+                    trunc_seeds=getattr(envs, "advertiser_trunc_seeds", None),
+                    pv_index_offset=total_pv_num, tick_begin=t_tick_begin, envs=envs))
 
             total_pv_num += pv_values.shape[0]
 

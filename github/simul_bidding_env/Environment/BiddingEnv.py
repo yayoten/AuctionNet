@@ -1,3 +1,5 @@
+import time
+
 import gin
 import numpy as np
 from scipy.stats import truncnorm
@@ -22,6 +24,9 @@ class BiddingEnv:
         self.NUM_SLOTS = 3
         self.DEFAULT_SEED = default_seed
         self.CONVERSION_SEED = conversion_seed  # 露出・pValue ノイズの乱数列と共有しない
+        # 記録用（結果には影響しない）。直前の simulate_ad_bidding の途中の量と、各段の所要時間。乱数は引かない
+        self.last_record = {}
+        self.advertiser_trunc_seeds = [None] * self.NUM_ADVERTISERS
 
     def generate_trunc_values(self, advertiser_index: int, time_step_index: int, episode: int) -> tuple[
         int, float, float]:
@@ -33,24 +38,37 @@ class BiddingEnv:
 
     def reset(self, episode: int) -> None:
         """Resets the environment for a new episode."""
-        self.advertiser_trunc_values = [
-            self.generate_trunc_values(advertiser_index, 0, episode)[1:]
-            for advertiser_index in range(self.NUM_ADVERTISERS)
-        ]
+        trunc = [self.generate_trunc_values(advertiser_index, 0, episode)
+                 for advertiser_index in range(self.NUM_ADVERTISERS)]
+        self.advertiser_trunc_values = [t[1:] for t in trunc]
+        self.advertiser_trunc_seeds = [t[0] for t in trunc]  # 記録用
 
     def simulate_ad_bidding(self, pv_values: np.ndarray, p_value_sigmas: np.ndarray, bids: np.ndarray) -> tuple:
         """Simulates the ad bidding process."""
         xi, slot, cost = np.zeros_like(pv_values), np.zeros_like(pv_values), np.zeros_like(pv_values)
 
+        # t0..t7 と last_record は記録用（結果には影響しない。乱数は引かない）
+        t0 = time.perf_counter()
         sorted_bid_indices, market_prices = self._get_sorted_bids_and_market_prices(bids)
+        t1 = time.perf_counter()
         slot, xi = self._assign_slots_and_xi(sorted_bid_indices, slot, xi)
+        t2 = time.perf_counter()
         cost = self._calculate_cost(slot, market_prices)
+        t3 = time.perf_counter()
 
         is_exposed = self._calculate_exposure(slot)
+        t4 = time.perf_counter()
         values = self._generate_values_matrix(pv_values, p_value_sigmas)
+        t5 = time.perf_counter()
         conversion_action = self._calculate_conversion_action(values, is_exposed)
+        t6 = time.perf_counter()
 
         self._handle_unsold_slots(cost, xi, slot, is_exposed, conversion_action, market_prices)
+        t7 = time.perf_counter()
+        self.last_record.update(
+            values=values, sorted_bid_indices=sorted_bid_indices,
+            seconds=dict(sort=t1 - t0, slot=t2 - t1, cost=t3 - t2, exposure=t4 - t3, values=t5 - t4,
+                         conversion=t6 - t5, unsold=t7 - t6))
 
         least_winning_cost = market_prices[:, -1]
         return xi.T, slot.T, cost.T, is_exposed.T, conversion_action.T, least_winning_cost, market_prices
@@ -86,6 +104,7 @@ class BiddingEnv:
         is_exposed[slot == 0] = 0
         rng = np.random.default_rng(seed=self.DEFAULT_SEED)
         is_exposed = rng.binomial(n=1, p=np.clip(is_exposed, 0, 1))
+        self.last_record["exposure_draw"] = is_exposed.copy()  # 記録用。枠 3 の取り消し（下）と、売れ残りの処理の前の抽選
         return self._enforce_slot_continuity(is_exposed, slot)
 
     def _enforce_slot_continuity(self, is_exposed: np.ndarray, slot: np.ndarray) -> np.ndarray:
@@ -111,6 +130,7 @@ class BiddingEnv:
         """Calculates conversion actions based on values and exposure."""
         rng = np.random.default_rng(seed=self.CONVERSION_SEED)
         conversion_action = rng.binomial(n=1, p=np.clip(values, 0, 1))
+        self.last_record["conversion_draw"] = conversion_action  # 記録用。露出を掛ける前の抽選（全機会 × 全広告主）
         return conversion_action * is_exposed
 
     def _handle_unsold_slots(self, cost: np.ndarray, xi: np.ndarray, slot: np.ndarray, is_exposed: np.ndarray,

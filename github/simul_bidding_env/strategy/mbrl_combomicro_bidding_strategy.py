@@ -91,6 +91,8 @@ class MbrlComboMicroBiddingStrategy(BaseBiddingStrategy):
             historical_pv_num_total
         ])
 
+        state_raw = test_state.copy()  # 記録用（正規化の前の状態）
+
         def normalize(value, min_value, max_value):
             return (value - min_value) / (max_value - min_value) if max_value > min_value else 0
 
@@ -100,6 +102,9 @@ class MbrlComboMicroBiddingStrategy(BaseBiddingStrategy):
         test_state = torch.tensor(test_state, dtype=torch.float)
         alpha = self.model(test_state)
         alpha = alpha.detach().cpu().numpy()
+        # 記録用（結果には影響しない）：入力状態（正規化の前と後）と、方策の出力 alpha
+        self.last_internal = dict(state_raw=state_raw, state_norm=test_state.detach().cpu().numpy().ravel(),
+                                  alpha=float(np.asarray(alpha).ravel()[0]))
         bids = alpha * pValues
 
         return bids

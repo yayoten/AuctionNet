@@ -58,6 +58,10 @@ class OnlineLpBiddingStrategy(BaseBiddingStrategy):
             else:
                 alpha = res
 
+        # 記録用（結果には影響しない）：早見表の行数、表から引いた値（引けなければ None）、上限を掛ける前後の alpha
+        self.last_internal = dict(table_rows=int(len(tem)), table_cpa=None if (len(tem) == 0 or res is None) else float(res),
+                                  alpha_before_cap=float(alpha), alpha=float(min(self.cpa*self.cpa_cap_ratio,alpha)),
+                                  capped=bool(alpha > self.cpa*self.cpa_cap_ratio))
         alpha = min(self.cpa*self.cpa_cap_ratio,alpha)
         bids = alpha * pValues
         return bids
