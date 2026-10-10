@@ -206,6 +206,226 @@
     "meaning": "展開前の spec.json のパス",
     "why": "原本のファイルへの逆引き",
     "unit": ""
+   },
+   "config_key": {
+    "meaning": "設定（player・episodes・seed・gin）だけのハッシュ。コードの版を含まない（build_db.py が作る）",
+    "why": "コードの版が違う run（版 1 と版 2 など）で、同じ設定のものを結ぶため。run_id はコードの版で変わる",
+    "unit": ""
+   },
+   "record_version": {
+    "meaning": "記録の形式の版。1 = 2026-10-09 まで、2 = T006 で拡充（build_db.py が、無い run に 1 を入れる）",
+    "why": "どの列・表がある run かを見分けるため",
+    "unit": ""
+   },
+   "record_level": {
+    "meaning": "記録の段（basic / standard / detail / full）。版 1 の run は NULL",
+    "why": "どの表（raw/ の機会ごとの記録など）がある run かを見分けるため",
+    "unit": ""
+   },
+   "record_level_num": {
+    "meaning": "記録の段の数値（basic 0、standard 1、detail 2、full 3）",
+    "why": "「この段以上」で絞るため",
+    "unit": ""
+   },
+   "started_at_epoch": {
+    "meaning": "開始時刻（UNIX 時刻）",
+    "why": "並列で流した run の重なりを調べるため",
+    "unit": "秒"
+   },
+   "ended_at": {
+    "meaning": "終了日時（ローカル時刻）",
+    "why": "同上",
+    "unit": ""
+   },
+   "pid": {
+    "meaning": "プロセス番号",
+    "why": "同じ時刻に流れた run の区別",
+    "unit": ""
+   },
+   "n_workers": {
+    "meaning": "この run を流したときの並列数（--workers）",
+    "why": "所要時間は並列数で変わる（メモリ帯域の取り合い）ので、時間を比べるときにそろえるため",
+    "unit": ""
+   },
+   "n_tasks_in_batch": {
+    "meaning": "同じ起動で流した run の数",
+    "why": "同上",
+    "unit": ""
+   },
+   "cpu_model": {
+    "meaning": "CPU の型名",
+    "why": "端末差・所要時間の解釈",
+    "unit": ""
+   },
+   "machine": {
+    "meaning": "CPU の種類（x86_64 など）",
+    "why": "端末差の切り分け",
+    "unit": ""
+   },
+   "python_executable": {
+    "meaning": "Python の実行ファイル",
+    "why": "どの環境で流したか",
+    "unit": ""
+   },
+   "argv": {
+    "meaning": "起動したコマンドの引数",
+    "why": "流し方の再現",
+    "unit": ""
+   },
+   "loadavg1_start": {
+    "meaning": "開始時のロードアベレージ（1 分）",
+    "why": "他の処理と重なっていたか（所要時間の解釈）",
+    "unit": ""
+   },
+   "loadavg5_start": {
+    "meaning": "開始時のロードアベレージ（5 分）",
+    "why": "同上",
+    "unit": ""
+   },
+   "loadavg1_end": {
+    "meaning": "終了時のロードアベレージ（1 分）",
+    "why": "同上",
+    "unit": ""
+   },
+   "env_threads": {
+    "meaning": "スレッド数・GPU・ハッシュの種の環境変数（JSON）",
+    "why": "再現条件（スレッド数で数値・時間が変わりうる）",
+    "unit": ""
+   },
+   "torch_num_threads": {
+    "meaning": "torch のスレッド数",
+    "why": "同上",
+    "unit": ""
+   },
+   "run_experiment_sha1": {
+    "meaning": "research/src/run_experiment.py の SHA-1",
+    "why": "記録のコードの版（github_tree には入らない）",
+    "unit": ""
+   },
+   "lib_versions": {
+    "meaning": "scipy・gin・psutil・pyarrow・duckdb の版（JSON）",
+    "why": "再現条件（scipy は雑音の打ち切り正規分布を作る）",
+    "unit": ""
+   },
+   "import_seconds": {
+    "meaning": "import にかかった時間",
+    "why": "所要時間の内訳",
+    "unit": "秒"
+   },
+   "strategy_init_seconds": {
+    "meaning": "プレイヤーの戦略を作る時間（重みの読み込みを含む）",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "write_seconds": {
+    "meaning": "集計と parquet の書き出しの時間",
+    "why": "記録の重さ",
+    "unit": "秒"
+   },
+   "hook_seconds_total": {
+    "meaning": "記録（tick_hook）にかかった時間の合計",
+    "why": "記録を足したことで、どれだけ遅くなったか",
+    "unit": "秒"
+   },
+   "sim_cpu_seconds": {
+    "meaning": "シミュレーション全体の CPU 時間",
+    "why": "壁時計との差が、待ち（他の処理との取り合い）",
+    "unit": "秒"
+   },
+   "cpu_seconds": {
+    "meaning": "run 全体の CPU 時間",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "cpu_user_seconds": {
+    "meaning": "CPU 時間（ユーザー）",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "cpu_system_seconds": {
+    "meaning": "CPU 時間（システム）",
+    "why": "メモリの確保・解放の重さ",
+    "unit": "秒"
+   },
+   "bidding_seconds_all_total": {
+    "meaning": "全 48 社の bidding() の時間の合計",
+    "why": "所要時間の内訳（入札／環境／記録）",
+    "unit": "秒"
+   },
+   "env_sim_seconds_total": {
+    "meaning": "simulate_ad_bidding の時間の合計（やり直しを含む）",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "adjust_seconds_total": {
+    "meaning": "adjust_over_cost（予算超過の入札の取り消し）の時間の合計",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "n_sim_iters_total": {
+    "meaning": "simulate_ad_bidding を呼んだ回数の合計（ティック数 + やり直しの回数）",
+    "why": "予算超過のやり直しが、どれだけ起きたか",
+    "unit": "回"
+   },
+   "maxrss_mb": {
+    "meaning": "プロセスの最大メモリ（OS が数えた値。peak_rss_mb はティックの終わりに測った値の最大）",
+    "why": "並列数を決めるため",
+    "unit": "MB"
+   },
+   "mem_total_mb": {
+    "meaning": "端末のメモリ",
+    "why": "並列数の解釈",
+    "unit": "MB"
+   },
+   "mem_available_start_mb": {
+    "meaning": "開始時の空きメモリ",
+    "why": "メモリ不足の失敗の切り分け",
+    "unit": "MB"
+   },
+   "mem_available_end_mb": {
+    "meaning": "終了時の空きメモリ",
+    "why": "同上",
+    "unit": "MB"
+   },
+   "gin_file_sha1": {
+    "meaning": "github/config/test.gin の SHA-1",
+    "why": "設定ファイルが同じか",
+    "unit": ""
+   },
+   "gin_config": {
+    "meaning": "実行前の gin の設定の全文",
+    "why": "設定の全文を残すため",
+    "unit": ""
+   },
+   "gin_operative_config": {
+    "meaning": "実行後の gin の設定の全文（実際に使われた値だけ）",
+    "why": "同上",
+    "unit": ""
+   },
+   "spec_file_sha1": {
+    "meaning": "spec.json の SHA-1",
+    "why": "spec を書き換えていないかの確認",
+    "unit": ""
+   },
+   "seeds": {
+    "meaning": "乱数の種の一覧（JSON）：numpy・torch、エピソード番号、環境の露出・雑音／抽選、予算超過の取り消し、広告機会の生成",
+    "why": "再現条件を 1 か所で読むため",
+    "unit": ""
+   },
+   "files": {
+    "meaning": "この run のファイルと、そのバイト数（JSON）",
+    "why": "容量の実測",
+    "unit": ""
+   },
+   "bytes_total": {
+    "meaning": "この run のファイルの合計",
+    "why": "容量の見積もり",
+    "unit": "バイト"
+   },
+   "bytes_raw": {
+    "meaning": "そのうち raw/（git 管理外）の合計",
+    "why": "同上",
+    "unit": "バイト"
    }
   }
  },
@@ -316,6 +536,76 @@
     "meaning": "プレイヤー以外の47人の score_component の平均",
     "why": "背景の広告主の成績。プレイヤーの変更が他者に与える影響や、環境の難しさの目安",
     "unit": ""
+   },
+   "n_est": {
+    "meaning": "N_est：プレイヤーが落札して露出した機会の、推定価値（①）の和",
+    "why": "REP006 の E = cost / n_est / C、P = n_est / n_real。入札者が見積もった購入数",
+    "unit": "件"
+   },
+   "n_real": {
+    "meaning": "N_real：同じ機会の、雑音を加えて 0〜1 に切った確率（②）の和",
+    "why": "REP006 の P、L = n_real / reward。環境にとっての購入数の期待値",
+    "unit": "件"
+   },
+   "real_var": {
+    "meaning": "同じ機会の、②×(1−②) の和",
+    "why": "抽選の分散。z = (reward − n_real) / sqrt(real_var) が平均 0・標準偏差 1 に近いかを見る（REP006 集計5）",
+    "unit": ""
+   },
+   "n_won": {
+    "meaning": "落札した機会の数（露出の抽選の前）",
+    "why": "露出率（all_win_pv / n_won）",
+    "unit": ""
+   },
+   "n_bids_dropped": {
+    "meaning": "予算超過のやり直しで、0 にされた入札の数",
+    "why": "C5（予算超過の取り消し）が、どれだけ効いたか",
+    "unit": "件"
+   },
+   "n_sim_iters": {
+    "meaning": "simulate_ad_bidding を呼んだ回数（48 + やり直しの回数）",
+    "why": "同上",
+    "unit": "回"
+   },
+   "trunc_u1": {
+    "meaning": "プレイヤーの雑音の打ち切りの乱数 u1（下側の幅は −2×u1 標準偏差）",
+    "why": "C3：打ち切りが上下で対称でないことと、P の関係を調べるため",
+    "unit": ""
+   },
+   "trunc_u2": {
+    "meaning": "同・u2（上側の幅は +2×u2 標準偏差）",
+    "why": "同上",
+    "unit": ""
+   },
+   "budget_exhausted_tick": {
+    "meaning": "残り予算が min_remaining_budget を下回ったティック（下回らなければ −1）",
+    "why": "予算切れの時刻（last_compete_tick_index は「最後に露出したティック」で、意味が違う）",
+    "unit": ""
+   },
+   "num_pv": {
+    "meaning": "そのエピソードの広告機会の総数",
+    "why": "規模",
+    "unit": ""
+   },
+   "episode_wall_seconds": {
+    "meaning": "エピソードの所要時間（最初のティックの記録から、最後のティックの記録まで）",
+    "why": "時間の内訳",
+    "unit": "秒"
+   },
+   "episode_cpu_seconds": {
+    "meaning": "同・CPU 時間",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "bidding_seconds": {
+    "meaning": "プレイヤーの bidding() の時間の合計",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "hook_seconds": {
+    "meaning": "記録にかかった時間の合計",
+    "why": "同上",
+    "unit": "秒"
    }
   }
  },
@@ -456,6 +746,321 @@
     "meaning": "そのティックでのメモリ使用量",
     "why": "規模を上げられるかの見積り",
     "unit": "MB"
+   },
+   "est_sum_exposed": {
+    "meaning": "露出した機会の、推定価値（①）の和",
+    "why": "N_est のティックごとの値。必ず取る（REP006 8.1）",
+    "unit": "件"
+   },
+   "real_sum_exposed": {
+    "meaning": "露出した機会の、雑音を加えて 0〜1 に切った確率（②）の和",
+    "why": "N_real のティックごとの値。必ず取る",
+    "unit": "件"
+   },
+   "real_var_exposed": {
+    "meaning": "露出した機会の、②×(1−②) の和",
+    "why": "抽選の分散。必ず取る",
+    "unit": ""
+   },
+   "est_sum_won": {
+    "meaning": "落札した機会（露出の前）の、①の和",
+    "why": "露出の抽選が、買った機会の質を変えていないかの確認",
+    "unit": "件"
+   },
+   "real_sum_won": {
+    "meaning": "落札した機会（露出の前）の、②の和",
+    "why": "同上",
+    "unit": "件"
+   },
+   "real_sum_all": {
+    "meaning": "全機会の、②の和",
+    "why": "落札しなかった機会を含めた水準。買った機会の偏り（P が手法の選び方で決まるか）を見る",
+    "unit": "件"
+   },
+   "real_var_all": {
+    "meaning": "全機会の、②×(1−②) の和",
+    "why": "同上",
+    "unit": ""
+   },
+   "conv_draw_sum_all": {
+    "meaning": "全機会の、抽選（露出を掛ける前）の結果の和",
+    "why": "C6：抽選の乱数が毎ティック同じ種で作り直されることの影響を調べるため",
+    "unit": "件"
+   },
+   "n_real_below0": {
+    "meaning": "雑音を加えた値が 0 未満だった機会の数（0 に切られる）",
+    "why": "C3：0〜1 への切り詰めが、どれだけ起きているか",
+    "unit": "件"
+   },
+   "n_real_above1": {
+    "meaning": "雑音を加えた値が 1 を超えた機会の数（1 に切られる）",
+    "why": "同上",
+    "unit": "件"
+   },
+   "n_exposed_slot1": {
+    "meaning": "枠 1 で露出した数",
+    "why": "枠ごとの露出率（1・0.8・0.6）と、枠 3 の取り消しの確認",
+    "unit": "件"
+   },
+   "n_exposed_slot2": {
+    "meaning": "枠 2 で露出した数",
+    "why": "同上",
+    "unit": "件"
+   },
+   "n_exposed_slot3": {
+    "meaning": "枠 3 で露出した数（枠 2 が露出しなければ、枠 3 も露出しない）",
+    "why": "同上",
+    "unit": "件"
+   },
+   "cost_slot1": {
+    "meaning": "枠 1 での支払い",
+    "why": "どの枠で払っているか",
+    "unit": ""
+   },
+   "cost_slot2": {
+    "meaning": "枠 2 での支払い",
+    "why": "同上",
+    "unit": ""
+   },
+   "cost_slot3": {
+    "meaning": "枠 3 での支払い",
+    "why": "同上",
+    "unit": ""
+   },
+   "bid_sum": {
+    "meaning": "入札額の和（予算超過の取り消しのあと）",
+    "why": "alpha_eff の分子",
+    "unit": ""
+   },
+   "bid_sum_exposed": {
+    "meaning": "露出した機会の入札額の和",
+    "why": "支払い / これ = 第二価格による割引（second_price_ratio のティックごとの値）",
+    "unit": ""
+   },
+   "bid_sum_won": {
+    "meaning": "落札した機会の入札額の和",
+    "why": "同上（露出の前）",
+    "unit": ""
+   },
+   "bid_p10": {
+    "meaning": "入札額の 10% 点",
+    "why": "入札額の分布",
+    "unit": ""
+   },
+   "bid_p50": {
+    "meaning": "入札額の中央値",
+    "why": "同上",
+    "unit": ""
+   },
+   "bid_p90": {
+    "meaning": "入札額の 90% 点",
+    "why": "同上",
+    "unit": ""
+   },
+   "bid_max": {
+    "meaning": "入札額の最大",
+    "why": "同上",
+    "unit": ""
+   },
+   "alpha_internal": {
+    "meaning": "手法の内部の入札係数 α（PID の alpha、Online LP の上限を掛けたあとの α、学習ベースの方策の出力）。ABid は、入札額が α × 価値² なので、alpha_eff と単位が違う",
+    "why": "alpha_eff（入札額の和 / 価値の和）は、予算超過の取り消しで下がる。手法が出した α そのものを見るため",
+    "unit": ""
+   },
+   "remaining_budget_after": {
+    "meaning": "そのティックの支払いのあとの残り予算",
+    "why": "予算の残り方",
+    "unit": ""
+   },
+   "n_bids_dropped": {
+    "meaning": "予算超過のやり直しで、0 にされた入札の数",
+    "why": "C5 の確認",
+    "unit": "件"
+   },
+   "cost_first_iter": {
+    "meaning": "やり直しの前（1 回目）の支払い",
+    "why": "予算超過の取り消しで、支払いがどれだけ減ったか",
+    "unit": ""
+   },
+   "over_cost_ratio_first": {
+    "meaning": "1 回目の、(支払い − 残り予算) / 支払い（超過していなければ 0）",
+    "why": "同上",
+    "unit": ""
+   },
+   "est_sum_all": {
+    "meaning": "全機会の、①の和（= pvalue_mean × num_pv）",
+    "why": "落札しなかった機会を含めた水準",
+    "unit": "件"
+   },
+   "reward_slot1": {
+    "meaning": "枠 1 での購入数",
+    "why": "枠ごとの成果",
+    "unit": "件"
+   },
+   "reward_slot2": {
+    "meaning": "枠 2 での購入数",
+    "why": "同上",
+    "unit": "件"
+   },
+   "reward_slot3": {
+    "meaning": "枠 3 での購入数",
+    "why": "同上",
+    "unit": "件"
+   },
+   "pvalue_p10": {
+    "meaning": "推定価値の 10% 点",
+    "why": "機会の価値の分布",
+    "unit": ""
+   },
+   "pvalue_p50": {
+    "meaning": "推定価値の中央値",
+    "why": "同上",
+    "unit": ""
+   },
+   "pvalue_p90": {
+    "meaning": "推定価値の 90% 点",
+    "why": "同上",
+    "unit": ""
+   },
+   "pvalue_max": {
+    "meaning": "推定価値の最大",
+    "why": "同上",
+    "unit": ""
+   },
+   "pvalue_sigma_sum_exposed": {
+    "meaning": "露出した機会の、不確実性 σ の和",
+    "why": "買った機会の σ が、P（見積もりの偏り）に効くかを見るため",
+    "unit": ""
+   },
+   "n_sim_iters": {
+    "meaning": "そのティックで simulate_ad_bidding を呼んだ回数（1 = やり直しなし）",
+    "why": "C5 の確認",
+    "unit": "回"
+   },
+   "reward_first_iter": {
+    "meaning": "やり直しの前（1 回目）の購入数",
+    "why": "予算超過の取り消しで、購入がどれだけ減ったか",
+    "unit": "件"
+   },
+   "n_overcost_agents_first": {
+    "meaning": "1 回目に、支払いが残り予算を超えた広告主の数",
+    "why": "やり直しの原因が、プレイヤーか他社か",
+    "unit": "社"
+   },
+   "mp1_mean": {
+    "meaning": "2 位の入札額（枠 1 の支払い単価）の平均",
+    "why": "市場価格の水準（枠ごと）",
+    "unit": ""
+   },
+   "mp2_mean": {
+    "meaning": "3 位の入札額（枠 2 の支払い単価）の平均",
+    "why": "同上",
+    "unit": ""
+   },
+   "lwc_p10": {
+    "meaning": "4 位の入札額（枠 3 の支払い単価 = least winning cost）の 10% 点",
+    "why": "市場価格の分布",
+    "unit": ""
+   },
+   "lwc_p50": {
+    "meaning": "同・中央値",
+    "why": "同上",
+    "unit": ""
+   },
+   "lwc_p90": {
+    "meaning": "同・90% 点",
+    "why": "同上",
+    "unit": ""
+   },
+   "n_pv_sold3": {
+    "meaning": "3 枠とも売れた機会の数",
+    "why": "売れ残りの量（入札者が減った時間帯）",
+    "unit": "件"
+   },
+   "n_pv_sold0": {
+    "meaning": "1 枠も売れなかった機会の数",
+    "why": "同上",
+    "unit": "件"
+   },
+   "n_exposed_all": {
+    "meaning": "全 48 社の露出の合計",
+    "why": "市場全体の量",
+    "unit": "件"
+   },
+   "reward_all": {
+    "meaning": "全 48 社の購入数の合計",
+    "why": "同上",
+    "unit": "件"
+   },
+   "bidding_seconds_all": {
+    "meaning": "全 48 社の bidding() の時間の合計",
+    "why": "ティックの時間の内訳",
+    "unit": "秒"
+   },
+   "sim_seconds": {
+    "meaning": "simulate_ad_bidding の時間（やり直しを含む合計）",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "adjust_seconds": {
+    "meaning": "adjust_over_cost の時間",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "env_sort_seconds": {
+    "meaning": "環境の段：入札額の順位づけ",
+    "why": "シミュレータのどの段が重いか",
+    "unit": "秒"
+   },
+   "env_slot_seconds": {
+    "meaning": "環境の段：枠の割り当て",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "env_cost_seconds": {
+    "meaning": "環境の段：支払い単価",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "env_exposure_seconds": {
+    "meaning": "環境の段：露出の抽選",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "env_values_seconds": {
+    "meaning": "環境の段：雑音を加えた確率（打ち切り正規分布）",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "env_conversion_seconds": {
+    "meaning": "環境の段：購入の抽選",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "env_unsold_seconds": {
+    "meaning": "環境の段：売れ残りの処理",
+    "why": "同上",
+    "unit": "秒"
+   },
+   "tick_core_seconds": {
+    "meaning": "入札の開始から、記録の直前までの時間（記録を含まない）",
+    "why": "記録を除いたティックの時間",
+    "unit": "秒"
+   },
+   "tick_cpu_seconds": {
+    "meaning": "そのティックの CPU 時間",
+    "why": "壁時計との差が、待ち",
+    "unit": "秒"
+   },
+   "hook_seconds": {
+    "meaning": "記録（tick_hook）にかかった時間",
+    "why": "記録の重さ",
+    "unit": "秒"
+   },
+   "ended_at_epoch": {
+    "meaning": "ティックが終わった時刻（UNIX 時刻）",
+    "why": "並列の run との重なり",
+    "unit": "秒"
    }
   }
  },
@@ -535,6 +1140,56 @@
    "is_player": {
     "meaning": "プレイヤー戦略を置いた広告主か",
     "why": "プレイヤーと背景の区別",
+    "unit": ""
+   },
+   "n_est": {
+    "meaning": "N_est：落札して露出した機会の、①の和（エピソードの合計）",
+    "why": "背景の 47 社についても、E・P・L を作れるようにするため",
+    "unit": "件"
+   },
+   "n_real": {
+    "meaning": "N_real：同・②の和",
+    "why": "同上",
+    "unit": "件"
+   },
+   "real_var": {
+    "meaning": "同・②×(1−②) の和",
+    "why": "同上",
+    "unit": ""
+   },
+   "trunc_u1": {
+    "meaning": "雑音の打ち切りの乱数 u1（下側 −2×u1 標準偏差）。広告主 × エピソードで決まる",
+    "why": "C3 の確認。P の水準を、u1・u2 から予測できるかを見る（REP006 7 節 (3)）",
+    "unit": ""
+   },
+   "trunc_u2": {
+    "meaning": "同・u2（上側 +2×u2 標準偏差）",
+    "why": "同上",
+    "unit": ""
+   },
+   "trunc_seed": {
+    "meaning": "u1・u2 を作った乱数の種（hash((広告主, 0, エピソード)) + 1019 の下位 32 ビット）",
+    "why": "再現",
+    "unit": ""
+   },
+   "budget_exhausted_tick": {
+    "meaning": "残り予算が min_remaining_budget を下回ったティック（下回らなければ −1）",
+    "why": "競合の脱落の時刻",
+    "unit": ""
+   },
+   "bid_sum_exposed": {
+    "meaning": "露出した機会の入札額の和",
+    "why": "第二価格による割引（cost / これ）",
+    "unit": ""
+   },
+   "n_bids_dropped": {
+    "meaning": "予算超過のやり直しで、0 にされた入札の数",
+    "why": "C5 の確認",
+    "unit": "件"
+   },
+   "strategy_class": {
+    "meaning": "戦略のクラス名",
+    "why": "agent_name より確実に、手法で集計するため",
     "unit": ""
    }
   }
@@ -768,5 +1423,669 @@
     "unit": ""
    }
   }
+ },
+ "sim_iters": {
+  "description": "1実行 × エピソード × ティック × simulate_ad_bidding の呼び出し（iter 0 = 1 回目、1 以上 = 予算超過のやり直し）。主キー (run_id, episode, tick, iter)。版 2 の run だけ。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "episode": {
+    "meaning": "エピソード番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "tick": {
+    "meaning": "ティック番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "iter": {
+    "meaning": "呼び出しの番号（0 から）",
+    "why": "やり直しの何回目か",
+    "unit": ""
+   },
+   "n_overcost_agents": {
+    "meaning": "この回に、支払いが残り予算を超えた広告主の数",
+    "why": "C5：やり直しが、いつ、何社で起きるか",
+    "unit": "社"
+   },
+   "over_cost_ratio_max": {
+    "meaning": "(支払い − 残り予算) / 支払い の、48 社の最大（0 なら、この回で確定）",
+    "why": "同上",
+    "unit": ""
+   },
+   "overcost_agents": {
+    "meaning": "超過した広告主の番号（JSON）",
+    "why": "同上",
+    "unit": ""
+   },
+   "player_over_cost_ratio": {
+    "meaning": "プレイヤーの同じ値",
+    "why": "プレイヤーが原因のやり直しか",
+    "unit": ""
+   },
+   "player_cost": {
+    "meaning": "この回のプレイヤーの支払い",
+    "why": "やり直しで、支払いがどう変わったか",
+    "unit": ""
+   },
+   "player_reward": {
+    "meaning": "この回のプレイヤーの購入数",
+    "why": "やり直しで、購入がどう変わったか",
+    "unit": "件"
+   },
+   "total_cost_all": {
+    "meaning": "この回の全 48 社の支払い",
+    "why": "同上",
+    "unit": ""
+   },
+   "sim_seconds": {
+    "meaning": "この回の simulate_ad_bidding の時間",
+    "why": "時間の内訳",
+    "unit": "秒"
+   }
+  }
+ },
+ "agent_ticks": {
+  "description": "1実行 × エピソード × ティック × 広告主（48）。全員のティックごとの集計と、手法の内部状態。主キー (run_id, episode, tick, agent_index)。原本は raw/agent_ticks.parquet（git 管理外）。記録の段 standard 以上の run だけ。DuckDB では view。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "episode": {
+    "meaning": "エピソード番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "tick": {
+    "meaning": "ティック番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "agent_index": {
+    "meaning": "広告主の番号（0..47）",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "is_player": {
+    "meaning": "プレイヤーか",
+    "why": "プレイヤーと背景の区別",
+    "unit": ""
+   },
+   "did_bid": {
+    "meaning": "このティックで bidding() が呼ばれたか（予算が残っていたか）",
+    "why": "予算切れの検出",
+    "unit": ""
+   },
+   "remaining_budget_before": {
+    "meaning": "入札前の残り予算",
+    "why": "競合の予算の残り方",
+    "unit": ""
+   },
+   "alpha_eff": {
+    "meaning": "実効入札係数 = 入札額の和 / 推定価値の和",
+    "why": "全 48 社の α の時系列（プレイヤーの α との差が、勝敗を決める）",
+    "unit": ""
+   },
+   "bid_mean": {
+    "meaning": "入札額の平均",
+    "why": "入札の水準",
+    "unit": ""
+   },
+   "bid_nonzero_n": {
+    "meaning": "入札額が正の機会の数",
+    "why": "予算切れ・取り消しの検出",
+    "unit": "件"
+   },
+   "pvalue_sum": {
+    "meaning": "推定価値の和",
+    "why": "alpha_eff の分母",
+    "unit": ""
+   },
+   "pvalue_std": {
+    "meaning": "推定価値の標準偏差",
+    "why": "価値のばらつき",
+    "unit": ""
+   },
+   "sigma_sum": {
+    "meaning": "不確実性 σ の和",
+    "why": "σ の水準",
+    "unit": ""
+   },
+   "n_won": {
+    "meaning": "落札した数",
+    "why": "勝てた量",
+    "unit": "件"
+   },
+   "n_slot1": {
+    "meaning": "枠 1 の落札",
+    "why": "枠の内訳",
+    "unit": "件"
+   },
+   "n_slot2": {
+    "meaning": "枠 2 の落札",
+    "why": "同上",
+    "unit": "件"
+   },
+   "n_slot3": {
+    "meaning": "枠 3 の落札",
+    "why": "同上",
+    "unit": "件"
+   },
+   "n_exposed": {
+    "meaning": "露出した数",
+    "why": "支払い・購入が生じる単位",
+    "unit": "件"
+   },
+   "cost": {
+    "meaning": "支払い",
+    "why": "予算の消化",
+    "unit": ""
+   },
+   "reward": {
+    "meaning": "購入数",
+    "why": "成果",
+    "unit": "件"
+   },
+   "bidding_seconds": {
+    "meaning": "bidding() の時間",
+    "why": "手法ごとの計算の重さ",
+    "unit": "秒"
+   },
+   "state_raw": {
+    "meaning": "学習ベースの手法の入力状態（16 次元、正規化の前）。ルールベースは NULL",
+    "why": "方策が何を見て α を決めたか。学習データの状態の分布と比べるため",
+    "unit": ""
+   },
+   "state_norm": {
+    "meaning": "同・正規化のあと（方策に渡した値）",
+    "why": "同上",
+    "unit": ""
+   },
+   "internal_json": {
+    "meaning": "手法の内部状態（JSON）。PID：alpha・branch（up/down/keep/init）・last_tick_cost・low_ratio・high_ratio。Online LP：table_rows・table_cpa・alpha_before_cap・alpha・capped。ABid：alpha・base_action・pvalue_mean。学習ベース：alpha",
+    "why": "α が、なぜその値になったか（PID のどの分岐か、Online LP が上限に当たったか）を、あとから読むため",
+    "unit": ""
+   },
+   "est_sum_exposed": {
+    "meaning": "露出した機会の、推定価値（①）の和",
+    "why": "N_est のティックごとの値。必ず取る（REP006 8.1）",
+    "unit": "件"
+   },
+   "real_sum_exposed": {
+    "meaning": "露出した機会の、雑音を加えて 0〜1 に切った確率（②）の和",
+    "why": "N_real のティックごとの値。必ず取る",
+    "unit": "件"
+   },
+   "real_var_exposed": {
+    "meaning": "露出した機会の、②×(1−②) の和",
+    "why": "抽選の分散。必ず取る",
+    "unit": ""
+   },
+   "est_sum_won": {
+    "meaning": "落札した機会（露出の前）の、①の和",
+    "why": "露出の抽選が、買った機会の質を変えていないかの確認",
+    "unit": "件"
+   },
+   "real_sum_won": {
+    "meaning": "落札した機会（露出の前）の、②の和",
+    "why": "同上",
+    "unit": "件"
+   },
+   "real_sum_all": {
+    "meaning": "全機会の、②の和",
+    "why": "落札しなかった機会を含めた水準。買った機会の偏り（P が手法の選び方で決まるか）を見る",
+    "unit": "件"
+   },
+   "real_var_all": {
+    "meaning": "全機会の、②×(1−②) の和",
+    "why": "同上",
+    "unit": ""
+   },
+   "conv_draw_sum_all": {
+    "meaning": "全機会の、抽選（露出を掛ける前）の結果の和",
+    "why": "C6：抽選の乱数が毎ティック同じ種で作り直されることの影響を調べるため",
+    "unit": "件"
+   },
+   "n_real_below0": {
+    "meaning": "雑音を加えた値が 0 未満だった機会の数（0 に切られる）",
+    "why": "C3：0〜1 への切り詰めが、どれだけ起きているか",
+    "unit": "件"
+   },
+   "n_real_above1": {
+    "meaning": "雑音を加えた値が 1 を超えた機会の数（1 に切られる）",
+    "why": "同上",
+    "unit": "件"
+   },
+   "n_exposed_slot1": {
+    "meaning": "枠 1 で露出した数",
+    "why": "枠ごとの露出率（1・0.8・0.6）と、枠 3 の取り消しの確認",
+    "unit": "件"
+   },
+   "n_exposed_slot2": {
+    "meaning": "枠 2 で露出した数",
+    "why": "同上",
+    "unit": "件"
+   },
+   "n_exposed_slot3": {
+    "meaning": "枠 3 で露出した数（枠 2 が露出しなければ、枠 3 も露出しない）",
+    "why": "同上",
+    "unit": "件"
+   },
+   "cost_slot1": {
+    "meaning": "枠 1 での支払い",
+    "why": "どの枠で払っているか",
+    "unit": ""
+   },
+   "cost_slot2": {
+    "meaning": "枠 2 での支払い",
+    "why": "同上",
+    "unit": ""
+   },
+   "cost_slot3": {
+    "meaning": "枠 3 での支払い",
+    "why": "同上",
+    "unit": ""
+   },
+   "bid_sum": {
+    "meaning": "入札額の和（予算超過の取り消しのあと）",
+    "why": "alpha_eff の分子",
+    "unit": ""
+   },
+   "bid_sum_exposed": {
+    "meaning": "露出した機会の入札額の和",
+    "why": "支払い / これ = 第二価格による割引（second_price_ratio のティックごとの値）",
+    "unit": ""
+   },
+   "bid_sum_won": {
+    "meaning": "落札した機会の入札額の和",
+    "why": "同上（露出の前）",
+    "unit": ""
+   },
+   "bid_p10": {
+    "meaning": "入札額の 10% 点",
+    "why": "入札額の分布",
+    "unit": ""
+   },
+   "bid_p50": {
+    "meaning": "入札額の中央値",
+    "why": "同上",
+    "unit": ""
+   },
+   "bid_p90": {
+    "meaning": "入札額の 90% 点",
+    "why": "同上",
+    "unit": ""
+   },
+   "bid_max": {
+    "meaning": "入札額の最大",
+    "why": "同上",
+    "unit": ""
+   },
+   "alpha_internal": {
+    "meaning": "手法の内部の入札係数 α（PID の alpha、Online LP の上限を掛けたあとの α、学習ベースの方策の出力）。ABid は、入札額が α × 価値² なので、alpha_eff と単位が違う",
+    "why": "alpha_eff（入札額の和 / 価値の和）は、予算超過の取り消しで下がる。手法が出した α そのものを見るため",
+    "unit": ""
+   },
+   "remaining_budget_after": {
+    "meaning": "そのティックの支払いのあとの残り予算",
+    "why": "予算の残り方",
+    "unit": ""
+   },
+   "n_bids_dropped": {
+    "meaning": "予算超過のやり直しで、0 にされた入札の数",
+    "why": "C5 の確認",
+    "unit": "件"
+   },
+   "cost_first_iter": {
+    "meaning": "やり直しの前（1 回目）の支払い",
+    "why": "予算超過の取り消しで、支払いがどれだけ減ったか",
+    "unit": ""
+   },
+   "over_cost_ratio_first": {
+    "meaning": "1 回目の、(支払い − 残り予算) / 支払い（超過していなければ 0）",
+    "why": "同上",
+    "unit": ""
+   }
+  }
+ },
+ "pv_won": {
+  "description": "プレイヤーの機会ごとの記録のうち、落札した機会と、予算超過で入札を取り消された機会。主キー (run_id, episode, tick, pv_index)。原本は raw/pv_won.parquet（git 管理外）。記録の段 standard 以上。DuckDB では view。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "episode": {
+    "meaning": "エピソード番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "tick": {
+    "meaning": "ティック番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "pv_index": {
+    "meaning": "そのティックの中での機会の番号（0 から）",
+    "why": "同じ番号の機会に、同じ乱数が当たるか（C6）を調べるため",
+    "unit": ""
+   },
+   "pvalue": {
+    "meaning": "推定価値（①）。float32",
+    "why": "入札者の見積もり",
+    "unit": ""
+   },
+   "sigma": {
+    "meaning": "推定価値の不確実性 σ。float32",
+    "why": "雑音の大きさ",
+    "unit": ""
+   },
+   "value_real": {
+    "meaning": "雑音を加えた値（0〜1 に切る前）。②は clip(value_real, 0, 1)。float32",
+    "why": "環境の本当の購入確率。雑音 = (value_real − pvalue) / sigma",
+    "unit": ""
+   },
+   "bid": {
+    "meaning": "入札額（予算超過の取り消しのあと）。float32",
+    "why": "入札",
+    "unit": ""
+   },
+   "bid_before_adjust": {
+    "meaning": "入札額（取り消しの前）。bid が 0 でこれが正なら、取り消された入札",
+    "why": "C5 の確認",
+    "unit": ""
+   },
+   "slot": {
+    "meaning": "得た枠（1〜3。0 = 落札せず）",
+    "why": "枠",
+    "unit": ""
+   },
+   "price": {
+    "meaning": "支払い単価（1 つ下の順位の入札額）。露出しなければ払わない",
+    "why": "第二価格",
+    "unit": ""
+   },
+   "exposure_draw": {
+    "meaning": "露出の抽選の結果（枠 3 の取り消しと、売れ残りの処理の前）",
+    "why": "枠 3 の取り消しが、どれだけ起きたか",
+    "unit": ""
+   },
+   "is_exposed": {
+    "meaning": "露出したか（最終）",
+    "why": "支払い・購入が生じるか",
+    "unit": ""
+   },
+   "conversion_draw": {
+    "meaning": "購入の抽選の結果（露出を掛ける前）",
+    "why": "落札しなかった機会でも、抽選の結果が分かる（反実仮想）",
+    "unit": ""
+   },
+   "conversion": {
+    "meaning": "購入（= conversion_draw × is_exposed）",
+    "why": "成果",
+    "unit": ""
+   },
+   "bid_rank": {
+    "meaning": "48 社の中での入札額の順位（1 = 最高。自分より高い入札の数 + 1）",
+    "why": "あと何位で落札できたか",
+    "unit": ""
+   },
+   "top1_bid": {
+    "meaning": "その機会の 1 位の入札額",
+    "why": "競合の入札の上位（市場価格）",
+    "unit": ""
+   },
+   "top2_bid": {
+    "meaning": "2 位の入札額（枠 1 の支払い単価）",
+    "why": "同上",
+    "unit": ""
+   },
+   "top3_bid": {
+    "meaning": "3 位の入札額（枠 2 の支払い単価）",
+    "why": "同上",
+    "unit": ""
+   },
+   "top4_bid": {
+    "meaning": "4 位の入札額（枠 3 の支払い単価。最低落札価格）",
+    "why": "同上",
+    "unit": ""
+   },
+   "winner1": {
+    "meaning": "枠 1 を得た広告主の番号（−1 = 売れ残り）",
+    "why": "誰に負けたか",
+    "unit": ""
+   },
+   "winner2": {
+    "meaning": "枠 2 を得た広告主の番号",
+    "why": "同上",
+    "unit": ""
+   },
+   "winner3": {
+    "meaning": "枠 3 を得た広告主の番号",
+    "why": "同上",
+    "unit": ""
+   }
+  }
+ },
+ "pv_all": {
+  "description": "プレイヤーの機会ごとの記録（全機会。1 エピソード約 50 万行）。主キー (run_id, episode, tick, pv_index)。原本は raw/pv_all.parquet（git 管理外）。記録の段 detail 以上。DuckDB では view。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "episode": {
+    "meaning": "エピソード番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "tick": {
+    "meaning": "ティック番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "pv_index": {
+    "meaning": "そのティックの中での機会の番号（0 から）",
+    "why": "同じ番号の機会に、同じ乱数が当たるか（C6）を調べるため",
+    "unit": ""
+   },
+   "pvalue": {
+    "meaning": "推定価値（①）。float32",
+    "why": "入札者の見積もり",
+    "unit": ""
+   },
+   "sigma": {
+    "meaning": "推定価値の不確実性 σ。float32",
+    "why": "雑音の大きさ",
+    "unit": ""
+   },
+   "value_real": {
+    "meaning": "雑音を加えた値（0〜1 に切る前）。②は clip(value_real, 0, 1)。float32",
+    "why": "環境の本当の購入確率。雑音 = (value_real − pvalue) / sigma",
+    "unit": ""
+   },
+   "bid": {
+    "meaning": "入札額（予算超過の取り消しのあと）。float32",
+    "why": "入札",
+    "unit": ""
+   },
+   "bid_before_adjust": {
+    "meaning": "入札額（取り消しの前）。bid が 0 でこれが正なら、取り消された入札",
+    "why": "C5 の確認",
+    "unit": ""
+   },
+   "slot": {
+    "meaning": "得た枠（1〜3。0 = 落札せず）",
+    "why": "枠",
+    "unit": ""
+   },
+   "price": {
+    "meaning": "支払い単価（1 つ下の順位の入札額）。露出しなければ払わない",
+    "why": "第二価格",
+    "unit": ""
+   },
+   "exposure_draw": {
+    "meaning": "露出の抽選の結果（枠 3 の取り消しと、売れ残りの処理の前）",
+    "why": "枠 3 の取り消しが、どれだけ起きたか",
+    "unit": ""
+   },
+   "is_exposed": {
+    "meaning": "露出したか（最終）",
+    "why": "支払い・購入が生じるか",
+    "unit": ""
+   },
+   "conversion_draw": {
+    "meaning": "購入の抽選の結果（露出を掛ける前）",
+    "why": "落札しなかった機会でも、抽選の結果が分かる（反実仮想）",
+    "unit": ""
+   },
+   "conversion": {
+    "meaning": "購入（= conversion_draw × is_exposed）",
+    "why": "成果",
+    "unit": ""
+   },
+   "bid_rank": {
+    "meaning": "48 社の中での入札額の順位（1 = 最高。自分より高い入札の数 + 1）",
+    "why": "あと何位で落札できたか",
+    "unit": ""
+   },
+   "top1_bid": {
+    "meaning": "その機会の 1 位の入札額",
+    "why": "競合の入札の上位（市場価格）",
+    "unit": ""
+   },
+   "top2_bid": {
+    "meaning": "2 位の入札額（枠 1 の支払い単価）",
+    "why": "同上",
+    "unit": ""
+   },
+   "top3_bid": {
+    "meaning": "3 位の入札額（枠 2 の支払い単価）",
+    "why": "同上",
+    "unit": ""
+   },
+   "top4_bid": {
+    "meaning": "4 位の入札額（枠 3 の支払い単価。最低落札価格）",
+    "why": "同上",
+    "unit": ""
+   },
+   "winner1": {
+    "meaning": "枠 1 を得た広告主の番号（−1 = 売れ残り）",
+    "why": "誰に負けたか",
+    "unit": ""
+   },
+   "winner2": {
+    "meaning": "枠 2 を得た広告主の番号",
+    "why": "同上",
+    "unit": ""
+   },
+   "winner3": {
+    "meaning": "枠 3 を得た広告主の番号",
+    "why": "同上",
+    "unit": ""
+   }
+  }
+ },
+ "epl": {
+  "description": "view。1実行 × エピソード × 広告主（48）の、REP006 の三つの指標（E・P・L）。agents と runs から作る。版 2 の run だけ。購入 0 の行は L・R が NULL。",
+  "columns": {
+   "run_id": {
+    "meaning": "runs.run_id",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "episode": {
+    "meaning": "エピソード番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "agent_index": {
+    "meaning": "広告主の番号",
+    "why": "結合キー",
+    "unit": ""
+   },
+   "is_player": {
+    "meaning": "プレイヤーか",
+    "why": "プレイヤーと背景の区別",
+    "unit": ""
+   },
+   "strategy": {
+    "meaning": "プレイヤーの手法（runs.strategy）",
+    "why": "手法ごとの集計",
+    "unit": ""
+   },
+   "strategy_class": {
+    "meaning": "その広告主の戦略のクラス名",
+    "why": "背景の広告主の手法ごとの集計",
+    "unit": ""
+   },
+   "cpa_constraint": {
+    "meaning": "CPA 制約 C",
+    "why": "E と R の分母",
+    "unit": ""
+   },
+   "cost": {
+    "meaning": "支払い（Cost）",
+    "why": "E の分子",
+    "unit": ""
+   },
+   "reward": {
+    "meaning": "購入数（Conv）",
+    "why": "L の分母",
+    "unit": "件"
+   },
+   "n_est": {
+    "meaning": "N_est",
+    "why": "E の分母、P の分子",
+    "unit": "件"
+   },
+   "n_real": {
+    "meaning": "N_real",
+    "why": "P の分母、L の分子",
+    "unit": "件"
+   },
+   "real_var": {
+    "meaning": "②×(1−②) の和",
+    "why": "抽選の分散",
+    "unit": ""
+   },
+   "E": {
+    "meaning": "買い方 = cost / n_est / C",
+    "why": "REP006 2.8",
+    "unit": ""
+   },
+   "P": {
+    "meaning": "見積もりの偏り = n_est / n_real",
+    "why": "同上",
+    "unit": ""
+   },
+   "L": {
+    "meaning": "抽選 = n_real / reward（購入 0 なら NULL）",
+    "why": "同上",
+    "unit": ""
+   },
+   "R": {
+    "meaning": "実績 CPA ÷ C = cost / reward / C（購入 0 なら NULL）。E × P × L に等しい",
+    "why": "同上",
+    "unit": ""
+   },
+   "z": {
+    "meaning": "(reward − n_real) / sqrt(real_var)",
+    "why": "抽選の確認（REP006 集計5）",
+    "unit": ""
+   }
+  }
+ },
+ "runs_newest": {
+  "description": "view。同じ設定（config_key）× プレイヤー位置の run のうち、status = ok かつ github_dirty = false で、いちばん新しいもの 1 つ。列は runs と同じ。",
+  "columns": {}
  }
 }
