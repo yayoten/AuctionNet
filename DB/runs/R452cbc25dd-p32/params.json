@@ -1,0 +1,133 @@
+{
+  "spec": {
+    "work": "T006",
+    "name": "t006_check_same_as_old",
+    "note": "記録を足したコード（記録の形式の版 2）で、ルールベース3手法（既定）を6位置×エピソード0-3で流し、再実施（T003）の check_same_as_old の 18 run（版 1）と全セルで一致するかを見る。設定は research/W001_既存手法の比較/再実施_ルールベース/params/check_same_as_old.json と同じ",
+    "player": {
+      "strategy": "PID",
+      "kwargs": {}
+    },
+    "player_indices": [
+      0,
+      8,
+      16,
+      24,
+      32,
+      40
+    ],
+    "episodes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seed": 1,
+    "record": "standard",
+    "sweep_point": {
+      "player.strategy": "PID"
+    },
+    "spec_file": "github/Test/3_実験記録の拡充/params/check_same_as_old_v2.json"
+  },
+  "effective": {
+    "player": {
+      "strategy": "PID",
+      "kwargs": {
+        "budget": 100,
+        "name": "PidBiddingStrategy",
+        "cpa": 1,
+        "category": 0,
+        "exp_tempral_ratio": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "base_action": 15,
+        "up_factor": 1.2,
+        "down_factor": 0.7,
+        "low_threshold": 0.7,
+        "high_threshold": 1.1
+      }
+    },
+    "env": {
+      "Controller": {
+        "player_index": 0,
+        "player_agent": null,
+        "num_tick": 48,
+        "num_agent_category": 8,
+        "num_category": 6,
+        "pv_num": 500000,
+        "pv_generator_type": "neuripsPvGen",
+        "budget_ratio": 1
+      },
+      "BiddingEnv": {
+        "reserve_pv_price": 0.0001,
+        "min_remaining_budget": 0.1,
+        "slot_coefficients": [
+          1,
+          0.8,
+          0.6
+        ],
+        "default_seed": 1,
+        "conversion_seed": 2
+      },
+      "PlayerAnalysis": {
+        "name": "PlayerAnalysis",
+        "penalty_beta": 2,
+        "score_normalizer": 20000
+      }
+    },
+    "episodes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "seed": 1,
+    "gin_bindings": []
+  }
+}
