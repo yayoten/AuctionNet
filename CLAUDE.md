@@ -11,6 +11,7 @@
 - 事実・仮説・結論を混ぜない。判断指標は実験の前に決め、結果を見てから動かさない。
 - 仮説を立てるとき、検証の計画や進め方の資料を書くときは、`.claude/rules/hypothesis_and_verification.md` に従う。仮説は現象の言い換えにせず、仕組みを述べる。検証は、score や超過率のような最終の成果ではなく、仕組みの途中にある量で行う。「〜が減る」「〜が上がる」のような向きつきの期待は書かず、対立仮説どうしで違って見える観測を書く。
 - 実験を設計するとき、REP を立てるときは、`.claude/rules/research_conduct.md` に従う。骨子は大まかに決め、1 ステップの仮説と検証は単純にして細かく積む。仮説には、現象・コードの事実・理論からの筋道を必ず付ける（思いつきの案、後づけの仮説にしない）。うまくいく前提で書かず、起こりうる結果ごとに、分かることと次の一手を実験の前に書く。
+- ユーザーが `chat_with_claude` のファイルを指定して「対話形式」「Q&A 形式」と言ったときは、`.claude/rules/chat_with_claude_format.md` の書式にする（サマリ・目次・質問N・回答N・未確認の点）。
 - 内容が未記入・未決のときや、足りない情報があるときは、作り話で埋めず、ユーザーに確認する。
 - IDは、既存の最大値を調べてから次の番号を振る。再利用しない。
 - 作業のあと、`flow.md`（`research/src/make_flow.py`）、問いのまとめPDF（`research/src/build_summary.py`）、MASTER.md の現在地を、必要に応じて更新する。
@@ -31,8 +32,8 @@
 
 **push**
 
-- **push してよいのは、AuctionNet のリポジトリ（`https://github.com/yayoten/AuctionNet.git`）の `main` だけ。** その中では、確認なしで、自由に push してよい（無人で動く Claude も同じ）。コマンドは `git push origin main`。
-- 区切りごとに push する。たまったままにしない（サーバーが壊れても失われないようにするため。2026-10-09 に、丸 1 日ぶんがたまっていた）。
+- **push してよいのは、AuctionNet のリポジトリ（`https://github.com/yayoten/AuctionNet.git`）の `main` だけ。** **ただし、push するときは、毎回、先にユーザーの承認を得る**（2026-10-10 の指示）。承認なしに push しない。コマンドは `git push origin main`。無人で動く Claude は、承認を得られないので push せず、コミットまでにして `進捗.md` に「push 待ち」と書く。
+- 区切りごとに、「push してよいか」をユーザーに聞く（何件・何が入っているかを添える）。たまったままにしない（サーバーが壊れても失われないようにするため。2026-10-09 に、丸 1 日ぶんがたまっていた）。
 - **push の直前に確かめる**：`git remote get-url origin` が AuctionNet、`git branch --show-current` が `main`、`git status -sb` が `ahead` だけ（`behind` が付いていない）。大きなファイル（50MB 超）と、秘密（トークン、鍵、`.env`）が、コミットに入っていないこと。`github/` を変えたコミットを含むときは、テストが通っていること。
 - **やらない**：AuctionNet 以外への push（`git remote add` で別の宛先を足すことも）、`main` 以外の枝・タグの push、強制 push（`--force`、`+main`）、リモートの枝・タグの削除、**push 済み**のコミットの書き換え（`reset`、`rebase`、`filter-branch`、`commit --amend`）。
 - まだ push していないコミットは、書き換えてよい。その前に、バックアップの枝を作る。作業ツリーに他の Claude の未コミットの変更があるときは、`git filter-branch` が拒否されるので、`git worktree add` で別の作業ツリーを作って書き直し、`git update-ref refs/heads/main <新> <旧>` で差し替える。書き直しが済んだら、バックアップの枝は消してよい。
@@ -62,6 +63,16 @@
 - 「台帳からの警告」が出たら、その場所は他のタスクが予約している。編集する前に、そのタスクの指示書を確かめる。
 - コミットするときは、自分が変えたファイルを名前で指定する。他の Claude の未コミットの変更（ステージ済みのものを含む）を、巻き込まない。
 - tmux の中で無人で動く Claude（`agentctl.py launch`）は、`.claude/rules/unattended.md` に従う。
+- **エージェントの effort は medium が上限（`high` は使わない）。既定は medium、単純な作業は low。** ユーザーに聞かずに上げない。モデルは仕事の種類で分け（設計・判断は Opus、決められた実験を流すだけは Sonnet）、**実行を待つ間は AI を動かさない**（AI なしのスクリプトで流し、終わったら次のエージェントを起動する）。指示書・経緯は、短くしない。詳しくは `dashboards/agents/README.md` の「モデルと effort、トークンの節約」。新しいエージェントの予約は、先にユーザーの承認を取る。
+
+## テスト（`github/Test/`）
+
+`github/Test/` は、pytest による動作確認・軽微な検証・実験の置き場で、自由に使ってよい。
+**テストを書く・回す・`github/` を変える前に、次の README を、必ず全部読む**（フォルダが増えたら、ここにも足す）。
+
+- `github/Test/README.md`
+- `github/Test/1_初期セットアップ/README.md`
+- `github/Test/2_学習データと学習手法/README.md`
 
 ## 本家コード
 

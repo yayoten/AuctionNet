@@ -3,13 +3,15 @@
 
     agentctl.py new --title 題 [--summary 概要] [--paths フォルダ ...] [--ids REP006 ...]   予約を作る（経緯.md・指示書.md・進捗.md のひな形つき）
     agentctl.py list                                                                    一覧
-    agentctl.py launch T001 [--model opus]                                              tmux の中で Claude を起動する（確認なしで実行）
+    agentctl.py launch T001 [--model M] [--effort E] [--permission-mode auto]                  tmux の中で Claude を起動する（auto モード）
     agentctl.py done T001 / cancel T001                                                 完了／中止にする（予約を外す）
     agentctl.py stop T001                                                               tmux を止める（状態は「中止」）
 
 - 予約するのは、フォルダ（--paths。リポジトリ直下からの相対パス）と番号（--ids）。ファイル 1 つずつは予約しない。
 - 起動した Claude は、ssh や Wi-Fi が切れても動き続ける。様子を見るには `tmux attach -t agent-T001`（離れるのは Ctrl-b → d）。
-- 起動は `claude --dangerously-skip-permissions`（確認なしで全部実行）。守ることは .claude/rules/unattended.md に書いてある。
+- 起動は `claude --permission-mode auto`（auto モード。人に確認を出さず、Claude Code の側の審査で、危ない操作だけ止まる）。
+  モードは task.json の "claude.permission_mode" に明示する（auto / acceptEdits / plan / manual / dontAsk / bypassPermissions）。
+  2026-10-10 までは `--dangerously-skip-permissions`（bypassPermissions）だった。守ることは .claude/rules/unattended.md に書いてある。
 """
 import argparse
 import shlex
@@ -21,6 +23,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import agents_lib as A  # noqa: E402
 
+# task.json の "claude" のひな形（new が書く。launch が読む）
+DEFAULT_CLAUDE = {"model": "claude-opus-5-5", "effort": "medium", "permission_mode": "auto"}
+PERMISSION_MODES = ["auto", "acceptEdits", "plan", "manual", "dontAsk", "bypassPermissions"]   # claude --permission-mode の選択肢
 UNWRITTEN = "<!-- 未記入 -->"       # 経緯.md がこの行を含んだままなら、launch は起動しない
 
 BACKGROUND_TEMPLATE = """# {id} 経緯（このタスクができるまでの流れ）
@@ -115,6 +120,8 @@ def cmd_new(a):
     if (busy or ids_busy) and not a.force:
         sys.exit(f"予約が重なっています：{busy + ids_busy}。重ねてよければ --force を付けてください。")
     A.write_json(d / "task.json", {"id": tid, "title": a.title, "summary": a.summary, "status": "予約", "paths": paths, "ids": a.ids,
+                                   "claude": {"model": a.model or DEFAULT_CLAUDE["model"], "effort": a.effort or DEFAULT_CLAUDE["effort"],
+                                              "permission_mode": a.permission_mode or DEFAULT_CLAUDE["permission_mode"]},
                                    "created_at": A.now(), "created_on": A.host(), "session_ids": []})
     (d / "経緯.md").write_text(BACKGROUND_TEMPLATE.format(id=tid, unwritten=UNWRITTEN), encoding="utf-8")
     (d / "指示書.md").write_text(SPEC_TEMPLATE.format(id=tid, title=a.title, summary=a.summary or "（何のためにやるか）",
@@ -146,15 +153,24 @@ def cmd_launch(a):
               f".claude/rules/unattended.md、{spec} の順に読み、"
               f"指示書のとおりに最後まで進めてください。区切りごとに、指示書のチェックリストに印を付け、同じフォルダの 進捗.md に書いてください。"
               f"終わったら python3 dashboards/programs/agentctl.py done {a.task} を実行してください。")
-    claude = ["claude", "--dangerously-skip-permissions"] + (["--model", a.model] if a.model else []) + [prompt]
+    # 起動の設定は task.json の "claude"。--model / --effort / --permission-mode を付ければ、そちらが優先
+    cfg = {**DEFAULT_CLAUDE, **t.get("claude", {})}
+    model, effort = a.model or cfg.get("model"), a.effort or cfg.get("effort")
+    if effort not in (None, "low", "medium"):
+        sys.exit(f"effort は low か medium だけ（high 以上は使わない決まり。dashboards/agents/README.md の「モデルと effort」）：task.json の effort = {effort}")
+    mode = a.permission_mode or cfg.get("permission_mode")
+    if mode not in PERMISSION_MODES:
+        sys.exit(f"permission_mode は {PERMISSION_MODES} のどれか（task.json の claude.permission_mode が {mode!r}）")
+    claude = (["claude", "--permission-mode", mode] + (["--model", model] if model else [])
+              + (["--effort", effort] if effort else []) + [prompt])
     # Claude が終わっても画面を閉じない（なぜ終わったかを、あとから tmux attach で読めるようにする）
     inner = (f"export AGENT_TASK={shlex.quote(a.task)}; cd {shlex.quote(str(A.REPO))} && {' '.join(shlex.quote(c) for c in claude)}; "
              f"echo; echo '=== Claude が終了しました（終了コード '$?'）。この画面は exit で閉じます ==='; exec bash")
     subprocess.run(["tmux", "new-session", "-d", "-s", name, "-x", "200", "-y", "50", inner], check=True)
-    t.update(status="実行中", started_at=A.now(), tmux=name, host=A.host(), surface="tmux")
+    t.update(claude={"model": model, "effort": effort, "permission_mode": mode}, status="実行中", started_at=A.now(), tmux=name, host=A.host(), surface="tmux")
     t.pop("_dir", None)
     A.write_json(p, t)
-    print(f"{a.task} を起動しました。様子を見る：tmux attach -t {name}（離れるのは Ctrl-b → d）")
+    print(f"{a.task} を起動しました（{mode} モード）。様子を見る：tmux attach -t {name}（離れるのは Ctrl-b → d）")
 
 
 def finish(a, status):
@@ -180,11 +196,16 @@ def main():
     n.add_argument("--summary", default="")
     n.add_argument("--paths", nargs="*", default=[])
     n.add_argument("--ids", nargs="*", default=[])
+    n.add_argument("--model", help="Claude のモデル（既定: claude-opus-5-5）")
+    n.add_argument("--effort", choices=["low", "medium"], help="Claude の effort（既定: medium。high 以上は使わない決まり）")
+    n.add_argument("--permission-mode", choices=PERMISSION_MODES, help="Claude の権限のモード（既定: auto）")
     n.add_argument("--force", action="store_true")
     sub.add_parser("list")
     la = sub.add_parser("launch")
     la.add_argument("task")
-    la.add_argument("--model")
+    la.add_argument("--model", help="task.json の claude.model を上書き")
+    la.add_argument("--effort", choices=["low", "medium"], help="task.json の claude.effort を上書き（high 以上は使わない決まり）")
+    la.add_argument("--permission-mode", choices=PERMISSION_MODES, help="task.json の claude.permission_mode を上書き")
     for name in ("done", "cancel", "stop"):
         sub.add_parser(name).add_argument("task")
     a = ap.parse_args()

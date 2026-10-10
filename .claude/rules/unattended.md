@@ -1,7 +1,8 @@
 # 無人で動くときに守ること
 
-`dashboards/programs/agentctl.py launch` で起動された Claude（tmux の中で、確認なしで全部実行する設定）が守ること。
-確認の画面が出ないので、歯止めはこの文書だけである。迷ったら、進めない側に倒す。
+`dashboards/programs/agentctl.py launch` で起動された Claude（tmux の中で、auto モード。人に確認の画面を出さずに進む設定）が守ること。
+人に確認の画面が出ないので、歯止めは、この文書と、Claude Code の側の審査（auto モード。危ない操作だけ止まる）である。審査に頼らず、迷ったら、進めない側に倒す。
+操作が審査で止められたら、回り道を探さず、`進捗.md` に書いて、ほかにできる作業を進める。
 
 > 2026-10-09 作成。ユーザーと決めた内容（`dashboards/要件定義_2_エージェントと使用量.md`）を、Claude がまとめた。
 
@@ -18,7 +19,7 @@
 |---|---|
 | `/home/yayoten` の外のファイルを、作る・変える・消す | サーバーは共用で、ホームの外は他の人の領域である |
 | `sudo`、他の人のプロセスを止めること | 同上 |
-| `git push --force` などの強制 push、AuctionNet の `main` 以外への push（`.claude/rules/git_push.md`）、`git reset --hard`、`git clean`、push 済みのコミットの書き換え | push は `.claude/rules/git_push.md` の範囲（AuctionNet の `main`）に限って、してよい。それ以外と、消したら戻せないものは、やらない |
+| `git push --force` などの強制 push、AuctionNet の `main` 以外への push（`.claude/rules/git_push.md`）、`git reset --hard`、`git clean`、push 済みのコミットの書き換え | push は、ユーザーの承認が要る（`.claude/rules/git_push.md`）。無人では承認を得られないので、push せず、コミットまでにして `進捗.md` に「push 待ち」と書く。それ以外と、消したら戻せないものも、やらない |
 | `DB/dataset/`、`DB/runs/`、`DB/models/` の既存のファイルを消す・上書きする | 原本であり、作り直しに何時間もかかる |
 | 他のタスクが予約している場所を、断りなく編集する | 衝突を避けるため。編集しようとすると警告が出る |
 | 自分が作っていない未コミットの変更を、巻き込んでコミットする | 別の Claude の作業である可能性がある。`git add` は、自分のファイルを名前で指定する（`git add -A` や、ステージ済みのものごとの `git commit` をしない） |
@@ -37,7 +38,12 @@
 - コミットは、区切りごとに小さく行う（`CLAUDE.md` の決まりどおり）。
 - 終わったら、`python3 dashboards/programs/agentctl.py done <ID>` を実行する（予約が外れる）。
 
-## 5. サーバーの負荷
+## 5. 実行を待つとき（トークンの節約）
+
+- **長い実行（数十分より長い）を待つ間は、会話を続けない。** AI なしのシェルスクリプトを、`setsid nohup … &` で起動し、スクリプトの最後で、次のエージェントを `agentctl.py launch` で起動する（成功したときだけ）。起動したら、会話を終える。
+- effort は medium が上限（`high` は使わない）。詳しくは `dashboards/agents/README.md` の「モデルと effort、トークンの節約」。
+
+## 6. サーバーの負荷
 
 - 重い処理（学習、評価）を流す前に、`dashboards/programs/collect.py` の結果か `free -g`・`uptime` で、空きを確かめる。
 - 並列数は、指示書に書かれた上限を守る。書かれていなければ、評価は 8 並列まで（1 本 約 2.9GB）とする。
