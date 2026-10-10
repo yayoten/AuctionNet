@@ -1,0 +1,26 @@
+{
+  "id": "T007",
+  "title": "確定した設定での評価の流し直し（864 run、記録の形式の版 2）",
+  "summary": "T003・T004 で流した評価を、T006 で拡充した記録（standard）つきで流し直す。ルールベース 144 + 学習ベース 720 = 864 run。結果が前の run と一致することを確かめ、再実施の 2 つの REP（ルールベース、学習ベース）を仕上げる",
+  "status": "中止",
+  "paths": [
+    "research/W001_既存手法の比較/再実施_ルールベース",
+    "research/W001_既存手法の比較/再実施_学習ベース"
+  ],
+  "ids": [],
+  "claude": {
+    "model": "claude-sonnet-5-5",
+    "effort": "medium",
+    "permission_mode": "auto"
+  },
+  "created_at": "2026-10-10T22:47:21+09:00",
+  "created_on": "BariKata",
+  "session_ids": [
+    "d9a0a9d3-e1e3-4daf-901e-0fd43eaece37"
+  ],
+  "started_at": "2026-10-10T22:50:11+09:00",
+  "tmux": "agent-T007",
+  "host": "BariKata",
+  "surface": "tmux",
+  "finished_at": "2026-10-10T23:20:28+09:00"
+}
