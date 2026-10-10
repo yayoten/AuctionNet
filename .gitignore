@@ -25,3 +25,6 @@ DB/models/*/ckpt/*/*.pth
 
 # 学習用の公開データ（github/Test/2_学習データと学習手法/download_data.sh で取得。約80GB）
 /DB/dataset/
+
+# 旧い実験の run（2026-10-10 に、ユーザーの指示で DB から外して退避した。消してよい）
+DB/_legacy/
