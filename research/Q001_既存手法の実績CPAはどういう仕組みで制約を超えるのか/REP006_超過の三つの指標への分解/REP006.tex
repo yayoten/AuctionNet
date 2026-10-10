@@ -1,0 +1,258 @@
+% REP006 探索：超過の三つの指標への分解（親：Q001）。実験前の事前記録の報告
+% コンパイル：uplatex を2回 → dvipdfmx（TEXINPUTS で .claude/templates/progress_report// を参照）
+\documentclass[twocolumn, 10pt]{ujarticle}
+\usepackage{progress_report}
+
+\newcommand{\Nest}{N_{\mathrm{est}}}
+\newcommand{\Nreal}{N_{\mathrm{real}}}
+\newcommand{\Conv}{\mathrm{Conv}}
+\newcommand{\Cost}{\mathrm{Cost}}
+
+\begin{document}
+
+\reportid{REP006}
+\questionid{Q001}
+\exploration{CPA制約の超過は，実績CPAが決まるまでのどの部分で生じているか}
+\reportdate{20261010}
+\summary{%
+実績CPA÷制約を，買い方$E$・見積もりの偏り$P$・抽選$L$の三つの指標の積に分け，既存8手法の超過がどの指標で生じているかを測る。
+指標は，同じ広告機会の購入数を，入札者の見積もり・環境の本当の期待・実際の結果の3通りに数え，隣り合う比を取って作る。定義から必ず成り立つ恒等式なので，仮説ではなく測定として扱う。
+実験は未実施である（学習ベース5手法の検証のやり直しが終わるのを待つ）。
+}
+\beginverification
+
+% ============================================================
+\section{目的}\label{sec:e-purpose}
+% ============================================================
+
+既存8手法のCPA制約の超過が，実績CPAが決まるまでの，どの部分で生じているかを知る。
+REP005は「どの手法で」超過が起きているかを数えた。この報告は，同じ超過を「どの部分で」生じているかに分ける。
+
+% ============================================================
+\section{指標の説明}\label{sec:e-index}
+% ============================================================
+
+AuctionNetを知らなくても読めるよう，前提（\ref{sec:pre}節）から，三つの指標が作られる順（\ref{sec:derive}節）に書く。
+前提の内容は，シミュレータのコードを読んで分かる事実である（一部は実行して確かめていない）。
+
+\subsection{AuctionNetの前提}\label{sec:pre}
+
+AuctionNetは広告入札のシミュレータで，広告主48社のうち1社を評価したい入札手法に置き換える（これを「プレイヤー」と呼ぶ）。残りは同梱の戦略で動く。
+1日は48の時間帯に分かれ，1日に約50万回の広告機会がある。
+プレイヤーは位置（広告主の番号）ごとに，予算とCPA制約$C$（1件の購入に払ってよい額の上限，60〜130）を持つ。
+評価の単位は\textbf{セル}（手法×位置×1日）で，192セル（48位置×4日）が1手法の評価になる。
+
+1つの広告機会では，次の順に事が進む（表\ref{tab:flow}）。
+
+\begin{table}[H]
+\centering
+\caption{1つの広告機会で起きること}
+\label{tab:flow}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+段 & 内容 \\
+\midrule
+入札 & 各社が入札額を出す。入札者は「この機会で購入が起きる確率」の見積もり（推定価値）を持ち，入札額 $=\alpha\times$推定価値 とする手法が多い \\
+順位 & 入札額の上位3社が，枠1・2・3を得る \\
+支払い & 枠を得た社が払う額は，1つ下の順位の入札額（第二価格） \\
+露出 & 枠を得ても，見られるとは限らない（枠1・2・3で確率1・0.8・0.6）。支払いは露出した機会だけに生じる \\
+購入 & 露出した機会で，購入が起きるかが決まる（下の3段） \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+購入は3段で決まる。\textbf{①推定価値}は入札者が見積もる確率で，入札に使える。\textbf{②実際の確率}は，①に雑音を加えて0〜1に切ったもので，環境だけが知る。雑音は打ち切りつきの正規分布で，打ち切りの幅は広告主×日ごとに決まり，上下で対称でない。\textbf{③抽選}は，②の確率で購入するかを決める。
+したがって，入札者が見積もる購入数，環境の本当の期待購入数，実際の購入数は，同じ機会の集まりについて，別々の数になる。
+
+実績CPAは，1日の支払いの合計÷購入数である。実績CPAが$C$を超えることを「超過」と呼ぶ。超過したセルには，成績に$(C/\text{実績CPA})^2$が掛かる。超過は境界で決まるので，境界のすぐ上のセルと大きく超えたセルが，同じ「超過」に数えられる。
+
+\subsection{三つの指標は，どうできたか}\label{sec:derive}
+
+論理の流れは，超過を1つの数にする → 分子と分母に分ける → 分母を3通りに数える → 隣り合う比を取る → 掛けると元に戻る，である。
+
+\textbf{超過を1つの数にする}　$R=$ 実績CPA$\div C$ とおく。$C$の違いが消え，手法も位置も違うセルを同じ物差しで並べられる。$R>1$が超過である。
+
+\textbf{分子と分母に分ける}　$R=\Cost/\Conv/C$。$\Cost$は支払いの合計，$\Conv$は購入数である。
+$R$が1を超えるのは，払った額が多いか，購入が少ないか，その両方である。ただし「購入が少ない」には性質の違う2つが混ざる。購入が起きにくい機会を買ったことと，起きにくくない機会を買ったのに，たまたま起きなかったことである。これを分けるために，購入数を3通りに数える。
+
+\textbf{購入数を3通りに数える}　自分が落札して露出した機会について，次の3つを定義する（表\ref{tab:n}）。$\Nest$と$\Nreal$は，1日が終わったあとに記録から作る量で，入札の最中には計算できない。
+
+\begin{table}[H]
+\centering
+\caption{同じ機会の購入数の3通りの数え方}
+\label{tab:n}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}lX>{\raggedright\arraybackslash}p{2.2cm}@{}}
+\toprule
+記号 & 数え方 & 誰の見方か \\
+\midrule
+$\Nest$ & ①推定価値の和 & 入札者 \\
+$\Nreal$ & ②実際の確率の和（購入数の期待値） & 環境 \\
+$\Conv$ & ③抽選の結果の和 & 結果 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{隣り合う比を取る}　$\Cost/C$は，1件にC円まで払えるとしたとき買える購入数を表す。これと3つの購入数の比を，順に取る（表\ref{tab:epl}）。
+
+\begin{table}[H]
+\centering
+\caption{三つの指標}
+\label{tab:epl}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{1.45cm}>{\raggedright\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+指標 & 式 & 測るもの（動かす主体） \\
+\midrule
+$E$ 買い方 & $\Cost/\Nest/C$ & 見積もりのもとで，購入1件あたりの支払いが$C$の何倍か（入札者の決定） \\
+$P$ 見積もりの偏り & $\Nest/\Nreal$ & 見積もりが，環境の本当の期待の何倍か（環境の雑音） \\
+$L$ 抽選 & $\Nreal/\Conv$ & 期待した購入数が，実際の購入数の何倍か（偶然） \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+どの指標も，1が「その段のずれが無い」基準で，1を超えるほど$R$を大きくする向きに働く。3つは，入札者が決める → 環境が隠している → 偶然が決める，というシミュレータの因果の順に並び，各指標に責任の主体が1つ付く。
+
+\textbf{掛けると元に戻る}
+\[
+E\times P\times L=\frac{\Cost}{\Nest C}\cdot\frac{\Nest}{\Nreal}\cdot\frac{\Nreal}{\Conv}=\frac{\Cost}{\Conv\, C}=R
+\]
+$\Nest$と$\Nreal$が約分されるので，定義から必ず成り立つ（残差が無い）。対数では和になる。分け方に漏れもダブりも無く，これは仮説ではなく，測る道具である。
+
+\subsection{小さい数字の例}\label{sec:ex}
+
+自分が落札して露出した機会が6件あったとする（説明用の仮の数字，$C=55$）。表\ref{tab:ex}のとおり，$\Nest=1.05$，$\Nreal=1.30$，$\Cost=60$，$\Conv=1$である。
+
+\begin{table}[H]
+\centering
+\caption{6機会の例（説明用の仮の数字）}
+\label{tab:ex}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}crrrr@{}}
+\toprule
+機会 & ①推定 & ②実際 & 支払い & ③抽選 \\
+\midrule
+1 & 0.20 & 0.25 & 12 & 0 \\
+2 & 0.10 & 0.10 & 6 & 0 \\
+3 & 0.30 & 0.35 & 18 & 1 \\
+4 & 0.10 & 0.20 & 6 & 0 \\
+5 & 0.20 & 0.20 & 12 & 0 \\
+6 & 0.15 & 0.20 & 6 & 0 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+実績CPAは$60\div 1=60$で，$R=1.09$（超過）。$E=60\div1.05\div55=1.04$，$P=1.05\div1.30=0.81$，$L=1.30\div1=1.30$で，積は1.09となり$R$に一致する。
+入札者の見積もりのもとでは，ほぼ$C$ちょうどで買っていた（$E=1.04$）。実際の確率は見積もりより高く（$P=0.81$），有利な向きだった。それでも超過したのは，期待1.3件のところ1件しか購入が起きなかった（$L=1.30$）ためで，この例の超過は\textbf{抽選}で生じている。
+
+\subsection{超過の4区分}\label{sec:four}
+
+超過したセルを，どの指標が作ったかで，漏れもダブりも無く4つに分ける（表\ref{tab:four}）。基準を1に置くのは，1が各段の「ずれが無い」点だからである。表の条件は，上の行から外れたものだけを書いた（たとえば買い方型は$EP>1$かつ$P\le1$なので，$E>1$が導かれる）。$L$の向きは区分に入れず，区分ごとに別に報告する。
+
+\begin{table}[H]
+\centering
+\caption{超過したセル（$R>1$）の4区分}
+\label{tab:four}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+区分 & 条件 & 意味 \\
+\midrule
+抽選型 & $E P\le 1$ & 期待の上では制約内で，抽選だけで超過 \\
+買い方型 & $EP>1,\ P\le1$ & 偏りは寄与せず，買い方で超過 \\
+偏り型 & $EP>1,\ E\le1$ & 買い方は制約内で，偏りで超過 \\
+両方型 & $E>1,\ P>1$ & 買い方と偏りの両方が寄与 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{この分け方の限界}\label{sec:limit}
+
+分け方には限界がある。算術としては漏れもダブりも無いが，途中の量に$\Nest$を選んだのはこちらの選択で，別の中間の量を挟めば各指標の大きさは変わる（入札者の見ている量と環境の本当の量を分ける切り方は，意味があると考えた）。
+購入や支出を見て入札を変える手法では，$E$と$L$が独立でなく，抽選の運が入札に入り込む。この点は$\log E$と$\log L$の相関で確かめる。
+$L$の対数の平均は，購入数$N$で約$+1/(2N)$だけ，0からずれる（$N=25$で約0.02）。購入0のセルは分解に入らない。
+
+% ============================================================
+\section{実験}\label{sec:e-exp}
+% ============================================================
+
+\subsection{対象のアルゴリズム}\label{sec:e-algo}
+
+8手法は，REP005と同じである（ルールベース3手法のPID・ABid・Online LP，学習ベース5手法のBC・IQL・CQL・BCQ・TD3\_BC）。いずれも入札係数$\alpha$を決めて入札する。
+この報告では，入札や環境を変えず，確定した設定（\texttt{baseline\_params.json}）で動かして観測するだけである。学習ベースはseed 1〜3を別々のセルとして集計する。
+
+\subsection{実験環境}\label{sec:e-env}
+
+\begin{table}[H]
+\centering
+\caption{実験環境}
+\label{tab:env}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+区分 & 内容 \\
+\midrule
+固定 & 既定の\texttt{test.gin}，背景47社は同梱の戦略，同じ端末（Linux） \\
+対象 & 8手法×48位置×エピソード0〜3（学習ベースはseed 1〜3） \\
+記録の追加 & ティックごとに$\Nest$，$\Nreal$，$\sum p(1-p)$を記録（結果は変えない）。864 run \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+現状の記録には$\Nest$と$\Nreal$が無いため，\texttt{github/}に記録を足す変更と，run の流し直し（約5時間の見込み）が要る。学習ベース5手法の検証のやり直し（T004）が終わるまで，実験は流さない。
+
+\subsection{取る特徴量}\label{sec:e-feat}
+
+\begin{table}[H]
+\centering
+\caption{取る量}
+\label{tab:feat}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+種類 & 記録する量 \\
+\midrule
+指標の分布 & $\log E,\log P,\log L$の分位点，各指標が1を超えたセルの割合 \\
+超過の区分 & 4区分のセル数と割合，区分ごとの$\log L$の中央値 \\
+指標の関係 & $\log E,\log P,\log L$の相関。同じ位置×日での手法間の$\log P$ \\
+境界からの距離 & $R$の区間（1〜1.1，…，1.5超）ごとの4区分の割合 \\
+抽選の確認 & $z=(\Conv-\Nreal)/\sqrt{\sum p(1-p)}$の平均と標準偏差 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+\section{起こりうる結果と，その先}\label{sec:e-branch}
+% ============================================================
+
+手法の群ごとに別々に読む。超過したセルの50\%以上が1つの区分に入る手法は，その型が主とする（基準は実験の前に置いた）。
+
+\begin{table}[H]
+\centering
+\caption{結果ごとに分かることと次の一手}
+\label{tab:branch}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+結果 & 分かること & 次の一手 \\
+\midrule
+抽選型が主 & 期待の上では制約内で，偶然で超えている & 購入数と超過の関係の形を調べる \\
+買い方型・両方型が主 & 見積もりのもとでも$C$を超えて買っている & $E$を$\alpha$の水準と支払いの割引に分ける \\
+偏り型が主 & 原因は環境の雑音にある & 打ち切りの幅から$P$を予測し，測定と比べる \\
+どれも50\%未満 & 1つの指標では説明できない & 手法×位置の層に分ける \\
+$L$のぶれが予測より大きい & $L$に抽選以外が入っている & 乱数の作りを実行して確かめる \\
+恒等式や結果の一致が崩れる & 測定が成り立たない & 直して流し直す \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+「抽選型が主」でも，その手法の入札が良いとは言えない。超過の型を分けただけで，買い方の良し悪しは扱っていない。
+
+% ============================================================
+\section{結果}\label{sec:e-result}
+% ============================================================
+
+実験は未実施である。
+
+\end{document}
