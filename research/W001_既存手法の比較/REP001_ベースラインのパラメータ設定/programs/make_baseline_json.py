@@ -1,6 +1,6 @@
-"""確定したベースラインの設定を、research/src/baseline_params.json に書き出す（REP003.md 8 節）。
+"""確定したベースラインの設定を、research/src/baseline_params.json に書き出す（REP001.md 8 節）。
 
-    .venv/bin/python <REP003>/programs/make_baseline_json.py --commit <確定したコミット>
+    .venv/bin/python <REP001>/programs/make_baseline_json.py --commit <確定したコミット>
 
 - ルールベース 3 手法：本家の既定値（kwargs は空）。
 - 学習ベース 5 手法：spec_name = candidate_train の重み（DB/models/）と、その学習の条件。
@@ -26,7 +26,7 @@ CAVEAT = {
 }
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--commit", required=True, help="設定を確定したコミット（REP003 の結果と判断を入れたコミット）")
+ap.add_argument("--commit", required=True, help="設定を確定したコミット（REP001 の結果と判断を入れたコミット）")
 ap.add_argument("--date", required=True)
 a = ap.parse_args()
 
@@ -65,18 +65,18 @@ for algo in ALGOS:
     }
 
 out = {
-    "version": 1, "decided_in": "REP003", "decided_at": a.date, "commit": a.commit,
-    "note": "以後の比較に使う、既存 8 手法のベースライン設定。決め方は REP003.md（research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/）。"
+    "version": 1, "decided_in": "REP001", "decided_at": a.date, "commit": a.commit,
+    "note": "以後の比較に使う、既存 8 手法のベースライン設定。決め方は REP001.md（research/W001_既存手法の比較/REP001_ベースラインのパラメータ設定/）。"
             "このファイルは programs/make_baseline_json.py で作る（手で書き換えない）",
     "how_to_use": "評価の spec（run_experiment.py）の player に、strategy と kwargs を入れる。学習ベースは kwargs.model_dir に model_dirs の 3 つを順に入れ、3 seed の平均で報告する。"
                   "手法どうしを比べる run は、同じ端末・同じコードの版で流す",
     "rule_based": {
         "PID": {"strategy": "PID", "kwargs": {}}, "ABid": {"strategy": "ABid", "kwargs": {}}, "OnlineLP": {"strategy": "OnlineLP", "kwargs": {}},
-        "note": "kwargs が空 = 本家の既定値のまま。評価の日で調整していない（PID・ABid には、評価の日で測ると既定より良い値がある。REP001）",
+        "note": "kwargs が空 = 本家の既定値のまま。評価の日で調整していない（PID・ABid には、評価の日で測ると既定より良い値がある。REP002）",
     },
     "learned": learned,
     "learned_note": "weights_in_git が false の重みは、1 つ 50MB を超えるので git に入れていない。train.spec で学習し直すと、同じ重み（weights_sha1）になる。"
-                    "settled は、REP003 の「落ち着いた」の基準（プローブへの出力の差が α で 5 以内）を満たしたか。BCQ は一定の出力で基準を満たしたので false にした",
+                    "settled は、REP001 の「落ち着いた」の基準（プローブへの出力の差が α で 5 以内）を満たしたか。BCQ は一定の出力で基準を満たしたので false にした",
     "evaluation": {"episodes_used_for_selection": [4, 5, 6, 7], "episodes_reserved_for_evaluation": [0, 1, 2, 3],
                    "note": "設定の選択に使った日は 4〜7。評価の日（0〜3）の score は、選択に使っていない"},
 }

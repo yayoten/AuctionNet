@@ -1,6 +1,6 @@
 """REP002 の結果を DB から集計して、results/ に表（CSV, summary.json）、fig/ に図を作る。
 
-    .venv/bin/python research/W001_.../REP002_.../programs/analyze.py
+    .venv/bin/python research/W001_.../REP003_.../programs/analyze.py
 
 DB/auctionnet.duckdb を読む（先に `python DB/build_db.py`）。
 集計の定義は REP002.md「2. 達成とみなす条件」に従う。ここでは、結果を見てから定義を変えない。

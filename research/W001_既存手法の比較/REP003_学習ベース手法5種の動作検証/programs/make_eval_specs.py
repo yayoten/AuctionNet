@@ -1,6 +1,6 @@
 """学習した重み（DB/models/）から、自前の重みを評価する spec（params/eval_trained_*.json）を作る。
 
-    .venv/bin/python research/W001_.../REP002_.../programs/make_eval_specs.py
+    .venv/bin/python research/W001_.../REP003_.../programs/make_eval_specs.py
 
 model_id は学習してから決まるので、評価の spec は学習のあとに、この決まりで機械的に作る（手で選ばない）。
 - eval_trained_default_<手法>：既定のステップ数・seed=1 の重み。48 位置 × エピソード 0〜3（L4）
