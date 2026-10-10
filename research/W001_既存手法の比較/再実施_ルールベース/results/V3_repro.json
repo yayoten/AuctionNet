@@ -1,0 +1,101 @@
+{
+  "run_id": "Rbce18fda09-p00",
+  "before": {
+    "created_at": "2026-10-10T14:57:35",
+    "spec_name": "check_same_as_old",
+    "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
+    "status": "ok",
+    "sim_seconds": 99.15648746490479
+  },
+  "after": {
+    "created_at": "2026-10-10T15:11:36",
+    "spec_name": "repro_pid_p0",
+    "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
+    "status": "ok",
+    "sim_seconds": 112.87455606460571
+  },
+  "episodes": {
+    "rows": [
+      4,
+      4
+    ],
+    "max_abs_diff": {
+      "episode": 0.0,
+      "category": 0.0,
+      "cpa_constraint": 0.0,
+      "budget": 0.0,
+      "reward": 0.0,
+      "all_cost": 0.0,
+      "real_cpa": 0.0,
+      "penalty": 0.0,
+      "score_component": 0.0,
+      "score_rank": 0.0,
+      "n_agents": 0.0,
+      "all_compete_pv": 0.0,
+      "all_win_pv": 0.0,
+      "win_pv_ratio": 0.0,
+      "budget_consumer_ratio": 0.0,
+      "second_price_ratio": 0.0,
+      "cpa_exceedance_rate": 0.0,
+      "last_compete_tick_index": 0.0,
+      "bid_mean": 0.0,
+      "others_score_mean": 0.0
+    },
+    "all_equal": true
+  },
+  "ticks": {
+    "rows": [
+      192,
+      192
+    ],
+    "max_abs_diff": {
+      "episode": 0.0,
+      "tick": 0.0,
+      "num_pv": 0.0,
+      "pvalue_mean": 0.0,
+      "pvalue_std": 0.0,
+      "pvalue_sigma_mean": 0.0,
+      "bid_mean": 0.0,
+      "bid_nonzero_ratio": 0.0,
+      "alpha_eff": 0.0,
+      "alpha_rank": 0.0,
+      "alpha_others_mean": 0.0,
+      "alpha_others_median": 0.0,
+      "n_won": 0.0,
+      "n_slot1": 0.0,
+      "n_slot2": 0.0,
+      "n_slot3": 0.0,
+      "n_exposed": 0.0,
+      "reward": 0.0,
+      "cost": 0.0,
+      "remaining_budget_before": 0.0,
+      "lwc_mean": 0.0,
+      "total_cost_all": 0.0,
+      "n_active_agents": 0.0
+    },
+    "all_equal": true
+  },
+  "agents": {
+    "rows": [
+      192,
+      192
+    ],
+    "max_abs_diff": {
+      "episode": 0.0,
+      "agent_index": 0.0,
+      "category": 0.0,
+      "budget": 0.0,
+      "cpa_constraint": 0.0,
+      "reward": 0.0,
+      "cost": 0.0,
+      "final_remaining_budget": 0.0,
+      "real_cpa": 0.0,
+      "penalty": 0.0,
+      "score_component": 0.0,
+      "score_rank": 0.0,
+      "is_player": 0.0
+    },
+    "all_equal": true
+  },
+  "V3_ok": true
+}

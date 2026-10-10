@@ -1,0 +1,83 @@
+{
+  "n_old": 18,
+  "n_new": 18,
+  "old_version": "0536c690ef17edb6931655160fe3033bc2aac44e",
+  "new_versions": [
+    "5c8436a80ae060d9beaffc4aef1aa5526d734117"
+  ],
+  "new_head_commits": [
+    "80b5c19817af1d64f11e17c2f1a180425ed3974c",
+    "a860597b445495e1cb2ab5213d8229a9d9b00cab"
+  ],
+  "new_status": {
+    "ok": 18
+  },
+  "new_dirty": 0,
+  "old_status": {
+    "ok": 18
+  },
+  "old_dirty": 0,
+  "n_cells": 72,
+  "episodes_max_abs_diff": {
+    "category": 0.0,
+    "cpa_constraint": 0.0,
+    "budget": 0.0,
+    "reward": 0.0,
+    "all_cost": 0.0,
+    "real_cpa": 0.0,
+    "penalty": 0.0,
+    "score_component": 0.0,
+    "score_rank": 0.0,
+    "n_agents": 0.0,
+    "all_compete_pv": 0.0,
+    "all_win_pv": 0.0,
+    "win_pv_ratio": 0.0,
+    "budget_consumer_ratio": 0.0,
+    "second_price_ratio": 0.0,
+    "cpa_exceedance_rate": 0.0,
+    "last_compete_tick_index": 0.0,
+    "bid_mean": 0.0,
+    "others_score_mean": 0.0
+  },
+  "n_cells_mismatch": 0,
+  "score_component_all_equal": true,
+  "n_tick_rows": 3456,
+  "ticks_max_abs_diff": {
+    "num_pv": 0.0,
+    "pvalue_mean": 0.0,
+    "pvalue_std": 0.0,
+    "pvalue_sigma_mean": 0.0,
+    "bid_mean": 0.0,
+    "bid_nonzero_ratio": 0.0,
+    "alpha_eff": 0.0,
+    "alpha_rank": 0.0,
+    "alpha_others_mean": 0.0,
+    "alpha_others_median": 0.0,
+    "n_won": 0.0,
+    "n_slot1": 0.0,
+    "n_slot2": 0.0,
+    "n_slot3": 0.0,
+    "n_exposed": 0.0,
+    "reward": 0.0,
+    "cost": 0.0,
+    "remaining_budget_before": 0.0,
+    "lwc_mean": 0.0,
+    "total_cost_all": 0.0,
+    "n_active_agents": 0.0
+  },
+  "n_agent_rows": 3456,
+  "agents_max_abs_diff": {
+    "category": 0.0,
+    "budget": 0.0,
+    "cpa_constraint": 0.0,
+    "reward": 0.0,
+    "cost": 0.0,
+    "final_remaining_budget": 0.0,
+    "real_cpa": 0.0,
+    "penalty": 0.0,
+    "score_component": 0.0,
+    "score_rank": 0.0,
+    "is_player": 0.0
+  },
+  "judge": "一致"
+}

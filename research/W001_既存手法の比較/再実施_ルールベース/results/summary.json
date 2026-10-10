@@ -1,0 +1,261 @@
+{
+  "use": "old",
+  "V1": {
+    "n_runs": 144,
+    "by_strategy": {
+      "ABid": 48,
+      "OnlineLP": 48,
+      "PID": 48
+    },
+    "status": {
+      "ok": 144
+    },
+    "n_dirty": 0,
+    "github_versions": [
+      "0536c690ef17edb6931655160fe3033bc2aac44e"
+    ],
+    "hosts": [
+      "BariKata"
+    ],
+    "os": [
+      "Linux-6.8.0-124-generic-x86_64-with-glibc2.35"
+    ],
+    "reps": {
+      "REP002": 144
+    },
+    "spec_names": {
+      "eval_rule_based": 138,
+      "check_rule_based": 6
+    },
+    "head_commits": [
+      "23b21534d2941c65b33994176564c70024f934f4",
+      "d19c6560fa0c9d13a7a593e458fbb6925c648555"
+    ],
+    "python": [
+      "3.9.16"
+    ],
+    "torch": [
+      "1.12.0+cu102"
+    ],
+    "numpy": [
+      "1.24.2"
+    ],
+    "all_scores_finite": true,
+    "created": [
+      "2026-10-08T13:11:20",
+      "2026-10-08T14:57:13"
+    ]
+  },
+  "V1_ok": true,
+  "V2": {
+    "PID": {
+      "n_runs": 48,
+      "sim_seconds_mean": 162.925,
+      "sim_seconds_max": 182.062,
+      "peak_rss_mb_mean": 2825.989,
+      "peak_rss_mb_max": 2870.477,
+      "bidding_ms_mean": 0.126,
+      "bidding_ms_max_single_call": 0.638
+    },
+    "ABid": {
+      "n_runs": 48,
+      "sim_seconds_mean": 161.542,
+      "sim_seconds_max": 174.281,
+      "peak_rss_mb_mean": 2842.981,
+      "peak_rss_mb_max": 2879.742,
+      "bidding_ms_mean": 0.262,
+      "bidding_ms_max_single_call": 1.211
+    },
+    "OnlineLP": {
+      "n_runs": 48,
+      "sim_seconds_mean": 152.248,
+      "sim_seconds_max": 162.039,
+      "peak_rss_mb_mean": 2850.651,
+      "peak_rss_mb_max": 2897.57,
+      "bidding_ms_mean": 1.632,
+      "bidding_ms_max_single_call": 3.643
+    }
+  },
+  "V2_new18_3workers": {
+    "PID": {
+      "n_runs": 5,
+      "sim_seconds_mean": 121.293,
+      "sim_seconds_max": 136.344,
+      "peak_rss_mb_mean": 2816.426,
+      "peak_rss_mb_max": 2838.414,
+      "bidding_ms_mean": 0.085,
+      "bidding_ms_max_single_call": 0.409
+    },
+    "ABid": {
+      "n_runs": 6,
+      "sim_seconds_mean": 148.014,
+      "sim_seconds_max": 157.559,
+      "peak_rss_mb_mean": 2725.84,
+      "peak_rss_mb_max": 2764.754,
+      "bidding_ms_mean": 0.236,
+      "bidding_ms_max_single_call": 0.895
+    },
+    "OnlineLP": {
+      "n_runs": 6,
+      "sim_seconds_mean": 140.743,
+      "sim_seconds_max": 143.769,
+      "peak_rss_mb_mean": 2701.808,
+      "peak_rss_mb_max": 2716.559,
+      "bidding_ms_mean": 1.617,
+      "bidding_ms_max_single_call": 2.915
+    }
+  },
+  "V4": {
+    "PID": {
+      "n_cells": 192,
+      "score_sum": 2570.2896,
+      "score_sum_div20000": 0.1285,
+      "score_cell_mean": 13.3869,
+      "score_cell_cv": 0.7909,
+      "reward_mean": 24.4062,
+      "penalty_mean": 0.5334,
+      "budget_ratio_mean": 0.9882,
+      "budget_ratio_lt09_share": 0.026,
+      "stopped_before_last_tick_share": 0.5677,
+      "rank_median": 35.0,
+      "rank_top10_share": 0.0521,
+      "others_score_mean": 21.2968,
+      "rel_to_ABid": 0.7838
+    },
+    "ABid": {
+      "n_cells": 192,
+      "score_sum": 3279.0913,
+      "score_sum_div20000": 0.164,
+      "score_cell_mean": 17.0786,
+      "score_cell_cv": 0.6949,
+      "reward_mean": 25.776,
+      "penalty_mean": 0.6302,
+      "budget_ratio_mean": 0.9292,
+      "budget_ratio_lt09_share": 0.1667,
+      "stopped_before_last_tick_share": 0.8073,
+      "rank_median": 32.0,
+      "rank_top10_share": 0.1042,
+      "others_score_mean": 21.3509,
+      "rel_to_ABid": 1.0
+    },
+    "OnlineLP": {
+      "n_cells": 192,
+      "score_sum": 4936.0578,
+      "score_sum_div20000": 0.2468,
+      "score_cell_mean": 25.7086,
+      "score_cell_cv": 0.6418,
+      "reward_mean": 28.7552,
+      "penalty_mean": 0.8457,
+      "budget_ratio_mean": 0.7515,
+      "budget_ratio_lt09_share": 0.4271,
+      "stopped_before_last_tick_share": 0.401,
+      "rank_median": 18.0,
+      "rank_top10_share": 0.3333,
+      "others_score_mean": 21.3874,
+      "rel_to_ABid": 1.5053
+    }
+  },
+  "V4_pairwise_win_share": {
+    "PID>ABid": 0.4271,
+    "PID>OnlineLP": 0.2344,
+    "ABid>PID": 0.5729,
+    "ABid>OnlineLP": 0.3021,
+    "OnlineLP>PID": 0.7656,
+    "OnlineLP>ABid": 0.6927
+  },
+  "V4_best_of3_share": {
+    "PID": 0.1302,
+    "ABid": 0.2448,
+    "OnlineLP": 0.625
+  },
+  "V4_onlinelp_sum_is_largest": true,
+  "V4_best_by_category": {
+    "0": "OnlineLP",
+    "1": "OnlineLP",
+    "2": "OnlineLP",
+    "3": "OnlineLP",
+    "4": "OnlineLP",
+    "5": "OnlineLP"
+  },
+  "V4_best_by_episode": {
+    "0": "OnlineLP",
+    "1": "OnlineLP",
+    "2": "OnlineLP",
+    "3": "OnlineLP"
+  },
+  "V4_alpha_median": {
+    "PID": {
+      "tick0": 15.0,
+      "min": 0.0,
+      "max": 160.49,
+      "mean": 78.6,
+      "first_tick_median_eq0": 45,
+      "first_tick_n_won_median_gt0": 10
+    },
+    "ABid": {
+      "tick0": 116.58,
+      "min": 0.0,
+      "max": 119.32,
+      "mean": 49.28,
+      "first_tick_median_eq0": 23,
+      "first_tick_n_won_median_gt0": 0
+    },
+    "OnlineLP": {
+      "tick0": 76.22,
+      "min": 70.0,
+      "max": 90.0,
+      "mean": 81.93,
+      "first_tick_median_eq0": -1,
+      "first_tick_n_won_median_gt0": 0
+    }
+  },
+  "V4_alpha_others_median": {
+    "tick0": 67.64,
+    "mean": 82.83,
+    "min": 48.85,
+    "max": 92.62
+  },
+  "V5": {
+    "PID": {
+      "n_cells": 192,
+      "exceed_share": 0.8177,
+      "exceedance_median": 0.5098,
+      "n_exceedance_gt05": 97,
+      "lost_reward_share": 0.4515,
+      "cpa_ratio_median": 1.5098,
+      "n_reward_zero": 0,
+      "reward_median": 23.0
+    },
+    "ABid": {
+      "n_cells": 192,
+      "exceed_share": 0.8542,
+      "exceedance_median": 0.2395,
+      "n_exceedance_gt05": 49,
+      "lost_reward_share": 0.3374,
+      "cpa_ratio_median": 1.2395,
+      "n_reward_zero": 0,
+      "reward_median": 22.0
+    },
+    "OnlineLP": {
+      "n_cells": 192,
+      "exceed_share": 0.3906,
+      "exceedance_median": -0.0863,
+      "n_exceedance_gt05": 19,
+      "lost_reward_share": 0.1059,
+      "cpa_ratio_median": 0.9137,
+      "n_reward_zero": 3,
+      "reward_median": 27.0
+    }
+  },
+  "V6_rows": {
+    "episodes": 576,
+    "ticks": 27648,
+    "agents": 27648
+  },
+  "V6_nonfinite_counts": {
+    "episodes": {},
+    "ticks": {},
+    "agents": {}
+  },
+  "V6_ok": true
+}
