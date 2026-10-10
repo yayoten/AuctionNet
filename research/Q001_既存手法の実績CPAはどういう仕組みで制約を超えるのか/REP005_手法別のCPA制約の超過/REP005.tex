@@ -1,6 +1,6 @@
 % REP005 探索：手法別のCPA制約の超過（親：Q001）
 % コンパイル：uplatex を2回 → dvipdfmx（TEXINPUTS で .claude/templates/progress_report// を参照）
-\documentclass[twocolumn, 10pt]{ujarticle}
+\documentclass[twocolumn, 11pt]{ujarticle}
 \usepackage{progress_report}
 
 \begin{document}
@@ -34,8 +34,8 @@
 \centering
 \caption{8手法と，CPA制約の使い方}
 \label{tab:algo}
-\footnotesize
-\begin{tabularx}{\linewidth}{@{}p{1.5cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+\small
+\begin{tabularx}{\linewidth}{@{}p{1.95cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
 \toprule
 手法 & $\alpha$の決め方 & CPA制約の使い方 \\
 \midrule
@@ -70,8 +70,8 @@ CQLとTD3\_BCは，ほとんど落札せず，数えられなかった。
 \centering
 \caption{落札した6手法の超過（各192セル）}
 \label{tab:share}
-\footnotesize\setlength{\tabcolsep}{3pt}
-\begin{tabularx}{\linewidth}{@{}Xrrrrrr@{}}
+\small\setlength{\tabcolsep}{2pt}
+\begin{tabularx}{\linewidth}{@{}p{1.6cm}rrrrrr@{}}
 \toprule
  & 超過 & 割合 & 中央値 & 75\%点 & 0.5超 & 失った割合 \\
 \midrule
@@ -92,7 +92,7 @@ BCQ & 87 & 0.45 & $-0.03$ & $+0.23$ & 17 & 0.17 \\
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.74\linewidth]{fig/fig_exceedance_rate.png}
+\includegraphics[width=\linewidth]{fig/fig_exceedance_rate.png}
 \caption{購入数が1以上のセルの超過率。黒線は25〜75\%点，縦棒は中央値（2超の点は右端）}
 \label{fig:exc}
 \end{figure}
