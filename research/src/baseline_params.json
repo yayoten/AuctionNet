@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "decided_in": "REP003",
+  "decided_in": "REP001",
   "decided_at": "2026-10-09",
   "commit": "f2f6693ea9a531bb86fc0758603e43ceaced83a5",
-  "note": "以後の比較に使う、既存 8 手法のベースライン設定。決め方は REP003.md（research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/）。このファイルは programs/make_baseline_json.py で作る（手で書き換えない）",
+  "note": "以後の比較に使う、既存 8 手法のベースライン設定。決め方は REP001.md（research/W001_既存手法の比較/REP001_ベースラインのパラメータ設定/）。このファイルは programs/make_baseline_json.py で作る（手で書き換えない）",
   "how_to_use": "評価の spec（run_experiment.py）の player に、strategy と kwargs を入れる。学習ベースは kwargs.model_dir に model_dirs の 3 つを順に入れ、3 seed の平均で報告する。手法どうしを比べる run は、同じ端末・同じコードの版で流す",
   "rule_based": {
     "PID": {
@@ -18,7 +18,7 @@
       "strategy": "OnlineLP",
       "kwargs": {}
     },
-    "note": "kwargs が空 = 本家の既定値のまま。評価の日で調整していない（PID・ABid には、評価の日で測ると既定より良い値がある。REP001）"
+    "note": "kwargs が空 = 本家の既定値のまま。評価の日で調整していない（PID・ABid には、評価の日で測ると既定より良い値がある。REP002）"
   },
   "learned": {
     "BC": {
@@ -35,7 +35,7 @@
         "other": {},
         "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
         "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
-        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_fast.json"
+        "spec": "research/W001_既存手法の比較/REP001_ベースラインのパラメータ設定/params/cand_train_fast.json"
       },
       "model_dirs": {
         "1": "DB/models/M7e2d6b4dcc",
@@ -90,7 +90,7 @@
         "other": {},
         "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
         "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
-        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_fast.json"
+        "spec": "research/W001_既存手法の比較/REP001_ベースラインのパラメータ設定/params/cand_train_fast.json"
       },
       "model_dirs": {
         "1": "DB/models/M779b4f7138",
@@ -145,7 +145,7 @@
         "other": {},
         "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
         "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
-        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_fast.json"
+        "spec": "research/W001_既存手法の比較/REP001_ベースラインのパラメータ設定/params/cand_train_fast.json"
       },
       "model_dirs": {
         "1": "DB/models/M4c81bbf07d",
@@ -200,7 +200,7 @@
         "other": {},
         "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
         "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
-        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_bcq.json"
+        "spec": "research/W001_既存手法の比較/REP001_ベースラインのパラメータ設定/params/cand_train_bcq.json"
       },
       "model_dirs": {
         "1": "DB/models/M37d7bc29d6",
@@ -255,7 +255,7 @@
         "other": {},
         "train_data_sha1": "930623f4ddbb764704584a916ded03dc1111fdee",
         "github_version": "5c8436a80ae060d9beaffc4aef1aa5526d734117",
-        "spec": "research/W001_既存手法の比較/REP003_ベースラインのパラメータ設定/params/cand_train_fast.json"
+        "spec": "research/W001_既存手法の比較/REP001_ベースラインのパラメータ設定/params/cand_train_fast.json"
       },
       "model_dirs": {
         "1": "DB/models/Mbe2ad40790",
@@ -297,7 +297,7 @@
       }
     }
   },
-  "learned_note": "weights_in_git が false の重みは、1 つ 50MB を超えるので git に入れていない。train.spec で学習し直すと、同じ重み（weights_sha1）になる。settled は、REP003 の「落ち着いた」の基準（プローブへの出力の差が α で 5 以内）を満たしたか。BCQ は一定の出力で基準を満たしたので false にした",
+  "learned_note": "weights_in_git が false の重みは、1 つ 50MB を超えるので git に入れていない。train.spec で学習し直すと、同じ重み（weights_sha1）になる。settled は、REP001 の「落ち着いた」の基準（プローブへの出力の差が α で 5 以内）を満たしたか。BCQ は一定の出力で基準を満たしたので false にした",
   "evaluation": {
     "episodes_used_for_selection": [
       4,

@@ -68,7 +68,7 @@ cd github && ../.venv/bin/python main_test.py     # 約100秒
 | test_16 | シミュレータ → 学習データ → 学習 → 保存 → 戦略として読込 → オフライン評価 の通し |
 | test_17 | 直書きだった値を引数に出した変更（PID / ABid / OnlineLP / 環境 / スコア式）の回帰 |
 | test_18 | 学習ベース 5 戦略の `model_dir`（既定は同梱の重み）、学習スクリプトの `train_data_path` / `save_path` / `step_num`（既定は従来の値）、BCQ の 2 つの保存形式 |
-| test_19 | BCQ の学習の入口（`run_bcq.train_bcq_model`）の `max_action`（既定は従来の 100。渡さないときと同じ重みになる。渡すと、生成モデルと方策の上限がその値になる）。W001/REP003 のループ 3 で追加 |
+| test_19 | BCQ の学習の入口（`run_bcq.train_bcq_model`）の `max_action`（既定は従来の 100。渡さないときと同じ重みになる。渡すと、生成モデルと方策の上限がその値になる）。W001/REP001 のループ 3 で追加 |
 | test_99 | `github/` が無変更であること |
 
 ## 結論

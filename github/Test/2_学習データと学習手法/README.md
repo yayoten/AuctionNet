@@ -32,7 +32,7 @@ cd github/Test/2_学習データと学習手法
 | test_03_train_driver | 3 | `train_model.py`：5 手法が学習でき、条件・重みの SHA-1・損失が記録される。既定のステップ数は本家の値。同じ条件なら同じ重みになる（乱数の固定）。失敗は記録して止めない。spec の `train_kwargs`（本家の学習関数に渡す追加の引数。例：BCQ の `max_action`）が渡り、meta に残り、model_id に入る（書かないときの ID は従来どおり） |
 | test_04_eval_driver | 4 | `run_experiment.py`：同梱の重みと自前の重みの両方を、縮小設定で評価できる。どの重みを使ったかが run に残る。ルールベースもこれまでどおり動く |
 | test_05_trained_models | 5 | `DB/models/` の本番の重み：記録どおりのファイル、コミット済みのコードで CPU 学習、損失が有限、戦略として読めて入札が有限。既定設定の重みは、学習し直すと同じ重み（テンソルのハッシュが一致）・同じ損失になる（model_id の一致は、`github/` の版が学習時と同じときだけ比べる。`github/` を変えると ID は変わるが、重みは変わらないことを確かめる） |
-| test_06_baseline_params | 6 | ベースラインの設定（`research/src/baseline_params.json`、W001/REP003 の成果物）：形、参照している重みの meta（手法・ステップ数・seed・重みの SHA-1）、ルールベースの引数が各戦略にあること、設定を選んだ日と評価の日が重ならないこと。重みのファイルが無い端末（50MB を超える BCQ の重みは git に無い）では、ファイルが要る確認だけスキップ |
+| test_06_baseline_params | 6 | ベースラインの設定（`research/src/baseline_params.json`、W001/REP001 の成果物）：形、参照している重みの meta（手法・ステップ数・seed・重みの SHA-1）、ルールベースの引数が各戦略にあること、設定を選んだ日と評価の日が重ならないこと。重みのファイルが無い端末（50MB を超える BCQ の重みは git に無い）では、ファイルが要る確認だけスキップ |
 | test_99_untouched | — | テストが `github/` と `DB/` を汚していない |
 
 `needs_data` の印が付いたテストは、`DB/dataset/traffic/` が無い端末ではスキップする。原本の中身（行数、欠損、広告主の並び）は、
@@ -53,7 +53,7 @@ cd github/Test/2_学習データと学習手法
 
 - **GPU は使っていない。** ロックの `torch==1.12.0`（Linux の PyPI 版は CUDA 10.2）は RTX 3090 に対応せず、CUDA の計算が
   `no kernel image is available` で落ちる。`torch.cuda.is_available()` は True を返すので、学習コードは GPU を選んでしまう。
-  テストと実行スクリプトは、`CUDA_VISIBLE_DEVICES=""` で GPU を隠して CPU で動かす（REP001 の Windows も CPU）。
+  テストと実行スクリプトは、`CUDA_VISIBLE_DEVICES=""` で GPU を隠して CPU で動かす（REP002 の Windows も CPU）。
 - **uv の新しい版では `setup_env.sh` の uv 経路が通らない**（`gin==0.1.6` の配布物のファイル名を拒否する）。`--pip` を付ける。
 - **同梱の BCQ の重みと、リポジトリの学習コードが保存する BCQ は、呼び出しの形が違う**（同梱は `forward(states, eval_flag)`、
   学習コードは `forward(states)`）。シミュレータ側の BCQ 戦略は `eval_flag=True` を渡すので、自前の重みを呼べなかった。

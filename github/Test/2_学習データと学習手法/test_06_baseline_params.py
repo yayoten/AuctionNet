@@ -1,6 +1,6 @@
 """06: ベースラインの設定（research/src/baseline_params.json）が、決めた形で、参照している重みと戦略の引数に合っていること。
 
-json は W001/REP003 の成果物（以後の REP が、この 1 ファイルから既存 8 手法の設定を引く）。
+json は W001/REP001 の成果物（以後の REP が、この 1 ファイルから既存 8 手法の設定を引く）。
 重みのファイルが無い端末（50MB を超える BCQ の重みは git に入れていない）では、ファイルが要る確認だけスキップする。
 """
 import inspect
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.skipif(P is None, reason="research/src/baseline_params.
 
 
 def test_top_level_shape():
-    assert P["version"] == 1 and P["decided_in"] == "REP003"
+    assert P["version"] == 1 and P["decided_in"] == "REP001"
     assert len(P["commit"]) == 40 and all(c in "0123456789abcdef" for c in P["commit"])
     assert [k for k in P["rule_based"] if k != "note"] == RULE
     assert list(P["learned"]) == LEARNED

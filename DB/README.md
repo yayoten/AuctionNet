@@ -37,7 +37,7 @@ DB/
 ## 使い方
 
 ```bash
-# 実験を回す（spec.json は research/W001_.../REP001_.../params/ などに置く）
+# 実験を回す（spec.json は research/W001_.../REP002_.../params/ などに置く）
 .venv/Scripts/python.exe research/src/run_experiment.py <spec.json> --workers 4
 # DB を作り直す
 .venv/Scripts/python.exe DB/build_db.py
@@ -134,6 +134,6 @@ WHERE p.key = 'player.kwargs.base_action' GROUP BY 1 ORDER BY 1;
 ## 注意
 
 - `github/` を変更したら、`github/Test/1_初期セットアップ/` の pytest を回す（変更したパラメータの回帰は `test_17_params_injection.py`、`test_18_model_dir_and_train_args.py`）。
-- **端末をまたぐと、結果は完全には一致しない。** Windows（REP001）と Linux で同じ 24 セルを比べると、23 セルは一致し、1 セル（ABid・位置 0・エピソード 0）で購入数が違った（REP002）。手法どうしを比べるときは、`runs.host` / `os` が同じ run だけを使う。
+- **端末をまたぐと、結果は完全には一致しない。** Windows（REP002）と Linux で同じ 24 セルを比べると、23 セルは一致し、1 セル（ABid・位置 0・エピソード 0）で購入数が違った（REP003）。手法どうしを比べるときは、`runs.host` / `os` が同じ run だけを使う。
 - 実験で使う結果を引くときは、`github_dirty = false`、`status = 'ok'` で絞る。
 - 重い生データ（全入札のログなど）は、ここには入れない。必要になったら `runs/<run_id>/raw/` に置く（`.gitignore` 済み）。
