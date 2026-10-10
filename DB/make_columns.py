@@ -251,6 +251,9 @@ COLUMNS["runs"]["columns"].update({
     "bytes_total": c("この run のファイルの合計", "容量の見積もり", "バイト"),
     "bytes_raw": c("そのうち raw/（git 管理外）の合計", "同上", "バイト"),
 })
+COLUMNS["models"]["columns"].update({
+    "train_kwargs": c("本家の学習関数に渡した追加の引数（spec の train_kwargs。例：BCQ の max_action）", "既定と違う条件で学習した重みを見分けるため"),
+})
 COLUMNS["episodes"]["columns"].update({
     "n_est": c("N_est：プレイヤーが落札して露出した機会の、推定価値（①）の和", "REP006 の E = cost / n_est / C、P = n_est / n_real。入札者が見積もった購入数", "件"),
     "n_real": c("N_real：同じ機会の、雑音を加えて 0〜1 に切った確率（②）の和", "REP006 の P、L = n_real / reward。環境にとっての購入数の期待値", "件"),

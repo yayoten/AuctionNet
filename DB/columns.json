@@ -1396,6 +1396,11 @@
     "meaning": "学習の所要時間（データの読み込みを含む）",
     "why": "研究の規模感",
     "unit": "秒"
+   },
+   "train_kwargs": {
+    "meaning": "本家の学習関数に渡した追加の引数（spec の train_kwargs。例：BCQ の max_action）",
+    "why": "既定と違う条件で学習した重みを見分けるため",
+    "unit": ""
    }
   }
  },
